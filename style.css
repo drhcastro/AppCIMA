@@ -160,35 +160,69 @@ input:focus, select:focus {
     color: white;
 }
 
-
-/* --- Recuadro de Resumen --- */
-#summary-card {
+/* --- Recuadro de Resumen (AHORA HISTORIAL) --- */
+#summary-card h3 {
     text-align: center;
+    color: var(--primary-color);
+    margin-bottom: 16px;
 }
-#summary-box {
-    display: flex;
-    justify-content: space-around;
-    padding-top: 16px;
+
+#history-summary-container {
+    max-height: 400px;
+    overflow-y: auto;
+    padding-right: 10px; /* Espacio para la barra de scroll */
 }
+
+.summary-group {
+    margin-bottom: 16px;
+}
+
+.summary-group-header {
+    font-weight: 700;
+    color: var(--secondary-color);
+    padding-bottom: 8px;
+    border-bottom: 2px solid var(--secondary-color);
+    margin-bottom: 12px;
+}
+
 .summary-item {
-    display: flex;
-    flex-direction: column;
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    gap: 12px;
+    align-items: center;
+    padding: 8px;
+    border-radius: 6px;
+    transition: background-color 0.3s;
 }
-.z-label-neg, .z-label-pos {
-    font-size: 0.8rem;
-    color: var(--danger-color);
+
+.summary-item:not(:last-child) {
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.summary-item:hover {
+    background-color: #f8f9fa;
+}
+
+.summary-color-tag {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+}
+
+.summary-details .item-label {
     font-weight: 600;
 }
-.z-label-ideal {
-    font-size: 0.9rem;
-    color: var(--success-color);
-    font-weight: 700;
+.summary-details .item-age {
+    font-size: 0.8rem;
+    color: var(--muted-text-color);
 }
-.z-value {
-    font-size: 1.5rem;
+
+.summary-zscore {
     font-weight: 700;
-    color: var(--primary-color);
+    font-size: 1.1rem;
+    text-align: right;
 }
+
 
 /* --- Diseño Responsivo --- */
 @media (max-width: 1200px) {
