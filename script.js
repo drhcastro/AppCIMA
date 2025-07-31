@@ -78,13 +78,10 @@ const lhLabel = document.getElementById('lh-label');
 let distributionChart = null;
 
 // --- LÓGICA DE LA APLICACIÓN ---
-
-// Event listener para cambiar la UI
 chartTypeSelect.addEventListener('change', (e) => {
     updateUI(e.target.value);
 });
 
-// Función para actualizar la interfaz
 function updateUI(chartKey) {
     const config = chartConfig[chartKey];
     ageInputs.classList.toggle('active', config.requires === 'age');
@@ -95,7 +92,6 @@ function updateUI(chartKey) {
     }
 }
 
-// Función principal para calcular y graficar
 function calculateAndPlot() {
     const chartKey = chartTypeSelect.value;
     const config = chartConfig[chartKey];
@@ -104,17 +100,16 @@ function calculateAndPlot() {
 
     let xValue, patientData, table;
     
-    // 1. Obtener datos de entrada
     if (config.requires === 'age') {
         const dob = document.getElementById('dob').value;
         if (!dob || isNaN(measurement)) {
             alert('Por favor, complete todos los campos.');
             return;
         }
-        const ageInDays = Math.floor((new Date() - new Date(dob)) / (1000 * 60 * 60 * 24));
+        const ageInDays = Math.floor((new Date() - new Date()) / (1000 * 60 * 60 * 24));
         xValue = ageInDays;
         patientData = `Paciente de ${Math.floor(xValue / 30.4375)} meses (${xValue} días)`;
-    } else { // 'length' or 'height'
+    } else {
         const lhValue = parseFloat(document.getElementById('lhValue').value);
         if (!lhValue || isNaN(measurement)) {
             alert('Por favor, complete todos los campos.');
@@ -124,7 +119,6 @@ function calculateAndPlot() {
         patientData = `Paciente con ${config.lhLabel.toLowerCase()} de ${xValue} cm`;
     }
 
-    // 2. Obtener la tabla de datos y los parámetros LMS
     table = whoData[config.dataKey][sex];
     const params = getLMS(xValue, table);
 
@@ -133,16 +127,13 @@ function calculateAndPlot() {
         return;
     }
 
-    // 3. Calcular Z-Score
     const [_, L, M, S] = params;
     const zScore = (((measurement / M) ** L) - 1) / (L * S);
 
-    // 4. Mostrar resultados
     document.getElementById('resultsCard').style.display = 'block';
     document.getElementById('results').style.display = 'block';
     document.getElementById('resultText').innerHTML = `${patientData}<br>${config.measurementLabel}: <strong>${measurement.toFixed(1)}</strong><br>Puntuación Z (DE): <span>${zScore.toFixed(2)}</span>`;
     
-    // 5. Dibujar la NUEVA gráfica de distribución
     plotDistribution(zScore);
 }
 
@@ -155,29 +146,67 @@ function getLMS(xValue, table) {
 }
 
 /**
- * NUEVA FUNCIÓN PARA GRAFICAR LA CAMPANA DE GAUSS
+ * FUNCIÓN REESCRITA PARA GRAFICAR LA CAMPANA DE GAUSS CON ÁREAS SOMBREADAS
  * @param {number} patientZScore - La puntuación Z calculada del paciente.
  */
 function plotDistribution(patientZScore) {
     const ctx = document.getElementById('growthChart').getContext('2d');
 
-    // Función de densidad de probabilidad para una distribución normal estándar
     const pdf = (x) => Math.exp(-0.5 * x * x) / Math.sqrt(2 * Math.PI);
+    const range = (start, stop, step) => Array.from({ length: (stop - start) / step + 1 }, (_, i) => start + i * step);
 
-    // Generar datos para la curva de campana
-    const labels = [];
-    const curveData = [];
-    for (let i = -4; i <= 4; i += 0.1) {
-        const x = parseFloat(i.toFixed(2));
-        labels.push(x);
-        curveData.push({ x: x, y: pdf(x) });
-    }
-    const maxY = pdf(0); // El pico de la curva
+    const xValues = range(-3.5, 3.5, 0.1);
+    const maxY = pdf(0);
 
-    // Crear una línea vertical para la puntuación Z del paciente
-    const patientLine = [
-        { x: patientZScore, y: 0 },
-        { x: patientZScore, y: maxY }
+    const datasets = [
+        // Dataset para sombrear el área de -1 a +1 DE (Verde)
+        {
+            data: range(-1, 1, 0.1).map(x => ({ x, y: pdf(x) })),
+            backgroundColor: 'rgba(92, 184, 92, 0.5)',
+            borderColor: 'transparent',
+            pointRadius: 0,
+            fill: 'origin',
+            order: 2, // Se dibuja primero
+        },
+        // Dataset para sombrear el área de -2 a -1 y 1 a 2 DE (Amarillo)
+        {
+            data: [...range(-2, -1, 0.1), NaN, ...range(1, 2, 0.1)].map(x => ({ x, y: pdf(x) })),
+            backgroundColor: 'rgba(240, 173, 78, 0.5)',
+            borderColor: 'transparent',
+            pointRadius: 0,
+            fill: 'origin',
+            order: 1, 
+        },
+        // Dataset para sombrear el área de -3 a -2 y 2 a 3 DE (Rojo)
+        {
+            data: [...range(-3, -2, 0.1), NaN, ...range(2, 3, 0.1)].map(x => ({ x, y: pdf(x) })),
+            backgroundColor: 'rgba(217, 83, 79, 0.5)',
+            borderColor: 'transparent',
+            pointRadius: 0,
+            fill: 'origin',
+            order: 0,
+        },
+        // Dataset para la línea principal de la curva
+        {
+            label: 'Distribución Normal',
+            data: xValues.map(x => ({ x, y: pdf(x) })),
+            borderColor: 'rgba(0, 0, 0, 0.8)',
+            borderWidth: 2,
+            pointRadius: 0,
+            fill: false,
+            tension: 0.4,
+            order: 3,
+        },
+        // Dataset para la línea vertical del paciente
+        {
+            label: 'Puntuación Z del Paciente',
+            data: [{ x: patientZScore, y: 0 }, { x: patientZScore, y: pdf(patientZScore) }],
+            borderColor: 'rgba(0, 0, 255, 1)',
+            borderWidth: 4,
+            pointRadius: 0,
+            fill: false,
+            order: 4,
+        }
     ];
 
     if (distributionChart) {
@@ -186,36 +215,21 @@ function plotDistribution(patientZScore) {
 
     distributionChart = new Chart(ctx, {
         type: 'line',
-        data: {
-            datasets: [{
-                label: 'Distribución Normal Estándar',
-                data: curveData,
-                borderColor: 'rgba(0, 123, 255, 0.8)',
-                backgroundColor: 'rgba(0, 123, 255, 0.1)',
-                borderWidth: 2,
-                pointRadius: 0,
-                fill: true,
-                tension: 0.1
-            }, {
-                label: 'Puntuación Z del Paciente',
-                data: patientLine,
-                borderColor: 'rgba(217, 83, 79, 1)',
-                borderWidth: 3,
-                pointRadius: 0,
-                fill: false,
-            }]
-        },
+        data: { datasets },
         options: {
             responsive: true,
             maintainAspectRatio: false,
             plugins: {
                 title: {
                     display: true,
-                    text: 'Distribución de Puntuación Z (Campana de Gauss)',
+                    text: 'Distribución de Puntuación Z',
                     font: { size: 18 }
                 },
+                legend: {
+                    display: false // Ocultamos la leyenda para una gráfica más limpia
+                },
                 tooltip: {
-                    enabled: false // Deshabilitar tooltip para esta gráfica
+                    enabled: false
                 }
             },
             scales: {
@@ -225,14 +239,20 @@ function plotDistribution(patientZScore) {
                         display: true,
                         text: 'Puntuación Z (Desviaciones Estándar)'
                     },
-                    min: -4,
-                    max: 4,
+                    min: -3.5,
+                    max: 3.5,
                     ticks: {
-                        stepSize: 1
+                        stepSize: 1,
+                        font: {
+                            weight: 'bold'
+                        }
+                    },
+                    grid: {
+                        display: false
                     }
                 },
                 y: {
-                    display: false, // Ocultamos el eje Y ya que no es relevante para la interpretación
+                    display: false,
                     beginAtZero: true
                 }
             }
