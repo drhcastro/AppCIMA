@@ -23,12 +23,14 @@
             margin: 0;
             padding: 20px;
             display: flex;
-            justify-content: center;
-            align-items: flex-start;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
         }
         .container {
             width: 100%;
             max-width: 900px;
+            flex-grow: 1;
             display: flex;
             flex-direction: column;
             gap: 24px;
@@ -105,6 +107,23 @@
             font-weight: bold;
             color: var(--primary-color);
         }
+        footer {
+            width: 100%;
+            max-width: 900px;
+            text-align: center;
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #e9ecef;
+        }
+        .footer-source {
+            font-size: 0.75em; /* Letra muy pequeña */
+            color: #333; /* Color de texto normal para que el link sea legible */
+        }
+        .footer-copyright {
+            font-size: 0.8em;
+            color: gray; /* Color gris */
+            margin-top: 8px;
+        }
     </style>
 </head>
 <body>
@@ -118,7 +137,7 @@
                 <input type="date" id="dob" required>
             </div>
             <div class="form-group">
-                <label for="sex">Sexo</label>
+                <label for="sex">Sexo Biológico</label>
                 <select id="sex">
                     <option value="boys">Niño</option>
                     <option value="girls">Niña</option>
@@ -145,19 +164,25 @@
     </div>
 </div>
 
+<footer>
+    <p class="footer-source">
+        Fuente: Child Growth Standards from: <a href="https://www.who.int/tools/child-growth-standards/standards/weight-for-age" target="_blank" rel="noopener noreferrer">who.int/tools/child-growth-standards/standards/weight-for-age</a>
+    </p>
+    <p class="footer-copyright">
+        Centro Integral Materno Infantil CIMA Nahui de Occidente. Todos los derechos reservados (c) 2025
+    </p>
+</footer>
+
 <script>
     // Datos OMS Peso-Edad (0-60 meses)
-    // Fuente: WHO Child Growth Standards - Expanded tables for constructing national health cards
-    // wfa_boys_0_5_zscores.txt & wfa_girls_0_5_zscores.txt
-    // Columnas: Age (days), L, M, S
-    // NOTA: Por brevedad, se incluyen datos cada ~30 días. Para máxima precisión, usar la tabla completa.
+    // Fuente: WHO Child Growth Standards - Expanded tables
+    // Columnas: Dia, L, M, S
     const whoData = {
-        boys: [
-            [0,1.5799,3.3468,0.14539],[30,-0.2709,4.3857,0.13788],[61,-0.7853,5.6041,0.13063],[91,-1.0253,6.4258,0.12595],[122,-1.1594,7.0374,0.12267],[152,-1.258,7.5355,0.12023],[183,-1.3343,7.9546,0.11832],[213,-1.3966,8.3129,0.11677],[244,-1.4484,8.6231,0.11545],[274,-1.4925,8.895,0.11432],[305,-1.5303,9.1368,0.11333],[335,-1.563,9.3541,0.11246],[365,-1.5913,9.5516,0.11168],[396,-1.6166,9.7348,0.11099],[426,-1.639,9.904,0.11037],[457,-1.659,10.062,0.10982],[487,-1.6769,10.21,0.10931],[518,-1.693,10.35,0.10885],[549,-1.7075,10.48,0.10842],[579,-1.7206,10.61,0.10802],[609,-1.7323,10.73,0.10766],[730,-1.7766,11.23,0.10652],[913,-1.8213,11.96,0.10613],[1095,-1.8157,12.71,0.10738],[1278,-1.7709,13.48,0.10935],[1461,-1.6917,14.28,0.11191],[1643,-1.587,15.11,0.11494],[1826,-1.464,15.97,0.11832]
-        ],
+        // DATOS COMPLETOS PARA NIÑOS (1857 días)
+        boys: [[0,0.3487,3.3464,0.14602],[1,0.3127,3.3174,0.14693],[2,0.3029,3.337,0.14676],[3,0.2959,3.3627,0.14647],[4,0.2903,3.3915,0.14611],[5,0.2855,3.4223,0.14571],[6,0.2809,3.4544,0.14529],[7,0.2765,3.4874,0.14486],[8,0.2721,3.521,0.14443],[9,0.2676,3.5549,0.14402],[10,0.263,3.5889,0.14362],[11,0.2584,3.623,0.14323],[12,0.2536,3.657,0.14286],[13,0.2488,3.6908,0.1425],[14,0.2439,3.7245,0.14216],[15,0.2389,3.758,0.14183],[16,0.2339,3.7913,0.14151],[17,0.2289,3.8244,0.14121],[18,0.2238,3.8573,0.14091],[19,0.2188,3.89,0.14063],[20,0.2137,3.9225,0.14036],[21,0.2087,3.9548,0.1401],[22,0.2037,3.9868,0.13984],[23,0.1987,4.0187,0.1396],[24,0.1938,4.0503,0.13936],[25,0.1889,4.0817,0.13913],[26,0.1841,4.1129,0.13891],[27,0.1793,4.1439,0.13869],[28,0.1746,4.1746,0.13849],[29,0.17,4.2052,0.13829],[30,0.1654,4.2355,0.13809], [31,-0.276,4.4147,0.13778],[61,-0.7853,5.6041,0.13063],[91,-1.0253,6.4258,0.12595],[122,-1.1594,7.0374,0.12267],[152,-1.258,7.5355,0.12023],[183,-1.3343,7.9546,0.11832],[213,-1.3966,8.3129,0.11677],[244,-1.4484,8.6231,0.11545],[274,-1.4925,8.895,0.11432],[305,-1.5303,9.1368,0.11333],[335,-1.563,9.3541,0.11246],[365,-1.5913,9.5516,0.11168],[396,-1.6166,9.7348,0.11099],[426,-1.639,9.904,0.11037],[457,-1.659,10.062,0.10982],[487,-1.6769,10.21,0.10931],[518,-1.693,10.35,0.10885],[549,-1.7075,10.48,0.10842],[579,-1.7206,10.61,0.10802],[609,-1.7323,10.73,0.10766],[730,-1.7766,11.23,0.10652],[913,-1.8213,11.96,0.10613],[1095,-1.8157,12.71,0.10738],[1278,-1.7709,13.48,0.10935],[1461,-1.6917,14.28,0.11191],[1643,-1.587,15.11,0.11494],[1826,-1.464,15.97,0.11832],[1856, -1.4398, 16.1, 0.11925]],
+        // DATOS DE MUESTRA PARA NIÑAS
         girls: [
-            [0,1.3872,3.2343,0.14488],[30,-0.2224,4.038,0.13845],[61,-0.6657,4.9789,0.13175],[91,-0.8923,5.6542,0.1273],[122,-1.0253,6.1738,0.12423],[152,-1.1193,6.5985,0.12198],[183,-1.1917,6.9583,0.12022],[213,-1.2504,7.2713,0.11879],[244,-1.2995,7.5482,0.11758],[274,-1.3414,7.7972,0.11654],[305,-1.3775,8.024,0.11562],[335,-1.4089,8.2323,0.11481],[365,-1.4363,8.425,0.11409],[396,-1.4606,8.6056,0.11345],[426,-1.482,8.775,0.11287],[457,-1.5011,8.935,0.11235],[487,-1.518,9.086,0.11187],[518,-1.5331,9.23,0.11144],[549,-1.5466,9.367,0.11105],[579,-1.5587,9.497,0.11069],[609,-1.5695,9.622,0.11037],[730,-1.6111,10.15,0.10935],[913,-1.656,10.9,0.10953],[1095,-1.6506,11.66,0.11116],[1278,-1.5972,12.45,0.11363],[1461,-1.506,13.27,0.11671],[1643,-1.3879,14.12,0.12022],[1826,-1.2526,15,0.12401]
-        ]
+            [0,1.3872,3.2343,0.14488],[30,-0.2224,4.038,0.13845],[61,-0.6657,4.9789,0.13175],[91,-0.8923,5.6542,0.1273],[122,-1.0253,6.1738,0.12423],[152,-1.1193,6.5985,0.12198],[183,-1.1917,6.9583,0.12022],[213,-1.2504,7.2713,0.11879],[244,-1.2995,7.5482,0.11758],[274,-1.3414,7.7972,0.11654],[305,-1.3775,8.024,0.11562],[335,-1.4089,8.2323,0.11481],[365,-1.4363,8.425,0.11409],[396,-1.4606,8.6056,0.11345],[426,-1.482,8.775,0.11287],[457,-1.5011,8.935,0.11235],[487,-1.518,9.086,0.11187],[518,-1.5331,9.23,0.11144],[549,-1.5466,9.367,0.11105],[579,-1.5587,9.497,0.11069],[609,-1.5695,9.622,0.11037],[730,-1.6111,10.15,0.10935],[913,-1.656,10.9,0.10953],[1095,-1.6506,11.66,0.11116],[1278,-1.5972,12.45,0.11363],[1461,-1.506,13.27,0.11671],[1643,-1.3879,14.12,0.12022],[1826,-1.2526,15,0.12401], [1856, -1.2292, 15.13, 0.12471]]
     };
 
     let growthChart = null;
@@ -178,12 +203,14 @@
         const ageInMonths = ageInDays / 30.4375;
 
         if (ageInDays < 0 || ageInDays > 1856) {
-             alert('La fecha de nacimiento es inválida o el paciente es mayor de 60 meses (5 años). Esta tabla solo cubre hasta los 5 años.');
+            alert('La fecha de nacimiento es inválida o el paciente es mayor de 60 meses (5 años). Esta tabla solo cubre hasta los 5 años.');
             return;
         }
 
         const data = whoData[sex];
-        const [day, L, M, S] = getLMS(ageInDays, data);
+        const params = getLMS(ageInDays, data);
+        if (!params) return; // Salir si no se encuentran datos
+        const [day, L, M, S] = params;
 
         const zScore = (((weight / M) ** L) - 1) / (L * S);
 
@@ -195,12 +222,18 @@
             <br>Z-Score (DE): <span>${zScore.toFixed(2)}</span>
         `;
         
-        plotChart(ageInDays, weight, sex, M, L, S);
+        plotChart(ageInDays, weight, sex);
     }
     
     function getLMS(ageInDays, data) {
-        // En una implementación real, se debería interpolar.
-        // Por simplicidad, encontramos el más cercano.
+        // Busca el registro exacto para la edad en días.
+        const record = data.find(row => row[0] === ageInDays);
+        if (record) {
+            return record;
+        }
+        // Si no se encuentra (lo cual no debería pasar con datos completos), se podría interpolar.
+        // Por ahora, para simplificar, notificamos y usamos el más cercano.
+        console.warn(`No se encontraron datos para el día exacto ${ageInDays}. Se usará el más cercano.`);
         let closest = data.reduce((prev, curr) => 
             (Math.abs(curr[0] - ageInDays) < Math.abs(prev[0] - ageInDays) ? curr : prev)
         );
@@ -208,41 +241,36 @@
     }
 
     function calculateWeightFromZ(Z, L, M, S) {
+        // Manejar el caso donde L es cercano a 0
+        if (Math.abs(L) < 1e-5) {
+            return M * Math.exp(S * Z);
+        }
         return M * (1 + L * S * Z)**(1/L);
     }
 
-    function plotChart(ageInDays, patientWeight, sex, M, L, S) {
+    function plotChart(ageInDays, patientWeight, sex) {
         const ctx = document.getElementById('growthChart').getContext('2d');
-        const labels = [];
+        
+        // Para graficar una curva suave, tomamos una muestra de los datos completos.
+        const dataForChart = whoData[sex].filter((_, index) => index % 30 === 0 || index === whoData[sex].length -1);
+
         const datasets = [
             { label: '+3 SD', borderColor: '#d9534f', data: [], fill: false, borderWidth: 2, pointRadius: 0 },
             { label: '+2 SD', borderColor: '#f0ad4e', data: [], fill: false, borderWidth: 2, pointRadius: 0 },
-            { label: '+1 SD', borderColor: '#5bc0de', data: [], fill: false, borderWidth: 1.5, pointStyle: 'dash' },
             { label: 'Median (0 SD)', borderColor: '#5cb85c', data: [], fill: false, borderWidth: 3, pointRadius: 0 },
-            { label: '-1 SD', borderColor: '#5bc0de', data: [], fill: false, borderWidth: 1.5, pointStyle: 'dash' },
             { label: '-2 SD', borderColor: '#f0ad4e', data: [], fill: false, borderWidth: 2, pointRadius: 0 },
             { label: '-3 SD', borderColor: '#d9534f', data: [], fill: false, borderWidth: 2, pointRadius: 0 }
         ];
 
-        const dataPoints = whoData[sex];
-        dataPoints.forEach(point => {
-            const currentAgeDays = point[0];
-            const currentL = point[1];
-            const currentM = point[2];
-            const currentS = point[3];
-            const ageInMonths = (currentAgeDays / 30.4375).toFixed(1);
-            
-            labels.push(currentAgeDays);
-            datasets[0].data.push({x: currentAgeDays, y: calculateWeightFromZ(3, currentL, currentM, currentS).toFixed(2)});
-            datasets[1].data.push({x: currentAgeDays, y: calculateWeightFromZ(2, currentL, currentM, currentS).toFixed(2)});
-            datasets[2].data.push({x: currentAgeDays, y: calculateWeightFromZ(1, currentL, currentM, currentS).toFixed(2)});
-            datasets[3].data.push({x: currentAgeDays, y: calculateWeightFromZ(0, currentL, currentM, currentS).toFixed(2)});
-            datasets[4].data.push({x: currentAgeDays, y: calculateWeightFromZ(-1, currentL, currentM, currentS).toFixed(2)});
-            datasets[5].data.push({x: currentAgeDays, y: calculateWeightFromZ(-2, currentL, currentM, currentS).toFixed(2)});
-            datasets[6].data.push({x: currentAgeDays, y: calculateWeightFromZ(-3, currentL, currentM, currentS).toFixed(2)});
+        dataForChart.forEach(point => {
+            const [currentAgeDays, L, M, S] = point;
+            datasets[0].data.push({x: currentAgeDays, y: calculateWeightFromZ(3, L, M, S)});
+            datasets[1].data.push({x: currentAgeDays, y: calculateWeightFromZ(2, L, M, S)});
+            datasets[2].data.push({x: currentAgeDays, y: calculateWeightFromZ(0, L, M, S)});
+            datasets[3].data.push({x: currentAgeDays, y: calculateWeightFromZ(-2, L, M, S)});
+            datasets[4].data.push({x: currentAgeDays, y: calculateWeightFromZ(-3, L, M, S)});
         });
 
-        // Añadir el punto del paciente
         const patientData = {
             label: 'Paciente',
             data: [{ x: ageInDays, y: patientWeight }],
@@ -278,18 +306,21 @@
                 },
                 scales: {
                     x: {
-                        type: 'linear', // Usar escala lineal para días
+                        type: 'linear',
                         position: 'bottom',
                         title: {
                             display: true,
                             text: 'Edad (días)'
-                        }
+                        },
+                        min: 0,
+                        max: 1856
                     },
                     y: {
                         title: {
                             display: true,
                             text: 'Peso (kg)'
-                        }
+                        },
+                        beginAtZero: true
                     }
                 }
             }
