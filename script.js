@@ -150,9 +150,29 @@ function updateHistorySummary() {
     summaryCard.style.display = 'block';
 }
 
+/**
+ * FUNCIÓN ACTUALIZADA PARA GUARDAR COMO IMAGEN
+ */
 function saveChartAsImage() {
-    alert('Esta función requiere una implementación más compleja. Por ahora, se puede usar el botón de imprimir a PDF o tomar una captura de pantalla.');
+    const chartColumn = document.querySelector('.chart-column'); // Selecciona toda la columna derecha
+    if (!chartColumn) return;
+
+    // Opciones para html2canvas para mejorar la calidad de la imagen
+    const options = {
+        scale: 2, // Aumenta la resolución
+        useCORS: true, // Para cargar imágenes si las hubiera
+        logging: false,
+    };
+
+    html2canvas(chartColumn, options).then(canvas => {
+        // Crear un enlace temporal para descargar la imagen
+        const link = document.createElement('a');
+        link.download = 'grafica-crecimiento-cima-nahui.png';
+        link.href = canvas.toDataURL('image/png');
+        link.click();
+    });
 }
+
 
 // --- FUNCIONES DE GRÁFICA ---
 
@@ -174,6 +194,7 @@ function initializeChart() {
         options: {
             responsive: true,
             maintainAspectRatio: false,
+            animation: false, // Desactivar animación para que html2canvas capture el estado final
             plugins: {
                 title: { display: true, text: 'Distribución de Puntuación Z', font: { size: 18, family: 'Poppins' } },
                 legend: { display: false },
@@ -243,7 +264,7 @@ function updateChart() {
     });
 
     distributionChart.data.datasets = [...baseDatasets, ...patientDatasets];
-    distributionChart.update();
+    distributionChart.update('none'); // 'none' para evitar animación y asegurar captura correcta
 }
 
 // --- FUNCIONES AUXILIARES ---
