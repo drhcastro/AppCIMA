@@ -69,41 +69,33 @@ const chartConfig = {
     }
 };
 
-// --- El resto del script.js no necesita cambios ---
-// ... (LÓGICA DE LA APLICACIÓN) ...
-
-
 // --- ELEMENTOS DEL DOM ---
 const chartTypeSelect = document.getElementById('chartType');
 const ageInputs = document.getElementById('age-inputs');
 const lhInputs = document.getElementById('length-height-inputs');
 const measurementLabel = document.getElementById('measurement-label');
 const lhLabel = document.getElementById('lh-label');
-let growthChart = null;
+let distributionChart = null;
 
 // --- LÓGICA DE LA APLICACIÓN ---
 
-// Event listener para cambiar la UI cuando se selecciona una nueva gráfica
+// Event listener para cambiar la UI
 chartTypeSelect.addEventListener('change', (e) => {
     updateUI(e.target.value);
 });
 
-// Función para actualizar la interfaz de usuario
+// Función para actualizar la interfaz
 function updateUI(chartKey) {
     const config = chartConfig[chartKey];
-    
-    // Muestra/oculta los grupos de inputs
     ageInputs.classList.toggle('active', config.requires === 'age');
     lhInputs.classList.toggle('active', config.requires === 'length' || config.requires === 'height');
-
-    // Actualiza las etiquetas
     measurementLabel.textContent = config.measurementLabel;
     if (config.lhLabel) {
         lhLabel.textContent = config.lhLabel;
     }
 }
 
-// Función principal para calcular y dibujar la gráfica
+// Función principal para calcular y graficar
 function calculateAndPlot() {
     const chartKey = chartTypeSelect.value;
     const config = chartConfig[chartKey];
@@ -112,7 +104,7 @@ function calculateAndPlot() {
 
     let xValue, patientData, table;
     
-    // 1. Obtener datos de entrada según el tipo de gráfica
+    // 1. Obtener datos de entrada
     if (config.requires === 'age') {
         const dob = document.getElementById('dob').value;
         if (!dob || isNaN(measurement)) {
@@ -132,7 +124,7 @@ function calculateAndPlot() {
         patientData = `Paciente con ${config.lhLabel.toLowerCase()} de ${xValue} cm`;
     }
 
-    // 2. Obtener la tabla de datos correcta
+    // 2. Obtener la tabla de datos y los parámetros LMS
     table = whoData[config.dataKey][sex];
     const params = getLMS(xValue, table);
 
@@ -148,82 +140,99 @@ function calculateAndPlot() {
     // 4. Mostrar resultados
     document.getElementById('resultsCard').style.display = 'block';
     document.getElementById('results').style.display = 'block';
-    const resultText = document.getElementById('resultText');
-    resultText.innerHTML = `${patientData}<br>${config.measurementLabel}: <strong>${measurement.toFixed(1)}</strong><br>Z-Score (DE): <span>${zScore.toFixed(2)}</span>`;
+    document.getElementById('resultText').innerHTML = `${patientData}<br>${config.measurementLabel}: <strong>${measurement.toFixed(1)}</strong><br>Puntuación Z (DE): <span>${zScore.toFixed(2)}</span>`;
     
-    // 5. Dibujar la gráfica
-    plotChart(xValue, measurement, table, config);
+    // 5. Dibujar la NUEVA gráfica de distribución
+    plotDistribution(zScore);
 }
 
-
 function getLMS(xValue, table) {
-    // Para datos basados en talla, se busca el más cercano ya que pueden ser decimales.
-    // Para edad, se busca el día exacto.
     let record = table.find(row => row[0] === xValue);
     if (!record) {
-         record = table.reduce((prev, curr) => 
-            (Math.abs(curr[0] - xValue) < Math.abs(prev[0] - xValue) ? curr : prev)
-        );
+        record = table.reduce((prev, curr) => (Math.abs(curr[0] - xValue) < Math.abs(prev[0] - xValue) ? curr : prev));
     }
     return record;
 }
 
-function calculateYFromZ(Z, L, M, S) {
-    if (Math.abs(L) < 1e-5) return M * Math.exp(S * Z);
-    return M * (1 + L * S * Z) ** (1/L);
-}
-
-function plotChart(patientX, patientY, table, config) {
+/**
+ * NUEVA FUNCIÓN PARA GRAFICAR LA CAMPANA DE GAUSS
+ * @param {number} patientZScore - La puntuación Z calculada del paciente.
+ */
+function plotDistribution(patientZScore) {
     const ctx = document.getElementById('growthChart').getContext('2d');
-    
-    const datasets = [
-        { label: '+3 SD', data: [], borderColor: '#d9534f', borderWidth: 2, pointRadius: 0 },
-        { label: '+2 SD', data: [], borderColor: '#f0ad4e', borderWidth: 2, pointRadius: 0 },
-        { label: 'Median (0 SD)', data: [], borderColor: '#5cb85c', borderWidth: 3, pointRadius: 0 },
-        { label: '-2 SD', data: [], borderColor: '#f0ad4e', borderWidth: 2, pointRadius: 0 },
-        { label: '-3 SD', data: [], borderColor: '#d9534f', borderWidth: 2, pointRadius: 0 }
+
+    // Función de densidad de probabilidad para una distribución normal estándar
+    const pdf = (x) => Math.exp(-0.5 * x * x) / Math.sqrt(2 * Math.PI);
+
+    // Generar datos para la curva de campana
+    const labels = [];
+    const curveData = [];
+    for (let i = -4; i <= 4; i += 0.1) {
+        const x = parseFloat(i.toFixed(2));
+        labels.push(x);
+        curveData.push({ x: x, y: pdf(x) });
+    }
+    const maxY = pdf(0); // El pico de la curva
+
+    // Crear una línea vertical para la puntuación Z del paciente
+    const patientLine = [
+        { x: patientZScore, y: 0 },
+        { x: patientZScore, y: maxY }
     ];
 
-    table.forEach(point => {
-        const [x, L, M, S] = point;
-        datasets[0].data.push({ x, y: calculateYFromZ(3, L, M, S) });
-        datasets[1].data.push({ x, y: calculateYFromZ(2, L, M, S) });
-        datasets[2].data.push({ x, y: calculateYFromZ(0, L, M, S) });
-        datasets[3].data.push({ x, y: calculateYFromZ(-2, L, M, S) });
-        datasets[4].data.push({ x, y: calculateYFromZ(-3, L, M, S) });
-    });
-
-    const patientData = {
-        label: 'Paciente',
-        data: [{ x: patientX, y: patientY }],
-        backgroundColor: 'blue',
-        borderColor: 'white',
-        pointRadius: 8,
-        pointHoverRadius: 10,
-        type: 'scatter'
-    };
-
-    if (growthChart) {
-        growthChart.destroy();
+    if (distributionChart) {
+        distributionChart.destroy();
     }
 
-    growthChart = new Chart(ctx, {
+    distributionChart = new Chart(ctx, {
         type: 'line',
-        data: { datasets: [...datasets, patientData] },
+        data: {
+            datasets: [{
+                label: 'Distribución Normal Estándar',
+                data: curveData,
+                borderColor: 'rgba(0, 123, 255, 0.8)',
+                backgroundColor: 'rgba(0, 123, 255, 0.1)',
+                borderWidth: 2,
+                pointRadius: 0,
+                fill: true,
+                tension: 0.1
+            }, {
+                label: 'Puntuación Z del Paciente',
+                data: patientLine,
+                borderColor: 'rgba(217, 83, 79, 1)',
+                borderWidth: 3,
+                pointRadius: 0,
+                fill: false,
+            }]
+        },
         options: {
             responsive: true,
             maintainAspectRatio: false,
             plugins: {
-                title: { display: true, text: chartTypeSelect.options[chartTypeSelect.selectedIndex].text, font: { size: 18 } },
-                tooltip: { mode: 'index', intersect: false }
+                title: {
+                    display: true,
+                    text: 'Distribución de Puntuación Z (Campana de Gauss)',
+                    font: { size: 18 }
+                },
+                tooltip: {
+                    enabled: false // Deshabilitar tooltip para esta gráfica
+                }
             },
             scales: {
                 x: {
                     type: 'linear',
-                    title: { display: true, text: config.xAxisLabel }
+                    title: {
+                        display: true,
+                        text: 'Puntuación Z (Desviaciones Estándar)'
+                    },
+                    min: -4,
+                    max: 4,
+                    ticks: {
+                        stepSize: 1
+                    }
                 },
                 y: {
-                    title: { display: true, text: config.yAxisLabel },
+                    display: false, // Ocultamos el eje Y ya que no es relevante para la interpretación
                     beginAtZero: true
                 }
             }
