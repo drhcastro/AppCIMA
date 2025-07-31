@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registro de Paciente - CIMA Nahui</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="registro-style.css">
+</head>
+<body>
+
+<div class="form-container">
+    <header class="form-header">
+        <h1>📝 Registro de Nuevo Paciente</h1>
+        <p>Completa la información para generar un nuevo expediente.</p>
+    </header>
+
+    <form id="registro-form">
+        <div class="form-grid">
+            <div class="form-group">
+                <label for="nombre">Nombre(s)</label>
+                <input type="text" id="nombre" name="nombre" required>
+            </div>
+            <div class="form-group">
+                <label for="apellidoPaterno">Apellido Paterno</label>
+                <input type="text" id="apellidoPaterno" name="apellidoPaterno" required>
+            </div>
+            <div class="form-group">
+                <label for="apellidoMaterno">Apellido Materno</label>
+                <input type="text" id="apellidoMaterno" name="apellidoMaterno">
+            </div>
+            <div class="form-group">
+                <label for="fechaNacimiento">Fecha de Nacimiento</label>
+                <input type="date" id="fechaNacimiento" name="fechaNacimiento" required>
+            </div>
+            <div class="form-group full-width">
+                <label for="domicilio">Domicilio</label>
+                <input type="text" id="domicilio" name="domicilio">
+            </div>
+            <div class="form-group">
+                <label for="telefono">Teléfono</label>
+                <input type="tel" id="telefono" name="telefono">
+            </div>
+            <div class="form-group">
+                <label for="correo">Correo Electrónico</label>
+                <input type="email" id="correo" name="correo">
+            </div>
+             <div class="form-group">
+                <label for="nombreMama">Nombre de la Madre</label>
+                <input type="text" id="nombreMama" name="nombreMama">
+            </div>
+            <div class="form-group">
+                <label for="nombrePapa">Nombre del Padre</label>
+                <input type="text" id="nombrePapa" name="nombrePapa">
+            </div>
+             <div class="form-group full-width">
+                <label for="alergias">Alergias Conocidas</label>
+                <input type="text" id="alergias" name="alergias" placeholder="Penicilina, etc.">
+            </div>
+        </div>
+
+        <button type="submit" id="submit-btn" class="button-primary">Registrar Paciente</button>
+        
+        <div id="response-message"></div>
+    </form>
+
+    <footer class="form-footer">
+        <p>CIMA Nahui de Occidente &copy; 2025</p>
+    </footer>
+</div>
+
+<script src="registro-script.js"></script>
+
+</body>
+</html>
