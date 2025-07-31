@@ -9,6 +9,27 @@ const chartConfig = {
         xAxisLabel: 'Edad (días)',
         measurementLabel: 'Peso (kg)'
     },
+    lengthForAge: {
+        dataKey: 'lengthForAge',
+        requires: 'age',
+        yAxisLabel: 'Talla (cm)',
+        xAxisLabel: 'Edad (días)',
+        measurementLabel: 'Talla (cm)'
+    },
+    headCircumferenceForAge: {
+        dataKey: 'headCircumferenceForAge',
+        requires: 'age',
+        yAxisLabel: 'Perímetro Cefálico (cm)',
+        xAxisLabel: 'Edad (días)',
+        measurementLabel: 'Perímetro Cefálico (cm)'
+    },
+    bmiForAge: {
+        dataKey: 'bmiForAge',
+        requires: 'age',
+        yAxisLabel: 'IMC (kg/m²)',
+        xAxisLabel: 'Edad (días)',
+        measurementLabel: 'IMC'
+    },
     weightForLength: {
         dataKey: 'weightForLength',
         requires: 'length',
@@ -47,6 +68,10 @@ const chartConfig = {
         measurementLabel: 'Pliegue (mm)'
     }
 };
+
+// --- El resto del script.js no necesita cambios ---
+// ... (LÓGICA DE LA APLICACIÓN) ...
+
 
 // --- ELEMENTOS DEL DOM ---
 const chartTypeSelect = document.getElementById('chartType');
