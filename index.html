@@ -3,83 +3,109 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Calculadora de Crecimiento Pediátrico OMS</title>
+    <title>Crecimiento y Desarrollo - CIMA Nahui</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-<div class="container">
-    <div class="card">
-        <h1>📊 Calculadora de Crecimiento Pediátrico (OMS)</h1>
-        
-        <div class="form-group">
-    <label for="chartType">Seleccione la Gráfica</label>
-    <select id="chartType">
-        <option value="weightForAge">Peso para la Edad (0-5 años)</option>
-        <option value="lengthForAge">Talla para la Edad (0-5 años)</option>
-        <option value="headCircumferenceForAge">Perímetro Cefálico para la Edad (0-5 años)</option>
-        <option value="bmiForAge">IMC para la Edad (0-5 años)</option>
-        <option value="weightForLength">Peso para la Longitud (45-110 cm)</option>
-        <option value="weightForHeight">Peso para la Talla (65-120 cm)</option>
-        <option value="armCircumferenceForAge">Perímetro Braquial para la Edad (3m-5a)</option>
-        <option value="tricepsSkinfoldForAge">Pliegue Tricipital para la Edad (3m-5a)</option>
-        <option value="subscapularSkinfoldForAge">Pliegue Subescapular para la Edad (3m-5a)</option>
-    </select>
-</div>
+<div class="page-container">
+    <header class="main-header">
+        <h1>📈 Seguimiento de Crecimiento y Desarrollo</h1>
+        <p>Plataforma Profesional de Percentiles - CIMA Nahui de Occidente</p>
+    </header>
 
-        
-        <div id="input-container">
-            <div id="age-inputs" class="input-group active">
+    <div class="main-content">
+        <div class="controls-column">
+            <div class="card">
+                <h2>Parámetros del Paciente</h2>
                 <div class="form-group">
-                    <label for="dob">Fecha de Nacimiento</label>
-                    <input type="date" id="dob">
+                    <label for="chartType">1. Seleccione la Gráfica</label>
+                    <select id="chartType">
+                        <option value="weightForAge">Peso para la Edad (0-5 años)</option>
+                        <option value="lengthForAge">Talla para la Edad (0-5 años)</option>
+                        <option value="headCircumferenceForAge">Perímetro Cefálico para la Edad (0-5 años)</option>
+                        <option value="bmiForAge">IMC para la Edad (0-5 años)</option>
+                        <option value="weightForLength">Peso para la Longitud (45-110 cm)</option>
+                        <option value="weightForHeight">Peso para la Talla (65-120 cm)</option>
+                        <option value="armCircumferenceForAge">Perímetro Braquial para la Edad (3m-5a)</option>
+                        <option value="tricepsSkinfoldForAge">Pliegue Tricipital para la Edad (3m-5a)</option>
+                        <option value="subscapularSkinfoldForAge">Pliegue Subescapular para la Edad (3m-5a)</option>
+                    </select>
                 </div>
-                 <div class="form-group">
-                    <label for="sex">Sexo Biológico</label>
+                <div class="form-group">
+                    <label for="sex">2. Sexo Biológico</label>
                     <select id="sex">
                         <option value="boys">Niño</option>
                         <option value="girls">Niña</option>
                     </select>
                 </div>
             </div>
-            
-            <div id="length-height-inputs" class="input-group">
+            <div class="card">
+                <h2>Nueva Medición</h2>
+                <div id="dynamic-inputs">
+                    <div id="age-inputs" class="input-group active">
+                        <div class="form-group">
+                            <label for="dob">Fecha de Nacimiento</label>
+                            <input type="date" id="dob">
+                        </div>
+                    </div>
+                    <div id="length-height-inputs" class="input-group">
+                        <div class="form-group">
+                            <label id="lh-label" for="lhValue">Longitud (cm)</label>
+                            <input type="number" id="lhValue" step="0.1" placeholder="Ej: 75.5">
+                        </div>
+                    </div>
+                </div>
                 <div class="form-group">
-                    <label id="lh-label" for="lhValue">Longitud (cm)</label>
-                    <input type="number" id="lhValue" step="0.1" placeholder="Ej: 75.5">
+                    <label id="measurement-label" for="measurement">Peso (kg)</label>
+                    <input type="number" id="measurement" step="0.1" placeholder="Ej: 9.5">
+                </div>
+                <div class="form-group">
+                    <label for="measure-date">Fecha de la Medición</label>
+                    <input type="date" id="measure-date">
+                </div>
+                <button id="add-point-btn" class="button-primary">Agregar Medición a la Gráfica</button>
+            </div>
+        </div>
+
+        <div class="chart-column">
+            <div class="card chart-card">
+                <div id="chart-container">
+                    <canvas id="growthChart"></canvas>
                 </div>
             </div>
-
-            <div class="form-group">
-                <label id="measurement-label" for="measurement">Peso (kg)</label>
-                <input type="number" id="measurement" step="0.1" placeholder="Ej: 9.5">
+            <div class="card" id="summary-card" style="display: none;">
+                <h3>Resumen de la Última Medición</h3>
+                <div id="summary-box">
+                    <div class="summary-item">
+                        <span class="z-label-neg">-2 DE</span>
+                        <span id="z-neg-2" class="z-value">--</span>
+                    </div>
+                    <div class="summary-item ideal">
+                        <span class="z-label-ideal">Ideal (0 DE)</span>
+                        <span id="z-0" class="z-value">--</span>
+                    </div>
+                    <div class="summary-item">
+                        <span class="z-label-pos">+2 DE</span>
+                        <span id="z-pos-2" class="z-value">--</span>
+                    </div>
+                </div>
             </div>
-        </div>
-
-        <button onclick="calculateAndPlot()">Calcular y Graficar</button>
-    </div>
-
-    <div class="card" id="resultsCard" style="display: none;">
-        <h2>Resultados</h2>
-        <div id="chartContainer">
-            <canvas id="growthChart"></canvas>
-        </div>
-        <div id="results">
-            <p id="resultText"></p>
+             <div class="actions-toolbar">
+                <button id="print-btn">🖨️ Imprimir / Guardar PDF</button>
+                <button id="save-img-btn">🖼️ Guardar como Imagen</button>
+            </div>
         </div>
     </div>
 </div>
 
-<footer>
-    <p class="footer-source">
-        Fuente: Child Growth Standards from: <a href="https://www.who.int/tools/child-growth-standards" target="_blank">who.int/tools/child-growth-standards</a>
-    </p>
-    <p class="footer-copyright">
-        Centro Integral Materno Infantil CIMA Nahui de Occidente. Todos los derechos reservados (c) 2025
-    </p>
-</footer>
-
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
-<script src="data.js"></script> <script src="script.js"></script> </body>
+<script src="data.js"></script>
+<script src="script.js"></script>
+
+</body>
 </html>
