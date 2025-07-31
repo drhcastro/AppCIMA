@@ -1,0 +1,87 @@
+:root {
+    --primary-color: #005f73;
+    --secondary-color: #0a9396;
+    --bg-color: #f4f7f5;
+    --card-bg-color: #ffffff;
+    --text-color: #333;
+    --font-family: 'Poppins', sans-serif;
+    --card-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    --border-radius: 15px;
+}
+
+body {
+    font-family: var(--font-family);
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    text-align: center;
+}
+
+.portal-container {
+    max-width: 1200px;
+    width: 100%;
+    padding: 20px;
+}
+
+.portal-header .logo {
+    max-width: 150px;
+    margin-bottom: 1rem;
+}
+
+.portal-header h1 {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: var(--primary-color);
+}
+
+.portal-header p {
+    font-size: 1.2rem;
+    color: var(--secondary-color);
+    margin-bottom: 3rem;
+}
+
+.portal-actions {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 2rem;
+}
+
+.action-card {
+    background-color: var(--card-bg-color);
+    padding: 2.5rem 2rem;
+    border-radius: var(--border-radius);
+    box-shadow: var(--card-shadow);
+    text-decoration: none;
+    color: var(--text-color);
+    transition: transform 0.3s, box-shadow 0.3s;
+    border: 1px solid #e0e0e0;
+}
+
+.action-card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 10px 30px rgba(0, 95, 115, 0.15);
+}
+
+.action-card .icon {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+}
+
+.action-card h2 {
+    font-size: 1.5rem;
+    color: var(--primary-color);
+    margin-bottom: 0.5rem;
+}
+
+.action-card p {
+    font-size: 1rem;
+    color: #666;
+}
+
+.portal-footer {
+    margin-top: 4rem;
+    color: #999;
+}
