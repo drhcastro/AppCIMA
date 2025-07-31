@@ -7,7 +7,6 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
-    
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -21,52 +20,49 @@
     <div class="main-content">
         <div class="controls-column">
             <div class="card">
-                <h2>Parámetros del Paciente</h2>
+                <h2>1. Datos del Paciente</h2>
                 <div class="form-group">
-                    <label for="chartType">1. Seleccione la Gráfica</label>
-                    <select id="chartType">
-                        <option value="weightForAge">Peso para la Edad (0-5 años)</option>
-                        <option value="lengthForAge">Talla para la Edad (0-5 años)</option>
-                        <option value="headCircumferenceForAge">Perímetro Cefálico para la Edad (0-5 años)</option>
-                        <option value="bmiForAge">IMC para la Edad (0-5 años)</option>
-                        <option value="weightForLength">Peso para la Longitud (45-110 cm)</option>
-                        <option value="weightForHeight">Peso para la Talla (65-120 cm)</option>
-                        <option value="armCircumferenceForAge">Perímetro Braquial para la Edad (3m-5a)</option>
-                        <option value="tricepsSkinfoldForAge">Pliegue Tricipital para la Edad (3m-5a)</option>
-                        <option value="subscapularSkinfoldForAge">Pliegue Subescapular para la Edad (3m-5a)</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label for="sex">2. Sexo Biológico</label>
+                    <label for="sex">Sexo Biológico</label>
                     <select id="sex">
                         <option value="boys">Niño</option>
                         <option value="girls">Niña</option>
                     </select>
                 </div>
+                <div class="form-group">
+                    <label for="dob">Fecha de Nacimiento</label>
+                    <input type="date" id="dob">
+                </div>
+                 <div id="length-height-inputs" class="input-group">
+                    <div class="form-group">
+                        <label id="lh-label" for="lhValue">Longitud/Talla del Paciente (cm)</label>
+                        <input type="number" id="lhValue" step="0.1" placeholder="Solo para Peso p/ Talla">
+                    </div>
+                </div>
             </div>
+
             <div class="card">
-                <h2>Nueva Medición</h2>
-                <div id="dynamic-inputs">
-                    <div id="age-inputs" class="input-group active">
-                        <div class="form-group">
-                            <label for="dob">Fecha de Nacimiento</label>
-                            <input type="date" id="dob">
-                        </div>
-                    </div>
-                    <div id="length-height-inputs" class="input-group">
-                        <div class="form-group">
-                            <label id="lh-label" for="lhValue">Longitud (cm)</label>
-                            <input type="number" id="lhValue" step="0.1" placeholder="Ej: 75.5">
-                        </div>
-                    </div>
-                </div>
+                <h2>2. Registrar Medición</h2>
                 <div class="form-group">
-                    <label id="measurement-label" for="measurement">Peso (kg)</label>
-                    <input type="number" id="measurement" step="0.1" placeholder="Ej: 9.5">
+                    <label for="chartType">Tipo de Medición</label>
+                    <select id="chartType">
+                        <option value="weightForAge">Peso para la Edad</option>
+                        <option value="lengthForAge">Talla para la Edad</option>
+                        <option value="headCircumferenceForAge">Perímetro Cefálico para la Edad</option>
+                        <option value="bmiForAge">IMC para la Edad</option>
+                        <option value="weightForLength">Peso para la Longitud</option>
+                        <option value="weightForHeight">Peso para la Talla</option>
+                        <option value="armCircumferenceForAge">Perímetro Braquial p/ Edad</option>
+                        <option value="tricepsSkinfoldForAge">Pliegue Tricipital p/ Edad</option>
+                        <option value="subscapularSkinfoldForAge">Pliegue Subescapular p/ Edad</option>
+                    </select>
                 </div>
-                <div class="form-group">
+                 <div class="form-group">
                     <label for="measure-date">Fecha de la Medición</label>
                     <input type="date" id="measure-date">
+                </div>
+                <div class="form-group">
+                    <label id="measurement-label" for="measurement">Valor de la Medición</label>
+                    <input type="number" id="measurement" step="0.1" placeholder="Ej: 9.5">
                 </div>
                 <button id="add-point-btn" class="button-primary">Agregar Medición a la Gráfica</button>
             </div>
@@ -78,22 +74,10 @@
                     <canvas id="growthChart"></canvas>
                 </div>
             </div>
-            <div class="card" id="summary-card" style="display: none;">
-                <h3>Resumen de la Última Medición</h3>
-                <div id="summary-box">
-                    <div class="summary-item">
-                        <span class="z-label-neg">-2 DE</span>
-                        <span id="z-neg-2" class="z-value">--</span>
+             <div class="card" id="summary-card" style="display: none;">
+                <h3>Historial de Mediciones</h3>
+                <div id="history-summary-container">
                     </div>
-                    <div class="summary-item ideal">
-                        <span class="z-label-ideal">Ideal (0 DE)</span>
-                        <span id="z-0" class="z-value">--</span>
-                    </div>
-                    <div class="summary-item">
-                        <span class="z-label-pos">+2 DE</span>
-                        <span id="z-pos-2" class="z-value">--</span>
-                    </div>
-                </div>
             </div>
              <div class="actions-toolbar">
                 <button id="clear-btn" class="button-danger">🗑️ Limpiar Gráfica</button>
