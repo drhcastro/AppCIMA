@@ -48,10 +48,15 @@
         e.preventDefault();
         const codigo = prompt('Por favor, ingrese el Código Único del paciente (ej: CIMA-12345):');
         if (codigo) {
-            // Cuando construyamos la página del visor, esta línea nos llevará allí.
-            // Por ahora, podemos mostrar una alerta.
-            alert('Funcionalidad en desarrollo. Se buscará el paciente con código: ' + codigo);
-            // window.location.href = 'visor.html?codigo=' + codigo;
+    
+<script>
+    // Funcionalidad para el botón "Ver Paciente"
+    document.getElementById('ver-paciente-btn').addEventListener('click', function(e) {
+        e.preventDefault();
+        const codigo = prompt('Por favor, ingrese el Código Único del paciente (ej: CIMA-12345):');
+        if (codigo) {
+            // ESTA ES LA LÍNEA QUE DEBES CAMBIAR:
+            window.location.href = 'visor.html?codigo=' + codigo;
         }
     });
 </script>
