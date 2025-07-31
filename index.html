@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Plataforma Pediátrica - CIMA Nahui</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="inicio-style.css">
+</head>
+<body>
+
+<div class="portal-container">
+    <header class="portal-header">
+        <img src="https://i.imgur.com/YOUR_LOGO_ID.png" alt="Logo CIMA Nahui" class="logo"> <h1>Plataforma de Seguimiento Pediátrico</h1>
+        <p>CIMA Nahui de Occidente</p>
+    </header>
+
+    <main class="portal-actions">
+        <a href="registro.html" class="action-card">
+            <div class="icon">📝</div>
+            <h2>Registrar Nuevo Paciente</h2>
+            <p>Crear un nuevo expediente clínico completo.</p>
+        </a>
+
+        <a href="#" class="action-card" id="ver-paciente-btn">
+            <div class="icon">📂</div>
+            <h2>Ver Paciente Registrado</h2>
+            <p>Buscar y cargar un expediente existente por su código.</p>
+        </a>
+
+        <a href="graficas.html" class="action-card">
+            <div class="icon">📊</div>
+            <h2>Usar Sin Registro</h2>
+            <p>Acceder a las herramientas de cálculo y gráficas de forma rápida.</p>
+        </a>
+    </main>
+
+    <footer class="portal-footer">
+        <p>&copy; 2025 CIMA Nahui de Occidente. Todos los derechos reservados.</p>
+    </footer>
+</div>
+
+<script>
+    // Funcionalidad para el botón "Ver Paciente"
+    document.getElementById('ver-paciente-btn').addEventListener('click', function(e) {
+        e.preventDefault();
+        const codigo = prompt('Por favor, ingrese el Código Único del paciente (ej: CIMA-12345):');
+        if (codigo) {
+            // Cuando construyamos la página del visor, esta línea nos llevará allí.
+            // Por ahora, podemos mostrar una alerta.
+            alert('Funcionalidad en desarrollo. Se buscará el paciente con código: ' + codigo);
+            // window.location.href = 'visor.html?codigo=' + codigo;
+        }
+    });
+</script>
+
+</body>
+</html>
