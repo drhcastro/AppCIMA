@@ -1,27 +1,81 @@
-    <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Calculadora de Crecimiento Pediátrico OMS</title>
-    
     <link rel="stylesheet" href="style.css">
-    
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
 </head>
 <body>
 
-    <div class="container">
-        <div class="card">
-            <h1>📊 Calculadora de Crecimiento Pediátrico (OMS)</h1>
+<div class="container">
+    <div class="card">
+        <h1>📊 Calculadora de Crecimiento Pediátrico (OMS)</h1>
+        
+        <div class="form-group">
+            <label for="chartType">Seleccione la Gráfica</label>
+            <select id="chartType">
+                <option value="weightForAge">Peso para la Edad (0-5 años)</option>
+                <option value="weightForLength">Peso para la Longitud (45-110 cm)</option>
+                <option value="weightForHeight">Peso para la Talla (65-120 cm)</option>
+                <option value="armCircumferenceForAge">Perímetro Braquial para la Edad (3m-5a)</option>
+                <option value="tricepsSkinfoldForAge">Pliegue Tricipital para la Edad (3m-5a)</option>
+                <option value="subscapularSkinfoldForAge">Pliegue Subescapular para la Edad (3m-5a)</option>
+            </select>
+        </div>
+        
+        <div id="input-container">
+            <div id="age-inputs" class="input-group active">
+                <div class="form-group">
+                    <label for="dob">Fecha de Nacimiento</label>
+                    <input type="date" id="dob">
+                </div>
+                 <div class="form-group">
+                    <label for="sex">Sexo Biológico</label>
+                    <select id="sex">
+                        <option value="boys">Niño</option>
+                        <option value="girls">Niña</option>
+                    </select>
+                </div>
             </div>
+            
+            <div id="length-height-inputs" class="input-group">
+                <div class="form-group">
+                    <label id="lh-label" for="lhValue">Longitud (cm)</label>
+                    <input type="number" id="lhValue" step="0.1" placeholder="Ej: 75.5">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label id="measurement-label" for="measurement">Peso (kg)</label>
+                <input type="number" id="measurement" step="0.1" placeholder="Ej: 9.5">
+            </div>
+        </div>
+
+        <button onclick="calculateAndPlot()">Calcular y Graficar</button>
     </div>
 
-    <footer>
-        </footer>
+    <div class="card" id="resultsCard" style="display: none;">
+        <h2>Resultados</h2>
+        <div id="chartContainer">
+            <canvas id="growthChart"></canvas>
+        </div>
+        <div id="results">
+            <p id="resultText"></p>
+        </div>
+    </div>
+</div>
 
-    <script src="script.js"></script>
+<footer>
+    <p class="footer-source">
+        Fuente: Child Growth Standards from: <a href="https://www.who.int/tools/child-growth-standards" target="_blank">who.int/tools/child-growth-standards</a>
+    </p>
+    <p class="footer-copyright">
+        Centro Integral Materno Infantil CIMA Nahui de Occidente. Todos los derechos reservados (c) 2025
+    </p>
+</footer>
 
-</body>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
+<script src="data.js"></script> <script src="script.js"></script> </body>
 </html>
