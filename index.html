@@ -13,7 +13,7 @@
 
 <div class="portal-container">
     <header class="portal-header">
-        <img src="https://i.imgur.com/YOUR_LOGO_ID.png" alt="Logo CIMA Nahui" class="logo"> <h1>Plataforma de Seguimiento Pediátrico</h1>
+        <h1>Plataforma de Seguimiento Pediátrico</h1>
         <p>CIMA Nahui de Occidente</p>
     </header>
 
@@ -46,17 +46,12 @@
     // Funcionalidad para el botón "Ver Paciente"
     document.getElementById('ver-paciente-btn').addEventListener('click', function(e) {
         e.preventDefault();
-        const codigo = prompt('Por favor, ingrese el Código Único del paciente (ej: CIMA-12345):');
-        if (codigo) {
-    
-<script>
-    // Funcionalidad para el botón "Ver Paciente"
-    document.getElementById('ver-paciente-btn').addEventListener('click', function(e) {
-        e.preventDefault();
-        const codigo = prompt('Por favor, ingrese el Código Único del paciente (ej: CIMA-12345):');
-        if (codigo) {
-            // ESTA ES LA LÍNEA QUE DEBES CAMBIAR:
-            window.location.href = 'visor.html?codigo=' + codigo;
+        const codigo = prompt('Por favor, ingrese el Código Único del paciente (ej: CIMA-123456789):');
+        
+        // Si el usuario ingresa un código y no cancela el prompt
+        if (codigo && codigo.trim() !== '') {
+            // Redirige al visor de paciente con el código en la URL
+            window.location.href = 'visor.html?codigo=' + encodeURIComponent(codigo.trim());
         }
     });
 </script>
