@@ -243,22 +243,43 @@ input:focus, select:focus {
 @media print {
     body {
         background-color: #fff;
+        font-size: 10pt; /* Reducir tamaño de letra para mejor ajuste */
     }
+
     .page-container {
         padding: 0;
     }
+
     .controls-column, .actions-toolbar, .main-header p {
-        display: none;
+        display: none; /* Oculta elementos no necesarios */
     }
+
     .main-content {
-        grid-template-columns: 1fr;
+        grid-template-columns: 1fr; /* Una sola columna */
     }
+
     .card {
         box-shadow: none;
         border: 1px solid #ccc;
-        page-break-inside: avoid;
+        page-break-inside: avoid; /* Evita que una tarjeta se corte entre páginas */
     }
+
     .main-header h1 {
         font-size: 1.5rem;
+        margin-bottom: 1rem;
+    }
+    
+    /* --- REGLAS NUEVAS PARA CORREGIR LA GRÁFICA --- */
+
+    .chart-card {
+        height: auto !important; /* Permite que la tarjeta se ajuste a su contenido */
+        overflow: hidden; /* Evita cualquier desbordamiento visual */
+    }
+
+    #chart-container {
+        /* Define una altura fija y una relación de aspecto para la impresión */
+        height: 350px !important; 
+        width: 100% !important;
+        position: relative;
     }
 }
