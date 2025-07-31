@@ -2,21 +2,21 @@
 
 // --- CONFIGURACIÓN DE GRÁFICAS Y COLORES ---
 const chartConfig = {
-    weightForAge: { dataKey: 'weightForAge', label: 'Peso p/ Edad', requires: 'age', yAxisLabel: 'Peso (kg)', xAxisLabel: 'Edad (días)', measurementLabel: 'Peso (kg)', color: 'rgba(238, 155, 0, 1)' }, // Naranja
-    lengthForAge: { dataKey: 'lengthForAge', label: 'Talla p/ Edad', requires: 'age', yAxisLabel: 'Talla (cm)', xAxisLabel: 'Edad (días)', measurementLabel: 'Talla (cm)', color: 'rgba(0, 95, 115, 1)' }, // Azul Oscuro
-    headCircumferenceForAge: { dataKey: 'headCircumferenceForAge', label: 'PC p/ Edad', requires: 'age', yAxisLabel: 'PC (cm)', xAxisLabel: 'Edad (días)', measurementLabel: 'PC (cm)', color: 'rgba(202, 106, 134, 1)' }, // Rosa
-    bmiForAge: { dataKey: 'bmiForAge', label: 'IMC p/ Edad', requires: 'age', yAxisLabel: 'IMC (kg/m²)', xAxisLabel: 'Edad (días)', measurementLabel: 'IMC', color: 'rgba(0, 187, 204, 1)' }, // Cyan
-    weightForLength: { dataKey: 'weightForLength', label: 'Peso p/ Longitud', requires: 'length', yAxisLabel: 'Peso (kg)', xAxisLabel: 'Longitud (cm)', measurementLabel: 'Peso (kg)', lhLabel: 'Longitud (cm)', color: 'rgba(174, 32, 18, 1)' }, // Rojo
-    weightForHeight: { dataKey: 'weightForHeight', label: 'Peso p/ Talla', requires: 'height', yAxisLabel: 'Peso (kg)', xAxisLabel: 'Talla (cm)', measurementLabel: 'Peso (kg)', lhLabel: 'Talla (cm)', color: 'rgba(10, 147, 150, 1)' }, // Teal
-    armCircumferenceForAge: { dataKey: 'armCircumferenceForAge', label: 'PB p/ Edad', requires: 'age', yAxisLabel: 'PB (cm)', xAxisLabel: 'Edad (días)', measurementLabel: 'PB (cm)', color: 'rgba(75, 192, 192, 1)' },
-    tricepsSkinfoldForAge: { dataKey: 'tricepsSkinfoldForAge', label: 'Pl. Tricipital p/ Edad', requires: 'age', yAxisLabel: 'Pl. Tricipital (mm)', xAxisLabel: 'Edad (días)', measurementLabel: 'Pliegue (mm)', color: 'rgba(153, 102, 255, 1)' },
-    subscapularSkinfoldForAge: { dataKey: 'subscapularSkinfoldForAge', label: 'Pl. Subescapular p/ Edad', requires: 'age', yAxisLabel: 'Pl. Subescapular (mm)', xAxisLabel: 'Edad (días)', measurementLabel: 'Pliegue (mm)', color: 'rgba(255, 159, 64, 1)' }
+    weightForAge: { dataKey: 'weightForAge', label: 'Peso p/ Edad', requires: 'age', yAxisLabel: 'Peso (kg)', measurementLabel: 'Valor (kg)', color: 'rgba(238, 155, 0, 1)' }, // Naranja
+    lengthForAge: { dataKey: 'lengthForAge', label: 'Talla p/ Edad', requires: 'age', yAxisLabel: 'Talla (cm)', measurementLabel: 'Valor (cm)', color: 'rgba(0, 95, 115, 1)' }, // Azul Oscuro
+    headCircumferenceForAge: { dataKey: 'headCircumferenceForAge', label: 'PC p/ Edad', requires: 'age', yAxisLabel: 'PC (cm)', measurementLabel: 'Valor (cm)', color: 'rgba(202, 106, 134, 1)' }, // Rosa
+    bmiForAge: { dataKey: 'bmiForAge', label: 'IMC p/ Edad', requires: 'age', yAxisLabel: 'IMC (kg/m²)', measurementLabel: 'Valor IMC', color: 'rgba(0, 187, 204, 1)' }, // Cyan
+    weightForLength: { dataKey: 'weightForLength', label: 'Peso p/ Longitud', requires: 'length', yAxisLabel: 'Peso (kg)', measurementLabel: 'Valor (kg)', lhLabel: 'Longitud (cm)', color: 'rgba(174, 32, 18, 1)' }, // Rojo
+    weightForHeight: { dataKey: 'weightForHeight', label: 'Peso p/ Talla', requires: 'height', yAxisLabel: 'Peso (kg)', measurementLabel: 'Valor (kg)', lhLabel: 'Talla (cm)', color: 'rgba(10, 147, 150, 1)' }, // Teal
+    armCircumferenceForAge: { dataKey: 'armCircumferenceForAge', label: 'PB p/ Edad', requires: 'age', yAxisLabel: 'PB (cm)', measurementLabel: 'Valor (cm)', color: 'rgba(75, 192, 192, 1)' },
+    tricepsSkinfoldForAge: { dataKey: 'tricepsSkinfoldForAge', label: 'Pl. Tricipital p/ Edad', requires: 'age', yAxisLabel: 'Pl. Tricipital (mm)', measurementLabel: 'Valor (mm)', color: 'rgba(153, 102, 255, 1)' },
+    subscapularSkinfoldForAge: { dataKey: 'subscapularSkinfoldForAge', label: 'Pl. Subescapular p/ Edad', requires: 'age', yAxisLabel: 'Pl. Subescapular (mm)', measurementLabel: 'Valor (mm)', color: 'rgba(255, 159, 64, 1)' }
 };
 
 // --- ESTADO DE LA APLICACIÓN ---
 let patientHistory = [];
 let distributionChart = null;
-let baseDatasets = []; // Almacenará la campana de gauss base
+let baseDatasets = [];
 
 // --- ELEMENTOS DEL DOM ---
 const chartTypeSelect = document.getElementById('chartType');
@@ -26,12 +26,15 @@ const printBtn = document.getElementById('print-btn');
 const saveImgBtn = document.getElementById('save-img-btn');
 const clearBtn = document.getElementById('clear-btn');
 const measureDateInput = document.getElementById('measure-date');
+const summaryContainer = document.getElementById('history-summary-container');
+const summaryCard = document.getElementById('summary-card');
 
 // --- INICIALIZACIÓN ---
 document.addEventListener('DOMContentLoaded', () => {
     measureDateInput.valueAsDate = new Date();
     initializeChart();
-    
+    updateUI(chartTypeSelect.value);
+
     chartTypeSelect.addEventListener('change', () => updateUI(chartTypeSelect.value));
     addPointBtn.addEventListener('click', addMeasurement);
     clearBtn.addEventListener('click', clearAll);
@@ -40,25 +43,24 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 // --- FUNCIONES PRINCIPALES ---
+
 function updateUI(chartKey) {
     const config = chartConfig[chartKey];
-    document.getElementById('age-inputs').classList.toggle('active', config.requires === 'age');
-    document.getElementById('length-height-inputs').classList.toggle('active', config.requires === 'length' || config.requires === 'height');
+    const isAgeBased = config.requires === 'age';
+    // Muestra u oculta el input de talla/longitud
+    document.getElementById('length-height-inputs').style.display = isAgeBased ? 'none' : 'block';
     document.getElementById('measurement-label').textContent = config.measurementLabel;
-    if (config.lhLabel) {
-        document.getElementById('lh-label').textContent = config.lhLabel;
-    }
 }
 
 function addMeasurement() {
     const chartKey = chartTypeSelect.value;
     const config = chartConfig[chartKey];
-    const sex = sexSelect.value;
+    const sex = document.getElementById('sex').value;
     const measurement = parseFloat(document.getElementById('measurement').value);
-    const measureDate = measureDateInput.value;
+    const measureDate = document.getElementById('measure-date').value;
 
     if (!measureDate || isNaN(measurement)) {
-        alert('Por favor, complete la medición y la fecha.');
+        alert('Por favor, complete el valor y la fecha de la medición.');
         return;
     }
 
@@ -67,6 +69,7 @@ function addMeasurement() {
         const dob = document.getElementById('dob').value;
         if (!dob) { alert('Por favor, ingrese la fecha de nacimiento.'); return; }
         ageInDays = Math.floor((new Date(measureDate) - new Date(dob)) / (1000 * 60 * 60 * 24));
+        if (ageInDays < 0) { alert('La fecha de medición no puede ser anterior a la de nacimiento.'); return; }
         xValue = ageInDays;
     } else {
         const lhValue = parseFloat(document.getElementById('lhValue').value);
@@ -87,28 +90,68 @@ function addMeasurement() {
         date: measureDate,
         ageInDays: ageInDays,
         measurement: measurement,
-        measurementUnit: config.yAxisLabel.match(/\((.*)\)/)[1] // Extrae la unidad de la etiqueta
+        measurementUnit: config.yAxisLabel.match(/\((.*)\)/)[1]
     });
 
     updateChart();
-    updateSummaryBox(L, M, S);
+    updateHistorySummary();
 }
 
 function clearAll() {
     patientHistory = [];
     updateChart();
-    document.getElementById('summary-card').style.display = 'none';
+    summaryContainer.innerHTML = '';
+    summaryCard.style.display = 'none';
 }
 
-function updateSummaryBox(L, M, S) {
-    document.getElementById('z-neg-2').textContent = calculateValueFromZ(-2, L, M, S).toFixed(2);
-    document.getElementById('z-0').textContent = M.toFixed(2);
-    document.getElementById('z-pos-2').textContent = calculateValueFromZ(2, L, M, S).toFixed(2);
-    document.getElementById('summary-card').style.display = 'block';
+function updateHistorySummary() {
+    if (patientHistory.length === 0) {
+        summaryCard.style.display = 'none';
+        return;
+    }
+
+    summaryContainer.innerHTML = ''; // Limpiar
+
+    const groupedByDate = patientHistory.reduce((acc, p) => {
+        if (!acc[p.date]) acc[p.date] = [];
+        acc[p.date].push(p);
+        return acc;
+    }, {});
+    
+    const sortedDates = Object.keys(groupedByDate).sort((a, b) => new Date(b) - new Date(a));
+
+    for (const date of sortedDates) {
+        const groupDiv = document.createElement('div');
+        groupDiv.className = 'summary-group';
+        
+        const dateHeader = document.createElement('h4');
+        dateHeader.className = 'summary-group-header';
+        dateHeader.textContent = new Date(date + 'T00:00:00').toLocaleDateString('es-ES', { year: 'numeric', month: 'long', day: 'numeric' });
+        groupDiv.appendChild(dateHeader);
+
+        for (const item of groupedByDate[date]) {
+            const itemDiv = document.createElement('div');
+            itemDiv.className = 'summary-item';
+            const config = chartConfig[item.chartKey];
+            const ageString = item.ageInDays !== null ? `Edad: ${Math.floor(item.ageInDays / 30.4375)}m (${item.ageInDays}d)` : '';
+
+            itemDiv.innerHTML = `
+                <span class="summary-color-tag" style="background-color: ${config.color};"></span>
+                <div class="summary-details">
+                    <div class="item-label">${config.label}: ${item.measurement} ${item.measurementUnit}</div>
+                    <div class="item-age">${ageString}</div>
+                </div>
+                <div class="summary-zscore">Z: ${item.zScore.toFixed(2)}</div>
+            `;
+            groupDiv.appendChild(itemDiv);
+        }
+        summaryContainer.appendChild(groupDiv);
+    }
+    summaryCard.style.display = 'block';
 }
 
 function saveChartAsImage() {
-    // Implementación similar a la anterior
+    alert('Esta función requiere una implementación más compleja. Por ahora, se puede usar el botón de imprimir a PDF o tomar una captura de pantalla.');
 }
 
 // --- FUNCIONES DE GRÁFICA ---
@@ -127,7 +170,7 @@ function initializeChart() {
     const ctx = document.getElementById('growthChart').getContext('2d');
     distributionChart = new Chart(ctx, {
         type: 'line',
-        data: { datasets: baseDatasets },
+        data: { datasets: [...baseDatasets] },
         options: {
             responsive: true,
             maintainAspectRatio: false,
@@ -139,7 +182,7 @@ function initializeChart() {
                     mode: 'point',
                     intersect: true,
                     callbacks: {
-                        title: () => '', // Sin título
+                        title: () => '',
                         label: (context) => {
                             const details = context.raw.details;
                             if (!details) return '';
@@ -152,7 +195,7 @@ function initializeChart() {
                                 ageString,
                                 `Valor: ${details.measurement} ${details.measurementUnit}`,
                                 `Puntuación Z: ${details.zScore.toFixed(2)}`
-                            ].filter(Boolean); // Filtra líneas vacías
+                            ].filter(Boolean);
                         }
                     }
                 }
@@ -177,11 +220,8 @@ function initializeChart() {
 function updateChart() {
     if (!distributionChart) return;
 
-    // Agrupar el historial por tipo de métrica
     const groupedHistory = patientHistory.reduce((acc, p) => {
-        if (!acc[p.chartKey]) {
-            acc[p.chartKey] = [];
-        }
+        if (!acc[p.chartKey]) acc[p.chartKey] = [];
         acc[p.chartKey].push(p);
         return acc;
     }, {});
@@ -191,7 +231,7 @@ function updateChart() {
         const points = groupedHistory[key];
         return {
             label: config.label,
-            data: points.map(p => ({ x: p.zScore, y: 0.01, details: p })), // 'details' contiene toda la info para el tooltip
+            data: points.map(p => ({ x: p.zScore, y: 0.01, details: p })),
             backgroundColor: config.color,
             borderColor: '#FFFFFF',
             borderWidth: 2,
@@ -202,12 +242,12 @@ function updateChart() {
         };
     });
 
-    // Reemplazar todos los datasets (base + paciente)
     distributionChart.data.datasets = [...baseDatasets, ...patientDatasets];
     distributionChart.update();
 }
 
 // --- FUNCIONES AUXILIARES ---
+
 function getLMS(xValue, table) {
     let record = table.find(row => row[0] === xValue);
     if (!record) {
@@ -220,4 +260,3 @@ function calculateValueFromZ(Z, L, M, S) {
     if (Math.abs(L) < 1e-5) return M * Math.exp(S * Z);
     return M * (1 + L * S * Z) ** (1/L);
 }
-
