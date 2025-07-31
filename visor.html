@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Visor de Paciente - CIMA Nahui</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="registro-style.css">
+</head>
+<body>
+
+<div class="form-container">
+    <header class="form-header">
+        <h1>📂 Expediente del Paciente</h1>
+        <p id="patient-code-display">Cargando datos...</p>
+    </header>
+
+    <div id="patient-data-view">
+        <div class="card-section">
+            <h3>Datos de Identidad</h3>
+            <p><strong>Nombre:</strong> <span id="nombre-completo"></span></p>
+            <p><strong>Fecha de Nacimiento:</strong> <span id="fechaNacimiento"></span></p>
+            <p><strong>Domicilio:</strong> <span id="domicilio"></span></p>
+        </div>
+        <div class="card-section">
+            <h3>Datos de Contacto y Familiares</h3>
+            <p><strong>Teléfono:</strong> <span id="telefono"></span></p>
+            <p><strong>Correo Electrónico:</strong> <span id="correo"></span></p>
+            <p><strong>Madre:</strong> <span id="nombreMama"></span></p>
+            <p><strong>Padre:</strong> <span id="nombrePapa"></span></p>
+        </div>
+        <div class="card-section">
+            <h3>Información Médica</h3>
+            <p><strong>Alergias:</strong> <span id="alergias"></span></p>
+        </div>
+        
+        <a href="graficas.html" id="go-to-charts" class="button-primary">Ir a Gráficas de Crecimiento</a>
+    </div>
+
+    <div id="response-message"></div>
+
+    <footer class="form-footer">
+        <p>CIMA Nahui de Occidente &copy; 2025</p>
+    </footer>
+</div>
+
+<script src="visor-script.js"></script>
+
+</body>
+</html>
