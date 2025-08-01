@@ -125,3 +125,28 @@ input {
         grid-template-columns: 1fr;
     }
 }
+
+.actions-toolbar {
+    margin-top: 32px;
+}
+
+.button-secondary {
+    display: inline-block;
+    width: 100%;
+    padding: 16px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    text-align: center;
+    text-decoration: none;
+    color: var(--primary-color);
+    background-color: transparent;
+    border: 2px solid var(--primary-color);
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.button-secondary:hover {
+    background-color: var(--primary-color);
+    color: white;
+}
