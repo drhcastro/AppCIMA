@@ -14,73 +14,40 @@
 <div class="form-container">
     <header class="form-header">
         <h1>📝 Registro de Nuevo Paciente</h1>
-        <p>Completa la información para generar un nuevo expediente.</p>
+        <p>Completa la información en cada pestaña para generar el expediente.</p>
     </header>
 
     <form id="registro-form">
-        <div class="form-grid">
-            <div class="form-group">
-                <label for="nombre">Nombre(s)</label>
-                <input type="text" id="nombre" name="nombre" required>
-            </div>
-            <div class="form-group">
-                <label for="apellidoPaterno">Apellido Paterno</label>
-                <input type="text" id="apellidoPaterno" name="apellidoPaterno" required>
-            </div>
-            <div class="form-group">
-                <label for="apellidoMaterno">Apellido Materno</label>
-                <input type="text" id="apellidoMaterno" name="apellidoMaterno">
-            </div>
-            <div class="form-group">
-                <label for="fechaNacimiento">Fecha de Nacimiento</label>
-                <input type="date" id="fechaNacimiento" name="fechaNacimiento" required>
-            </div>
-
-            <div class="form-group">
-                <label for="sexo">Sexo Biológico</label>
-                <select id="sexo" name="sexo" required>
-                    <option value="Niño">Niño</option>
-                    <option value="Niña">Niña</option>
-                    <option value="No definido">No Definido</option>option>
-                </select>
-            </div>
-            <div class="form-group full-width">
-                <label for="domicilio">Domicilio</label>
-                <input type="text" id="domicilio" name="domicilio">
-            </div>
-            <div class="form-group">
-                <label for="telefono">Teléfono</label>
-                <input type="tel" id="telefono" name="telefono">
-            </div>
-            <div class="form-group">
-                <label for="correo">Correo Electrónico</label>
-                <input type="email" id="correo" name="correo">
-            </div>
-             <div class="form-group">
-                <label for="nombreMama">Nombre de la Madre</label>
-                <input type="text" id="nombreMama" name="nombreMama">
-            </div>
-            <div class="form-group">
-                <label for="nombrePapa">Nombre del Padre</label>
-                <input type="text" id="nombrePapa" name="nombrePapa">
-            </div>
-             <div class="form-group full-width">
-                <label for="alergias">Alergias Conocidas</label>
-                <input type="text" id="alergias" name="alergias" placeholder="Penicilina, etc.">
-            </div>
+        <div class="tab-nav">
+            <button type="button" class="tab-button active" data-tab="identidad">Identidad</button>
+            <button type="button" class="tab-button" data-tab="heredofamiliares">Heredofamiliares</button>
+            <button type="button" class="tab-button" data-tab="perinatales">Perinatales</button>
+            <button type="button" class="tab-button" data-tab="patologicos">Patológicos</button>
+            <button type="button" class="tab-button" data-tab="no-patologicos">No Patológicos</button>
         </div>
 
-        <button type="submit" id="submit-btn" class="button-primary">Registrar Paciente</button>
-        
-        <div id="response-message"></div>
-    </form>
+        <div class="tab-content-container">
+            <div id="identidad" class="tab-content active">
+                <div class="form-grid">
+                    <div class="form-group"><label for="nombre">Nombre(s)</label><input type="text" id="nombre" required></div>
+                    <div class="form-group"><label for="apellidoPaterno">Apellido Paterno</label><input type="text" id="apellidoPaterno" required></div>
+                    <div class="form-group"><label for="apellidoMaterno">Apellido Materno</label><input type="text" id="apellidoMaterno"></div>
+                    <div class="form-group"><label for="fechaNacimiento">Fecha de Nacimiento</label><input type="date" id="fechaNacimiento" required></div>
+                    <div class="form-group"><label for="sexo">Sexo Biológico</label><select id="sexo" required><option value="Niño">Niño</option><option value="Niña">Niña</option></select></div>
+                    <div class="form-group"><label for="telefono">Teléfono</label><input type="tel" id="telefono"></div>
+                    <div class="form-group full-width"><label for="domicilio">Domicilio</label><input type="text" id="domicilio"></div>
+                    <div class="form-group"><label for="nombreMama">Nombre de la Madre</label><input type="text" id="nombreMama"></div>
+                    <div class="form-group"><label for="nombrePapa">Nombre del Padre</label><input type="text" id="nombrePapa"></div>
+                    <div class="form-group"><label for="correo">Correo Electrónico</label><input type="email" id="correo"></div>
+                    <div class="form-group"><label for="alergias">Alergias Conocidas</label><input type="text" id="alergias"></div>
+                </div>
+            </div>
 
-    <footer class="form-footer">
-        <p>CIMA Nahui de Occidente &copy; 2025</p>
-    </footer>
-</div>
+            <div id="heredofamiliares" class="tab-content">
+                <div class="form-group">
+                    <label for="antecedentesHeredofamiliares">Detalles de Antecedentes Heredofamiliares</label>
+                    <textarea id="antecedentesHeredofamiliares" rows="12"></textarea>
+                </div>
+            </div>
 
-<script src="registro-script.js"></script>
-
-</body>
-</html>
+            <div id="
