@@ -1,15 +1,11 @@
 document.addEventListener('DOMContentLoaded', () => {
-    // --- CONFIGURACIÓN ---
     const API_URL = 'https://script.google.com/macros/s/AKfycbw6jZIjBoeSlIRF-lAMPNqmbxRsncqulzZEi8f7q2AyOawxbpSZRIUxsx9UgZwe/exec';
-
-    // --- ELEMENTOS DEL DOM ---
     const responseMsg = document.getElementById('response-message');
     const patientDataForm = document.getElementById('patient-data-form');
     const patientCodeDisplay = document.getElementById('patient-code-display');
-
-    // --- LÓGICA DE PESTAÑAS (CORREGIDA) ---
     const tabButtons = document.querySelectorAll('.tab-button');
     const tabContents = document.querySelectorAll('.tab-content');
+
     tabButtons.forEach(button => {
         button.addEventListener('click', () => {
             tabButtons.forEach(btn => btn.classList.remove('active'));
@@ -23,7 +19,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    // --- LÓGICA PRINCIPAL ---
     const params = new URLSearchParams(window.location.search);
     const codigo = params.get('codigo');
 
@@ -35,7 +30,6 @@ document.addEventListener('DOMContentLoaded', () => {
     patientCodeDisplay.textContent = `Código: ${codigo}`;
     patientDataForm.style.display = 'none';
 
-    // Cargar los datos del paciente
     fetch(`${API_URL}?action=getPaciente&codigo=${codigo}`)
         .then(res => res.json())
         .then(data => {
@@ -52,16 +46,12 @@ document.addEventListener('DOMContentLoaded', () => {
             localStorage.removeItem('activePatient');
         });
 
-    // Evento para guardar los cambios
     patientDataForm.addEventListener('submit', handleSaveChanges);
 
-    // --- FUNCIONES ---
     function populatePatientData(patient) {
-        // Rellena los campos del formulario con los datos del paciente
         for (const key in patient) {
             const element = document.getElementById(key);
             if (element) {
-                // Formatear la fecha para el input tipo 'date'
                 if (key === 'fechaNacimiento' && patient[key]) {
                     element.value = patient[key].substring(0, 10);
                 } else {
@@ -77,10 +67,9 @@ document.addEventListener('DOMContentLoaded', () => {
         submitBtn.disabled = true;
         submitBtn.textContent = 'Guardando...';
 
-        // Recolectar todos los datos del formulario
         const formData = {
-            action: 'actualizarPaciente', // <-- NUEVA ACCIÓN
-            codigoUnico: codigo, // El código del paciente que estamos editando
+            action: 'actualizarPaciente',
+            codigoUnico: codigo,
             nombre: document.getElementById('nombre').value,
             apellidoPaterno: document.getElementById('apellidoPaterno').value,
             apellidoMaterno: document.getElementById('apellidoMaterno').value,
@@ -106,10 +95,7 @@ document.addEventListener('DOMContentLoaded', () => {
             });
             const data = await response.json();
             if (data.status !== 'success') throw new Error(data.message);
-            
-            // Actualizar los datos en la memoria del navegador
             localStorage.setItem('activePatient', JSON.stringify(formData));
-            
             displayMessage('success', '¡Expediente actualizado con éxito!');
         } catch (error) {
             displayMessage('error', `Error al guardar: ${error.message}`);
