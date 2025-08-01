@@ -7,6 +7,15 @@ document.addEventListener('DOMContentLoaded', () => {
     const historialContainer = document.getElementById('planes-historial-container');
     const backToVisorBtn = document.getElementById('back-to-visor');
 
+    // --- LÓGICA DE PERMISOS ---
+    const currentUser = JSON.parse(sessionStorage.getItem('currentUser'));
+
+    // Regla: El perfil 'asistente' no puede acceder a esta página.
+    if (currentUser && currentUser.profile === 'asistente') {
+        document.body.innerHTML = '<div style="text-align: center; padding: 40px; font-family: Poppins, sans-serif;"><h1>Acceso Denegado</h1><p>Tu perfil no tiene permiso para ver esta sección.</p><a href="javascript:history.back()" style="color: #005f73;">Regresar</a></div>';
+        return; // Detener la ejecución del script
+    }
+
     // --- LÓGICA DE INICIALIZACIÓN ---
     const activePatient = JSON.parse(localStorage.getItem('activePatient'));
 
@@ -34,7 +43,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 return;
             }
 
-            // Guardamos los planes en la memoria de la sesión para que la página de impresión pueda acceder a ellos
+            // Guardamos los planes en la memoria de la sesión para la página de impresión
             sessionStorage.setItem('patientPlans', JSON.stringify(data.data));
 
             historialContainer.innerHTML = '';
