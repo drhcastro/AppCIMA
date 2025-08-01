@@ -490,3 +490,13 @@ details[open] > .consulta-summary::before {
     text-decoration: none;
 }
 
+/* ... al final de registro-style.css ... */
+
+/* Estilo para tarjetas de solo lectura */
+.tamizaje-card.view-only {
+    cursor: default;
+}
+.tamizaje-card.view-only:hover {
+    border-color: var(--border-color); /* Anula el efecto hover de resaltar borde */
+    box-shadow: none; /* Anula el efecto hover de sombra */
+}
