@@ -14,7 +14,9 @@
 <div class="page-container">
     <header class="main-header">
         <h1>📈 Seguimiento de Crecimiento y Desarrollo</h1>
-        <p>Plataforma Profesional de Percentiles - CIMA Nahui de Occidente</p>
+        <div id="active-patient-banner">
+            <p>Modo: Usar Sin Registro</p>
+        </div>
     </header>
 
     <div class="main-content">
@@ -32,7 +34,7 @@
                     <label for="dob">Fecha de Nacimiento</label>
                     <input type="date" id="dob">
                 </div>
-                 <div id="length-height-inputs" class="input-group">
+                <div id="length-height-inputs" class="input-group">
                     <div class="form-group">
                         <label id="lh-label" for="lhValue">Longitud/Talla del Paciente (cm)</label>
                         <input type="number" id="lhValue" step="0.1" placeholder="Solo para Peso p/ Talla">
@@ -66,6 +68,7 @@
                 </div>
                 <button id="add-point-btn" class="button-primary">Agregar Medición a la Gráfica</button>
             </div>
+            <a href="index.html" class="button-secondary full-width-btn">⬅️ Regresar al Menú Principal</a>
         </div>
 
         <div class="chart-column">
@@ -74,10 +77,9 @@
                     <canvas id="growthChart"></canvas>
                 </div>
             </div>
-             <div class="card" id="summary-card" style="display: none;">
+            <div class="card" id="summary-card" style="display: none;">
                 <h3>Historial de Mediciones</h3>
-                <div id="history-summary-container">
-                    </div>
+                <div id="history-summary-container"></div>
             </div>
              <div class="actions-toolbar">
                 <button id="clear-btn" class="button-danger">🗑️ Limpiar Gráfica</button>
