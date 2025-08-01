@@ -32,6 +32,28 @@ const summaryCard = document.getElementById('summary-card');
 // --- INICIALIZACIÓN ---
 document.addEventListener('DOMContentLoaded', () => {
     measureDateInput.valueAsDate = new Date();
+    
+    // ¡NUEVA LÓGICA! Cargar paciente activo desde localStorage
+    const activePatient = JSON.parse(localStorage.getItem('activePatient'));
+    
+    if (activePatient) {
+        // Si hay un paciente, rellenar los campos
+        document.getElementById('dob').value = activePatient.fechaNacimiento;
+        document.getElementById('sex').value = activePatient.sexo.toLowerCase(); // Asegura que sea 'boys' o 'girls'
+        
+        // Deshabilitar los campos para evitar cambios accidentales
+        document.getElementById('dob').disabled = true;
+        document.getElementById('sex').disabled = true;
+        
+        // Mostrar el banner con el nombre del paciente
+        const banner = document.getElementById('active-patient-banner');
+        banner.innerHTML = `<p>Paciente Activo: <span class="patient-name">${activePatient.nombre} ${activePatient.apellidoPaterno}</span> | Código: ${activePatient.codigoUnico}</p>`;
+    } else {
+        // Si no hay paciente, limpiar los campos por si acaso
+        document.getElementById('dob').value = '';
+        document.getElementById('sex').value = 'boys';
+    }
+
     initializeChart();
     updateUI(chartTypeSelect.value);
 
