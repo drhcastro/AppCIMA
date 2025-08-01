@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nueva Consulta - CIMA Nahui</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="registro-style.css"> </head>
+<body>
+
+<div class="form-container">
+    <header class="form-header">
+        <h1>📝 Nueva Consulta Médica</h1>
+        <p id="patient-banner">Cargando paciente...</p>
+    </header>
+
+    <form id="consulta-form">
+        <h3 class="section-title">Interrogatorio (SAMPLE)</h3>
+        <div class="form-grid">
+            <div class="form-group full-width">
+                <label for="sintomasSignosMotivo">Síntomas, Signos y Motivo de Consulta</label>
+                <textarea id="sintomasSignosMotivo" rows="4"></textarea>
+            </div>
+            <div class="form-group">
+                <label for="alergiasConsulta">Alergias (relevantes a la consulta)</label>
+                <input type="text" id="alergiasConsulta">
+            </div>
+            <div class="form-group">
+                <label for="medicamentosPrevios">Medicamentos Previos</label>
+                <input type="text" id="medicamentosPrevios">
+            </div>
+            <div class="form-group full-width">
+                <label for="historialClinicoPrevio">Historial Clínico Previo (relevante)</label>
+                <textarea id="historialClinicoPrevio" rows="3"></textarea>
+            </div>
+            <div class="form-group">
+                <label for="liquidosAlimentos">Últimos Líquidos y Alimentos Ingeridos</label>
+                <input type="text" id="liquidosAlimentos">
+            </div>
+            <div class="form-group">
+                <label for="eventosRelacionados">Eventos Relacionados</label>
+                <input type="text" id="eventosRelacionados">
+            </div>
+        </div>
+
+        <h3 class="section-title">Análisis y Diagnóstico</h3>
+        <div class="form-group">
+            <label for="analisis">Análisis y Exploración Física</label>
+            <textarea id="analisis" rows="5"></textarea>
+        </div>
+        <div class="form-grid">
+            <div class="form-group"><label for="diagnosticoSindromatico">Dx. Sindromático</label><input type="text" id="diagnosticoSindromatico"></div>
+            <div class="form-group"><label for="diagnosticoEtiologico">Dx. Etiológico</label><input type="text" id="diagnosticoEtiologico"></div>
+            <div class="form-group"><label for="diagnosticoNutricional">Dx. Nutricional</label><input type="text" id="diagnosticoNutricional"></div>
+            <div class="form-group"><label for="diagnosticoRadiologico">Dx. Radiológico</label><input type="text" id="diagnosticoRadiologico"></div>
+            <div class="form-group"><label for="diagnosticoPresuntivo">Dx. Presuntivo</label><input type="text" id="diagnosticoPresuntivo"></div>
+            <div class="form-group"><label for="diagnosticoNosologico">Dx. Nosológico (Final)</label><input type="text" id="diagnosticoNosologico"></div>
+        </div>
+        
+        <h3 class="section-title">Plan y Cierre</h3>
+         <div class="form-group">
+            <label for="plan">Plan de Tratamiento</label>
+            <textarea id="plan" name="plan" rows="5"></textarea>
+        </div>
+        <div class="form-grid">
+            <div class="form-group">
+                <label for="medicoTratante">Médico Tratante</label>
+                <input type="text" id="medicoTratante">
+            </div>
+            <div class="form-group">
+                <label for="fechaConsulta">Fecha de Consulta</label>
+                <input type="date" id="fechaConsulta" required>
+            </div>
+        </div>
+
+
+        <button type="submit" id="submit-btn" class="button-primary">Guardar Consulta</button>
+        <div id="response-message"></div>
+    </form>
+    
+    <div class="actions-toolbar">
+        <a href="#" id="back-to-visor" class="button-secondary">⬅️ Regresar al Expediente</a>
+    </div>
+
+    <footer class="form-footer">
+        <p>CIMA Nahui de Occidente &copy; 2025</p>
+    </footer>
+</div>
+
+<script src="consulta-script.js"></script>
+
+</body>
+</html>
