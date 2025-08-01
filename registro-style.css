@@ -473,3 +473,20 @@ details[open] > .consulta-summary::before {
     text-align: center;
     color: var(--primary-color);
 }
+/* ... al final de registro-style.css ... */
+
+/* --- Estilos para la Lista de Planes de Tratamiento --- */
+.plan-summary {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px;
+    width: 100%;
+}
+
+.plan-actions .small-btn {
+    padding: 6px 12px;
+    font-size: 0.8rem;
+    text-decoration: none;
+}
+
