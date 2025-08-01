@@ -2,22 +2,24 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- CONFIGURACIÓN ---
     const API_URL = 'https://script.google.com/macros/s/AKfycbw6jZIjBoeSlIRF-lAMPNqmbxRsncqulzZEi8f7q2AyOawxbpSZRIUxsx9UgZwe/exec';
 
-    // Configuración para cada tipo de especialidad
     const specialtyConfig = {
         psicologia: {
             title: "Psicología",
             getAction: "getPsicologia",
-            saveAction: "guardarPsicologia"
+            saveAction: "guardarPsicologia",
+            allowedProfile: "psicologo" // Perfil permitido para editar
         },
         nutricion: {
             title: "Nutrición",
             getAction: "getNutricion",
-            saveAction: "guardarNutricion"
+            saveAction: "guardarNutricion",
+            allowedProfile: "nutricionista"
         },
         rehabilitacion: {
             title: "Rehabilitación",
             getAction: "getRehabilitacion",
-            saveAction: "guardarRehabilitacion"
+            saveAction: "guardarRehabilitacion",
+            allowedProfile: "rehabilitador"
         }
     };
 
@@ -30,17 +32,18 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- LÓGICA DE INICIALIZACIÓN ---
     const params = new URLSearchParams(window.location.search);
-    const tipo = params.get('tipo'); // Obtiene 'psicologia', 'nutricion', etc.
+    const tipo = params.get('tipo');
     const config = specialtyConfig[tipo];
 
     const activePatient = JSON.parse(localStorage.getItem('activePatient'));
+    const currentUser = JSON.parse(sessionStorage.getItem('currentUser'));
 
     if (!activePatient || !config) {
         document.body.innerHTML = "<h1>Error: Paciente o tipo de consulta no especificado.</h1>";
         return;
     }
 
-    // Personalizar la página según la especialidad
+    // Personalizar la página
     document.getElementById('page-title').textContent = `Consulta de ${config.title}`;
     document.getElementById('main-title').textContent = `Consulta de ${config.title}`;
     document.getElementById('form-title').textContent = `Registrar Nueva Nota de ${config.title}`;
@@ -48,10 +51,33 @@ document.addEventListener('DOMContentLoaded', () => {
     backToVisorBtn.href = `visor.html?codigo=${activePatient.codigoUnico}`;
     document.getElementById('fechaConsulta').valueAsDate = new Date();
 
+    applyPermissions(); // <-- Aplicar permisos
     loadHistory();
 
     // --- MANEJO DE EVENTOS ---
-    notaForm.addEventListener('submit', async (e) => {
+    notaForm.addEventListener('submit', handleFormSubmit);
+
+    // --- FUNCIONES ---
+
+    function applyPermissions() {
+        if (!currentUser) return;
+        const userRole = currentUser.profile;
+        const submitBtn = notaForm.querySelector('button[type="submit"]');
+
+        // Regla: El usuario debe ser el especialista correspondiente o un superusuario/médico para guardar.
+        if (userRole === config.allowedProfile || userRole === 'medico' || userRole === 'superusuario') {
+            // El usuario tiene permiso
+        } else {
+            // Si no tiene permiso, deshabilitar todo el formulario.
+            notaForm.querySelectorAll('input, select, textarea, button').forEach(el => {
+                el.disabled = true;
+            });
+            submitBtn.textContent = 'Permiso denegado';
+            submitBtn.style.backgroundColor = '#6c757d'; // Color gris
+        }
+    }
+    
+    async function handleFormSubmit(e) {
         e.preventDefault();
         const submitBtn = notaForm.querySelector('button[type="submit"]');
         submitBtn.disabled = true;
@@ -74,10 +100,10 @@ document.addEventListener('DOMContentLoaded', () => {
             });
             const data = await response.json();
             if (data.status !== 'success') throw new Error(data.message);
-
+            
             notaForm.reset();
             document.getElementById('fechaConsulta').valueAsDate = new Date();
-            loadHistory(); // Recargar el historial para ver la nueva nota
+            loadHistory();
         } catch (error) {
             responseMsg.textContent = `Error: ${error.message}`;
             responseMsg.className = 'error';
@@ -86,9 +112,8 @@ document.addEventListener('DOMContentLoaded', () => {
             submitBtn.disabled = false;
             submitBtn.textContent = 'Guardar Nota';
         }
-    });
+    }
 
-    // --- FUNCIÓN PARA CARGAR EL HISTORIAL ---
     async function loadHistory() {
         historialContainer.innerHTML = 'Cargando historial...';
         try {
@@ -104,7 +129,7 @@ document.addEventListener('DOMContentLoaded', () => {
             historialContainer.innerHTML = '';
             data.data.forEach(nota => {
                 const card = document.createElement('div');
-                card.className = 'consulta-card'; // Reutilizamos el estilo
+                card.className = 'consulta-card';
                 const fecha = new Date(nota.fechaConsulta + 'T00:00:00').toLocaleDateString('es-ES', { year: 'numeric', month: 'long', day: 'numeric' });
                 card.innerHTML = `
                     <details>
