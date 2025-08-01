@@ -436,3 +436,40 @@ details[open] > .consulta-summary::before {
     color: var(--text-color);
     cursor: pointer;
 }
+/* ... al final de registro-style.css ... */
+
+/* --- Estilos para Formulario de Valoración Detallada --- */
+.assessment-section {
+    background-color: #f8f9fa;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 16px;
+    margin-bottom: 20px;
+}
+.assessment-section h4 {
+    color: var(--secondary-color);
+    margin-top: 0;
+    margin-bottom: 16px;
+}
+.assessment-item {
+    display: grid;
+    grid-template-columns: 1fr 2fr;
+    gap: 12px;
+    align-items: center;
+}
+.assessment-item label {
+    font-weight: 600;
+    margin-bottom: 0;
+}
+.assessment-item input, .assessment-item textarea {
+    grid-column: 1 / -1; /* Ocupan todo el ancho en la siguiente fila */
+}
+.assessment-item textarea {
+    margin-top: 8px;
+}
+#puntuacionTotal {
+    font-weight: bold;
+    font-size: 1.2rem;
+    text-align: center;
+    color: var(--primary-color);
+}
