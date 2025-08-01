@@ -366,3 +366,44 @@ details[open] > .consulta-summary::before {
     padding-bottom: 8px;
     border-bottom: 1px solid var(--border-color);
 }
+/* ... al final de registro-style.css ... */
+
+/* --- Estilos para la Página de Vacunación --- */
+.card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+}
+.card-header h3 {
+    margin: 0;
+    color: var(--primary-color);
+}
+.card-header .button-primary {
+    width: auto;
+    padding: 10px 16px;
+    font-size: 0.9rem;
+}
+
+.table-container {
+    width: 100%;
+    overflow-x: auto; /* Para tablas en pantallas pequeñas */
+}
+
+#vacunas-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+#vacunas-table th, #vacunas-table td {
+    padding: 12px 15px;
+    text-align: left;
+    border-bottom: 1px solid var(--border-color);
+}
+#vacunas-table th {
+    background-color: #f8f9fa;
+    font-weight: 600;
+    color: var(--primary-color);
+}
+#vacunas-table tbody tr:hover {
+    background-color: #f1f3f5;
+}
