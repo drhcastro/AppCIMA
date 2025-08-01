@@ -12,8 +12,15 @@ document.addEventListener('DOMContentLoaded', () => {
     const vacunaForm = document.getElementById('vacuna-form');
     const responseMsg = document.getElementById('response-message');
 
-    // --- LÓGICA DE INICIALIZACIÓN ---
+    // --- LÓGICA DE INICIALIZACIÓN Y PERMISOS ---
     const activePatient = JSON.parse(localStorage.getItem('activePatient'));
+    const currentUser = JSON.parse(sessionStorage.getItem('currentUser'));
+
+    // Regla 1: Bloquear acceso total a 'asistente'
+    if (currentUser && currentUser.profile === 'asistente') {
+        document.body.innerHTML = '<div style="text-align: center; padding: 40px; font-family: Poppins, sans-serif;"><h1>Acceso Denegado</h1><p>Tu perfil no tiene permiso para ver esta sección.</p><a href="javascript:history.back()" style="color: #005f73;">Regresar</a></div>';
+        return;
+    }
 
     if (!activePatient) {
         patientBanner.textContent = "ERROR: No hay un paciente activo.";
@@ -25,6 +32,7 @@ document.addEventListener('DOMContentLoaded', () => {
     backToVisorBtn.href = `visor.html?codigo=${activePatient.codigoUnico}`;
     document.getElementById('fechaAplicacion').valueAsDate = new Date();
 
+    applyPermissions(); // <-- Aplicar permisos para el resto de los roles
     loadVaccineHistory();
 
     // --- MANEJO DE EVENTOS ---
@@ -36,6 +44,20 @@ document.addEventListener('DOMContentLoaded', () => {
     vacunaForm.addEventListener('submit', handleFormSubmit);
 
     // --- FUNCIONES ---
+
+    function applyPermissions() {
+        if (!currentUser) return;
+        const userRole = currentUser.profile;
+
+        // Regla 2 y 3: Solo 'medico' y 'superusuario' pueden registrar vacunas.
+        const hasEditPermission = (userRole === 'medico' || userRole === 'superusuario');
+
+        if (!hasEditPermission) {
+            // Si no tiene permiso, ocultar el botón de registro.
+            addVaccineBtn.style.display = 'none';
+        }
+    }
+
     async function loadVaccineHistory() {
         tableBody.innerHTML = '<tr><td colspan="5">Cargando historial...</td></tr>';
         try {
@@ -48,7 +70,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 return;
             }
 
-            tableBody.innerHTML = ''; // Limpiar tabla
+            tableBody.innerHTML = '';
             data.data.forEach(vacuna => {
                 const tr = document.createElement('tr');
                 const fecha = new Date(vacuna.fechaAplicacion + 'T00:00:00').toLocaleDateString('es-ES');
@@ -103,7 +125,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (data.status !== 'success') throw new Error(data.message);
             
             closeModal();
-            loadVaccineHistory(); // Recargar tabla
+            loadVaccineHistory();
         } catch (error) {
             responseMsg.textContent = `Error: ${error.message}`;
             responseMsg.className = 'error';
