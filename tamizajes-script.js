@@ -1,10 +1,7 @@
 document.addEventListener('DOMContentLoaded', () => {
     // --- CONFIGURACIÓN ---
     const API_URL = 'https://script.google.com/macros/s/AKfycbw6jZIjBoeSlIRF-lAMPNqmbxRsncqulzZEi8f7q2AyOawxbpSZRIUxsx9UgZwe/exec';
-    const TIPOS_DE_TAMIZAJES = [
-        "Cardiológico", "Metabólico", "Visual", 
-        "Auditivo", "Genético", "Cadera"
-    ];
+    const TIPOS_DE_TAMIZAJES = [ "Cardiológico", "Metabólico", "Visual", "Auditivo", "Genético", "Cadera" ];
 
     // --- ELEMENTOS DEL DOM ---
     const patientBanner = document.getElementById('patient-banner');
@@ -18,16 +15,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- LÓGICA DE INICIALIZACIÓN ---
     const activePatient = JSON.parse(localStorage.getItem('activePatient'));
-
     if (!activePatient) {
         patientBanner.textContent = "ERROR: No hay un paciente activo.";
         backToVisorBtn.href = 'index.html';
         return;
     }
-
     patientBanner.innerHTML = `Mostrando tamizajes para: <strong>${activePatient.nombre} ${activePatient.apellidoPaterno}</strong>`;
     backToVisorBtn.href = `visor.html?codigo=${activePatient.codigoUnico}`;
-
     loadAndDisplayTamizajes();
 
     // --- MANEJO DE EVENTOS ---
@@ -42,11 +36,10 @@ document.addEventListener('DOMContentLoaded', () => {
         try {
             const response = await fetch(`${API_URL}?action=getTamizajes&codigo=${activePatient.codigoUnico}`);
             const data = await response.json();
-
             if (data.status !== 'success') throw new Error(data.message);
             
             const tamizajesGuardados = data.data;
-            listContainer.innerHTML = ''; // Limpiar lista
+            listContainer.innerHTML = '';
 
             TIPOS_DE_TAMIZAJES.forEach(tipo => {
                 const registroExistente = tamizajesGuardados.find(t => t.tipoTamiz === tipo);
@@ -63,10 +56,9 @@ document.addEventListener('DOMContentLoaded', () => {
         card.className = 'tamizaje-card';
         card.dataset.tipo = tipo;
 
-        // --- CORRECCIÓN AQUÍ ---
-        // Se crea la fecha directamente del valor del API, sin añadirle nada.
-        const statusText = registro ? `Realizado: ${new Date(registro.fechaRealizacion).toLocaleDateString('es-ES')}` : 'Pendiente';
-        
+        // --- AJUSTE AQUÍ ---
+        // Ahora podemos formatear la fecha de forma segura, añadiendo 'T00:00:00' para evitar problemas de zona horaria
+        const statusText = registro ? `Realizado: ${new Date(registro.fechaRealizacion + 'T00:00:00').toLocaleDateString('es-ES')}` : 'Pendiente';
         const statusClass = registro ? 'status-completado' : 'status-pendiente';
         const resultadoText = registro ? `Resultado: ${registro.resultado}` : '';
 
@@ -79,7 +71,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 <span class="${statusClass}">${statusText}</span>
             </div>
         `;
-
         card.addEventListener('click', () => openModal(tipo, registro));
         return card;
     }
@@ -87,11 +78,13 @@ document.addEventListener('DOMContentLoaded', () => {
     function openModal(tipo, registro) {
         responseMsg.style.display = 'none';
         modalTitle.textContent = `${registro ? 'Editar' : 'Registrar'} Tamizaje ${tipo}`;
-        
         tamizajeForm.reset();
         document.getElementById('tipoTamiz').value = tipo;
+        
         if (registro) {
-            document.getElementById('fechaRealizacion').value = registro.fechaRealizacion.substring(0, 10);
+            // --- AJUSTE AQUÍ ---
+            // Ya no se necesita .substring(0, 10) porque el formato es correcto
+            document.getElementById('fechaRealizacion').value = registro.fechaRealizacion;
             document.getElementById('numeroFolio').value = registro.numeroFolio || '';
             document.getElementById('resultado').value = registro.resultado || '';
             document.getElementById('observaciones').value = registro.observaciones || '';
@@ -134,7 +127,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (data.status !== 'success') throw new Error(data.message);
             
             closeModal();
-            loadAndDisplayTamizajes(); // Recargar la lista
+            loadAndDisplayTamizajes();
         } catch (error) {
             responseMsg.textContent = `Error: ${error.message}`;
             responseMsg.className = 'error';
