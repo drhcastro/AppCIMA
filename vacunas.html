@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Esquema de Vacunación - CIMA Nahui</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="registro-style.css">
+</head>
+<body>
+
+<div class="form-container">
+    <header class="form-header">
+        <h1>💉 Esquema de Vacunación</h1>
+        <p id="patient-banner">Cargando paciente...</p>
+    </header>
+
+    <div class="card">
+        <div class="card-header">
+            <h3>Historial de Vacunas Aplicadas</h3>
+            <button id="add-vaccine-btn" class="button-primary">➕ Registrar Dosis</button>
+        </div>
+        <div class="table-container">
+            <table id="vacunas-table">
+                <thead>
+                    <tr>
+                        <th>Vacuna</th>
+                        <th>Dosis</th>
+                        <th>Fecha de Aplicación</th>
+                        <th>Lote</th>
+                        <th>Profesional</th>
+                    </tr>
+                </thead>
+                <tbody id="vacunas-table-body">
+                    </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div id="modal-backdrop" class="modal-backdrop hidden">
+        <div id="vacuna-modal" class="modal-content">
+            <h2>Registrar Nueva Dosis</h2>
+            <form id="vacuna-form">
+                <div class="form-group">
+                    <label for="nombreVacuna">Nombre de la Vacuna</label>
+                    <input type="text" id="nombreVacuna" required>
+                </div>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="dosis">Dosis</label>
+                        <input type="text" id="dosis" placeholder="Ej: 1ra, Refuerzo, Anual">
+                    </div>
+                    <div class="form-group">
+                        <label for="fechaAplicacion">Fecha de Aplicación</label>
+                        <input type="date" id="fechaAplicacion" required>
+                    </div>
+                </div>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="lote">Lote</label>
+                        <input type="text" id="lote">
+                    </div>
+                    <div class="form-group">
+                        <label for="profesional">Profesional que aplicó</label>
+                        <input type="text" id="profesional">
+                    </div>
+                </div>
+                <div class="modal-actions">
+                    <button type="submit" class="button-primary">Guardar Dosis</button>
+                    <button type="button" id="close-modal-btn" class="button-secondary">Cancelar</button>
+                </div>
+                <div id="response-message"></div>
+            </form>
+        </div>
+    </div>
+
+    <div class="actions-toolbar">
+        <a href="#" id="back-to-visor" class="button-secondary">⬅️ Regresar al Expediente</a>
+    </div>
+
+    <footer class="form-footer">
+        <p>CIMA Nahui de Occidente &copy; 2025</p>
+    </footer>
+</div>
+
+<script src="vacunas-script.js"></script>
+
+</body>
+</html>
