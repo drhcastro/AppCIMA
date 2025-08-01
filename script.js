@@ -30,35 +30,32 @@ const summaryContainer = document.getElementById('history-summary-container');
 const summaryCard = document.getElementById('summary-card');
 const dobInput = document.getElementById('dob');
 
-
 // --- INICIALIZACIÓN ---
 document.addEventListener('DOMContentLoaded', () => {
     measureDateInput.valueAsDate = new Date();
     
-    // --- LÓGICA CORREGIDA PARA CARGAR PACIENTE ACTIVO ---
     const activePatientString = localStorage.getItem('activePatient');
     
     if (activePatientString) {
         const activePatient = JSON.parse(activePatientString);
         
-        // Si hay un paciente, rellenar los campos
-        dobInput.value = activePatient.fechaNacimiento;
+        // --- CORRECCIÓN AQUÍ ---
+        // Si existe la fecha de nacimiento, corta la cadena para obtener solo AAAA-MM-DD
+        if (activePatient.fechaNacimiento) {
+            dobInput.value = activePatient.fechaNacimiento.substring(0, 10);
+        }
         
-        // CORRECCIÓN: "Traducir" el valor del sexo para el menú desplegable
         if (activePatient.sexo) {
             const genderValue = activePatient.sexo.toLowerCase() === 'niño' ? 'boys' : 'girls';
             sexSelect.value = genderValue;
         }
         
-        // Deshabilitar los campos para evitar cambios accidentales
         dobInput.disabled = true;
         sexSelect.disabled = true;
         
-        // Mostrar el banner con el nombre del paciente
         const banner = document.getElementById('active-patient-banner');
         banner.innerHTML = `<p>Paciente Activo: <span class="patient-name">${activePatient.nombre} ${activePatient.apellidoPaterno}</span> | Código: ${activePatient.codigoUnico}</p>`;
     } else {
-        // Si no hay paciente, limpiar los campos
         dobInput.value = '';
         sexSelect.value = 'boys';
         dobInput.disabled = false;
@@ -81,7 +78,6 @@ document.addEventListener('DOMContentLoaded', () => {
 function updateUI(chartKey) {
     const config = chartConfig[chartKey];
     const isAgeBased = config.requires === 'age';
-    // Muestra u oculta el input de talla/longitud
     document.getElementById('length-height-inputs').style.display = isAgeBased ? 'none' : 'block';
     document.getElementById('measurement-label').textContent = config.measurementLabel;
 }
@@ -137,7 +133,6 @@ function clearAll() {
     summaryContainer.innerHTML = '';
     summaryCard.style.display = 'none';
 
-    // También reactiva los campos de paciente
     dobInput.value = '';
     sexSelect.value = 'boys';
     dobInput.disabled = false;
@@ -152,7 +147,7 @@ function updateHistorySummary() {
         return;
     }
 
-    summaryContainer.innerHTML = ''; // Limpiar
+    summaryContainer.innerHTML = '';
 
     const groupedByDate = patientHistory.reduce((acc, p) => {
         if (!acc[p.date]) acc[p.date] = [];
