@@ -40,14 +40,15 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
-        // El API ya devuelve las consultas ordenadas por fecha (la más reciente primero)
         consultas.forEach(consulta => {
             const consultaCard = document.createElement('div');
             consultaCard.className = 'consulta-card';
 
-            const fecha = new Date(consulta.fechaConsulta + 'T00:00:00').toLocaleDateString('es-ES', { year: 'numeric', month: 'long', day: 'numeric' });
+            // --- CORRECCIÓN AQUÍ ---
+            // Simplemente creamos la fecha directamente desde el valor que viene del API,
+            // sin añadirle nada más.
+            const fecha = new Date(consulta.fechaConsulta).toLocaleDateString('es-ES', { year: 'numeric', month: 'long', day: 'numeric' });
 
-            // Usamos <details> y <summary> para crear un acordeón simple y nativo
             consultaCard.innerHTML = `
                 <details>
                     <summary class="consulta-summary">
