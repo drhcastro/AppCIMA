@@ -10,6 +10,7 @@ document.addEventListener('DOMContentLoaded', () => {
     
     // --- LÓGICA DE INICIALIZACIÓN ---
     const activePatient = JSON.parse(localStorage.getItem('activePatient'));
+    const currentUser = JSON.parse(sessionStorage.getItem('currentUser')); // <-- Obtener usuario actual
 
     if (!activePatient) {
         patientBanner.textContent = "ERROR: No hay un paciente activo.";
@@ -17,9 +18,10 @@ document.addEventListener('DOMContentLoaded', () => {
         return;
     }
 
-    patientBanner.innerHTML = `Creando plan para: <strong>${activePatient.nombre} ${activePatient.apellidoPaterno}</strong>`;
+    patientBanner.innerHTML = `Creando plan для: <strong>${activePatient.nombre} ${activePatient.apellidoPaterno}</strong>`;
     document.getElementById('fechaPlan').valueAsDate = new Date();
 
+    applyPermissions(); // <-- Aplicar permisos al cargar la página
 
     // --- MANEJO DEL FORMULARIO ---
     planForm.addEventListener('submit', async (e) => {
@@ -47,7 +49,6 @@ document.addEventListener('DOMContentLoaded', () => {
             const data = await response.json();
             if (data.status !== 'success') throw new Error(data.message);
             
-            // Si se guarda con éxito, redirige al historial
             alert('Plan de tratamiento guardado con éxito.');
             window.location.href = 'planes.html';
 
@@ -59,4 +60,20 @@ document.addEventListener('DOMContentLoaded', () => {
             submitBtn.textContent = 'Guardar Plan de Tratamiento';
         }
     });
+    
+    // --- FUNCIÓN DE PERMISOS ---
+    function applyPermissions() {
+        if (!currentUser) return;
+        const userRole = currentUser.profile;
+
+        // Regla: El perfil 'asistente' no puede crear planes.
+        if (userRole === 'asistente') {
+            // Deshabilitar todos los campos y el botón del formulario
+            planForm.querySelectorAll('input, textarea, button').forEach(el => {
+                el.disabled = true;
+            });
+            submitBtn.textContent = 'Creación no permitida para este perfil';
+            submitBtn.style.backgroundColor = '#6c757d'; // Color gris
+        }
+    }
 });
