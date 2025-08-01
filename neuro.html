@@ -31,34 +31,61 @@
 
         <div id="amiel-tyson" class="tab-content">
             <h2>Registrar Valoración Amiel-Tyson</h2>
-            <form id="neuro-form">
-                <input type="hidden" id="tipoValoracion" value="Amiel-Tyson">
+            <form id="neuro-form-amiel">
+                <input type="hidden" id="tipoValoracionAmiel" value="Amiel-Tyson">
                 <div class="form-grid">
                     <div class="form-group">
-                        <label for="fechaValoracion">Fecha de Valoración</label>
-                        <input type="date" id="fechaValoracion" required>
+                        <label for="fechaValoracionAmiel">Fecha de Valoración</label>
+                        <input type="date" id="fechaValoracionAmiel" required>
                     </div>
                     <div class="form-group">
-                        <label for="edadMeses">Edad en la Valoración (meses)</label>
-                        <input type="number" id="edadMeses" required>
+                        <label for="edadMesesAmiel">Edad en la Valoración (meses)</label>
+                        <input type="number" id="edadMesesAmiel" required>
                     </div>
                 </div>
                 <div class="form-group">
-                    <label for="resultados">Resultados y Hallazgos</label>
-                    <textarea id="resultados" rows="8"></textarea>
+                    <label for="resultadosAmiel">Resultados y Hallazgos</label>
+                    <textarea id="resultadosAmiel" rows="8"></textarea>
                 </div>
                 <div class="form-group">
-                    <label for="observaciones">Observaciones Adicionales</label>
-                    <textarea id="observaciones" rows="4"></textarea>
+                    <label for="observacionesAmiel">Observaciones Adicionales</label>
+                    <textarea id="observacionesAmiel" rows="4"></textarea>
                 </div>
-                <button type="submit" class="button-primary">Guardar Valoración</button>
-                <div id="response-message"></div>
+                <button type="submit" class="button-primary">Guardar Valoración Amiel-Tyson</button>
+                <div id="response-message-amiel"></div>
             </form>
         </div>
 
         <div id="hitos" class="tab-content">
-            <h2>Hitos del Desarrollo</h2>
-            <p>Este módulo para registrar hitos específicos del desarrollo por edad está en construcción.</p>
+            <h2>Registrar Hitos del Desarrollo</h2>
+            <form id="neuro-form-hitos">
+                 <div class="form-grid">
+                    <div class="form-group">
+                        <label for="fechaValoracionHitos">Fecha de Valoración</label>
+                        <input type="date" id="fechaValoracionHitos" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="edadHitosSelect">Seleccionar Edad a Evaluar</label>
+                        <select id="edadHitosSelect">
+                            <option value="">-- Elija una edad --</option>
+                            <option value="rn">Recién Nacido</option>
+                            <option value="2m">2 Meses</option>
+                            <option value="4m">4 Meses</option>
+                            <option value="6m">6 Meses</option>
+                            <option value="9m">9 Meses</option>
+                            <option value="12m">12 Meses</option>
+                        </select>
+                    </div>
+                </div>
+                <div id="hitos-checklist-container">
+                    </div>
+                <div class="form-group">
+                    <label for="observacionesHitos">Observaciones Adicionales</label>
+                    <textarea id="observacionesHitos" rows="3"></textarea>
+                </div>
+                <button type="submit" class="button-primary">Guardar Hitos</button>
+                <div id="response-message-hitos"></div>
+            </form>
         </div>
     </div>
     
