@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Plan de Tratamiento</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="imprimir-style.css">
+</head>
+<body>
+
+<div class="page-container">
+    <div class="printable-page">
+        <header class="page-header">
+            <div class="clinic-info">
+                <h1>CIMA Nahui de Occidente</h1>
+                <p>Centro Integral Materno Infantil</p>
+            </div>
+            <div class="document-title">
+                <h2>Plan de Tratamiento</h2>
+            </div>
+        </header>
+
+        <section class="patient-info">
+            <div class="info-item"><strong>Paciente:</strong> <span id="nombre-paciente"></span></div>
+            <div class="info-item"><strong>Fecha de Nacimiento:</strong> <span id="fecha-nacimiento"></span></div>
+            <div class="info-item"><strong>Fecha del Plan:</strong> <span id="fecha-plan"></span></div>
+        </section>
+
+        <main class="plan-content">
+            <div class="content-section">
+                <h3>Diagnóstico Relacionado</h3>
+                <p id="diagnostico"></p>
+            </div>
+
+            <div class="content-section">
+                <h3>Indicaciones y Tratamiento</h3>
+                <pre id="indicaciones"></pre>
+            </div>
+
+            <div class="content-section">
+                <h3>Próxima Cita</h3>
+                <p id="proxima-cita"></p>
+            </div>
+        </main>
+
+        <footer class="page-footer">
+            <div class="signature-line">
+                <p><strong>Firma del Profesional:</strong> <span id="profesional"></span></p>
+                <hr>
+            </div>
+            <div class="clinic-contact">
+                <p>Contacto: (667) 123-4567 | correo@ejemplo.com | Domicilio Conocido</p>
+                <p>&copy; 2025 CIMA Nahui de Occidente</p>
+            </div>
+        </footer>
+    </div>
+
+    <div class="actions-toolbar no-print">
+        <button id="print-btn" class="button-primary">🖨️ Imprimir / Guardar PDF</button>
+        <a href="planes.html" class="button-secondary">⬅️ Regresar al Historial</a>
+    </div>
+</div>
+
+<script src="imprimir-plan-script.js"></script>
+
+</body>
+</html>
