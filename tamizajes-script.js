@@ -61,10 +61,13 @@ document.addEventListener('DOMContentLoaded', () => {
     function createTamizajeCard(tipo, registro) {
         const card = document.createElement('div');
         card.className = 'tamizaje-card';
-        card.dataset.tipo = tipo; // Guardar el tipo de tamiz en el elemento
+        card.dataset.tipo = tipo;
 
+        // --- CORRECCIÓN AQUÍ ---
+        // Se crea la fecha directamente del valor del API, sin añadirle nada.
+        const statusText = registro ? `Realizado: ${new Date(registro.fechaRealizacion).toLocaleDateString('es-ES')}` : 'Pendiente';
+        
         const statusClass = registro ? 'status-completado' : 'status-pendiente';
-        const statusText = registro ? `Realizado: ${new Date(registro.fechaRealizacion + 'T00:00:00').toLocaleDateString()}` : 'Pendiente';
         const resultadoText = registro ? `Resultado: ${registro.resultado}` : '';
 
         card.innerHTML = `
@@ -85,7 +88,6 @@ document.addEventListener('DOMContentLoaded', () => {
         responseMsg.style.display = 'none';
         modalTitle.textContent = `${registro ? 'Editar' : 'Registrar'} Tamizaje ${tipo}`;
         
-        // Llenar el formulario con datos existentes o vaciarlo
         tamizajeForm.reset();
         document.getElementById('tipoTamiz').value = tipo;
         if (registro) {
@@ -132,7 +134,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (data.status !== 'success') throw new Error(data.message);
             
             closeModal();
-            loadAndDisplayTamizajes(); // Recargar la lista para mostrar los cambios
+            loadAndDisplayTamizajes(); // Recargar la lista
         } catch (error) {
             responseMsg.textContent = `Error: ${error.message}`;
             responseMsg.className = 'error';
