@@ -10,13 +10,11 @@
     <link rel="stylesheet" href="registro-style.css">
 </head>
 <body>
-
 <div class="form-container">
     <header class="form-header">
         <h1>📝 Registro de Nuevo Paciente</h1>
         <p>Completa la información en cada pestaña para generar el expediente.</p>
     </header>
-
     <form id="registro-form">
         <div class="tab-nav">
             <button type="button" class="tab-button active" data-tab="identidad">Identidad</button>
@@ -25,7 +23,6 @@
             <button type="button" class="tab-button" data-tab="patologicos">Patológicos</button>
             <button type="button" class="tab-button" data-tab="no-patologicos">No Patológicos</button>
         </div>
-
         <div class="tab-content-container">
             <div id="identidad" class="tab-content active">
                 <div class="form-grid">
@@ -42,12 +39,19 @@
                     <div class="form-group"><label for="alergias">Alergias Conocidas</label><input type="text" id="alergias"></div>
                 </div>
             </div>
-
-            <div id="heredofamiliares" class="tab-content">
-                <div class="form-group">
-                    <label for="antecedentesHeredofamiliares">Detalles de Antecedentes Heredofamiliares</label>
-                    <textarea id="antecedentesHeredofamiliares" rows="12"></textarea>
-                </div>
-            </div>
-
-            <div id="
+            <div id="heredofamiliares" class="tab-content"><div class="form-group"><label for="antecedentesHeredofamiliares">Detalles de Antecedentes Heredofamiliares</label><textarea id="antecedentesHeredofamiliares" rows="12"></textarea></div></div>
+            <div id="perinatales" class="tab-content"><div class="form-group"><label for="antecedentesPerinatales">Detalles de Antecedentes Perinatales y Natales</label><textarea id="antecedentesPerinatales" rows="12"></textarea></div></div>
+            <div id="patologicos" class="tab-content"><div class="form-group"><label for="antecedentesPatologicos">Detalles de Antecedentes Personales Patológicos</label><textarea id="antecedentesPatologicos" rows="12"></textarea></div></div>
+            <div id="no-patologicos" class="tab-content"><div class="form-group"><label for="antecedentesNoPatologicos">Detalles de Antecedentes Personales No Patológicos</label><textarea id="antecedentesNoPatologicos" rows="12"></textarea></div></div>
+        </div>
+        <button type="submit" id="submit-btn" class="button-primary">Registrar Paciente</button>
+        <div id="response-message"></div>
+    </form>
+    <footer class="form-footer">
+        <a href="index.html" style="color: #aaa; text-decoration: none;">⬅️ Regresar al Menú Principal</a>
+        <p>CIMA Nahui de Occidente &copy; 2025</p>
+    </footer>
+</div>
+<script src="registro-script.js"></script>
+</body>
+</html>
