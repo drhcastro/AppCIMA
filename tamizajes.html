@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tamizajes - CIMA Nahui</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="registro-style.css"> </head>
+<body>
+
+<div class="form-container">
+    <header class="form-header">
+        <h1>🧪 Tamizajes Neonatales y de Seguimiento</h1>
+        <p id="patient-banner">Cargando paciente...</p>
+    </header>
+
+    <div id="tamizajes-list-container">
+        </div>
+
+    <div id="modal-backdrop" class="modal-backdrop hidden">
+        <div id="tamizaje-modal" class="modal-content">
+            <h2 id="modal-title">Registrar Tamizaje</h2>
+            <form id="tamizaje-form">
+                <input type="hidden" id="tipoTamiz">
+                <div class="form-group">
+                    <label for="fechaRealizacion">Fecha de Realización</label>
+                    <input type="date" id="fechaRealizacion">
+                </div>
+                <div class="form-group">
+                    <label for="numeroFolio">Número de Folio</label>
+                    <input type="text" id="numeroFolio">
+                </div>
+                <div class="form-group">
+                    <label for="resultado">Resultado</label>
+                    <input type="text" id="resultado">
+                </div>
+                 <div class="form-group">
+                    <label for="observaciones">Observaciones</label>
+                    <textarea id="observaciones" rows="3"></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="seguimiento">Seguimiento</label>
+                    <textarea id="seguimiento" rows="3"></textarea>
+                </div>
+                 <div class="form-group">
+                    <label for="notas">Notas Adicionales</label>
+                    <textarea id="notas" rows="2"></textarea>
+                </div>
+                <div class="modal-actions">
+                    <button type="submit" class="button-primary">Guardar Cambios</button>
+                    <button type="button" id="close-modal-btn" class="button-secondary">Cancelar</button>
+                </div>
+                 <div id="response-message"></div>
+            </form>
+        </div>
+    </div>
+
+    <div class="actions-toolbar">
+        <a href="#" id="back-to-visor" class="button-secondary">⬅️ Regresar al Expediente</a>
+    </div>
+
+    <footer class="form-footer">
+        <p>CIMA Nahui de Occidente &copy; 2025</p>
+    </footer>
+</div>
+
+<script src="tamizajes-script.js"></script>
+
+</body>
+</html>
