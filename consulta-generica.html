@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title id="page-title">Consulta de Especialidad</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="registro-style.css">
+</head>
+<body>
+
+<div class="form-container">
+    <header class="form-header">
+        <h1 id="main-title">Consulta de Especialidad</h1>
+        <p id="patient-banner">Cargando paciente...</p>
+    </header>
+
+    <div class="card">
+        <h3 id="form-title">Registrar Nueva Nota</h3>
+        <form id="nota-form">
+            <div class="form-grid">
+                <div class="form-group">
+                    <label for="fechaConsulta">Fecha</label>
+                    <input type="date" id="fechaConsulta" required>
+                </div>
+                <div class="form-group">
+                    <label for="profesional">Profesional a Cargo</label>
+                    <input type="text" id="profesional">
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="notaClinica">Nota Clínica / Evolución</label>
+                <textarea id="notaClinica" rows="6"></textarea>
+            </div>
+            <div class="form-group">
+                <label for="planSeguimiento">Plan y Seguimiento</label>
+                <textarea id="planSeguimiento" rows="4"></textarea>
+            </div>
+            <button type="submit" class="button-primary">Guardar Nota</button>
+            <div id="response-message"></div>
+        </form>
+    </div>
+
+    <div class="card">
+        <h3>Historial de la Especialidad</h3>
+        <div id="historial-container"></div>
+    </div>
+    
+    <div class="actions-toolbar">
+        <a href="#" id="back-to-visor" class="button-secondary">⬅️ Regresar al Expediente</a>
+    </div>
+
+    <footer class="form-footer">
+        <p>CIMA Nahui de Occidente &copy; 2025</p>
+    </footer>
+</div>
+
+<script src="consulta-generica-script.js"></script>
+
+</body>
+</html>
