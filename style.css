@@ -283,3 +283,43 @@ input:focus, select:focus {
         position: relative;
     }
 }
+/* ... al final de style.css ... */
+
+/* Estilo para el banner del paciente activo */
+#active-patient-banner {
+    background-color: #e7f5ff;
+    color: var(--primary-color);
+    padding: 8px 16px;
+    border-radius: 8px;
+    margin: 16px auto 0;
+    max-width: 800px;
+    font-weight: 600;
+}
+
+#active-patient-banner .patient-name {
+    font-weight: 700;
+}
+
+/* Estilo para el botón secundario de regreso */
+.button-secondary {
+    display: block;
+    width: 100%;
+    padding: 14px;
+    text-align: center;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 1rem;
+    color: var(--primary-color);
+    background-color: transparent;
+    border: 2px solid var(--primary-color);
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+.button-secondary:hover {
+    background-color: var(--primary-color);
+    color: white;
+}
+.full-width-btn {
+    margin-top: 16px;
+}
