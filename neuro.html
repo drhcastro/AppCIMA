@@ -30,63 +30,60 @@
         </div>
 
         <div id="amiel-tyson" class="tab-content">
-            <h2>Registrar Valoración Amiel-Tyson</h2>
+            <h2>Registrar Valoración Neurológica (Amiel-Tyson)</h2>
             <form id="neuro-form-amiel">
-                <input type="hidden" id="tipoValoracionAmiel" value="Amiel-Tyson">
                 <div class="form-grid">
-                    <div class="form-group">
-                        <label for="fechaValoracionAmiel">Fecha de Valoración</label>
-                        <input type="date" id="fechaValoracionAmiel" required>
+                    <div class="form-group"><label for="fechaValoracionAmiel">Fecha de Valoración</label><input type="date" id="fechaValoracionAmiel" required></div>
+                    <div class="form-group"><label for="edadMesesAmiel">Edad en la Valoración (meses)</label><input type="number" id="edadMesesAmiel" required></div>
+                </div>
+
+                <div class="assessment-section">
+                    <h4>Tono Pasivo</h4>
+                    <div class="assessment-item">
+                        <label>Puntuación Tono Pasivo</label>
+                        <input type="number" class="puntuacion-input" id="tonoPasivoPuntuacion">
+                        <textarea id="tonoPasivoObs" placeholder="Observaciones de Tono Pasivo..." rows="3"></textarea>
                     </div>
-                    <div class="form-group">
-                        <label for="edadMesesAmiel">Edad en la Valoración (meses)</label>
-                        <input type="number" id="edadMesesAmiel" required>
+                </div>
+
+                <div class="assessment-section">
+                    <h4>Tono Activo</h4>
+                    <div class="assessment-item">
+                        <label>Puntuación Tono Activo</label>
+                        <input type="number" class="puntuacion-input" id="tonoActivoPuntuacion">
+                        <textarea id="tonoActivoObs" placeholder="Observaciones de Tono Activo..." rows="3"></textarea>
                     </div>
                 </div>
-                <div class="form-group">
-                    <label for="resultadosAmiel">Resultados y Hallazgos</label>
-                    <textarea id="resultadosAmiel" rows="8"></textarea>
+
+                <div class="assessment-section">
+                    <h4>Reflejos Primarios</h4>
+                     <div class="assessment-item">
+                        <label>Puntuación Reflejos</label>
+                        <input type="number" class="puntuacion-input" id="reflejosPuntuacion">
+                        <textarea id="reflejosObs" placeholder="Observaciones de Reflejos Primarios..." rows="3"></textarea>
+                    </div>
                 </div>
-                <div class="form-group">
-                    <label for="observacionesAmiel">Observaciones Adicionales</label>
-                    <textarea id="observacionesAmiel" rows="4"></textarea>
+                
+                <hr>
+                
+                <div class="form-grid">
+                     <div class="form-group">
+                        <label for="puntuacionTotal">Puntuación Total</label>
+                        <input type="number" id="puntuacionTotal" readonly style="background-color: #e9ecef;">
+                    </div>
+                    <div class="form-group full-width">
+                         <label for="conclusion">Conclusión / Resumen de la Valoración</label>
+                         <textarea id="conclusion" rows="4"></textarea>
+                    </div>
                 </div>
+               
                 <button type="submit" class="button-primary">Guardar Valoración Amiel-Tyson</button>
                 <div id="response-message-amiel"></div>
             </form>
         </div>
 
         <div id="hitos" class="tab-content">
-            <h2>Registrar Hitos del Desarrollo</h2>
-            <form id="neuro-form-hitos">
-                 <div class="form-grid">
-                    <div class="form-group">
-                        <label for="fechaValoracionHitos">Fecha de Valoración</label>
-                        <input type="date" id="fechaValoracionHitos" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="edadHitosSelect">Seleccionar Edad a Evaluar</label>
-                        <select id="edadHitosSelect">
-                            <option value="">-- Elija una edad --</option>
-                            <option value="rn">Recién Nacido</option>
-                            <option value="2m">2 Meses</option>
-                            <option value="4m">4 Meses</option>
-                            <option value="6m">6 Meses</option>
-                            <option value="9m">9 Meses</option>
-                            <option value="12m">12 Meses</option>
-                        </select>
-                    </div>
-                </div>
-                <div id="hitos-checklist-container">
-                    </div>
-                <div class="form-group">
-                    <label for="observacionesHitos">Observaciones Adicionales</label>
-                    <textarea id="observacionesHitos" rows="3"></textarea>
-                </div>
-                <button type="submit" class="button-primary">Guardar Hitos</button>
-                <div id="response-message-hitos"></div>
-            </form>
-        </div>
+            </div>
     </div>
     
     <div class="actions-toolbar">
