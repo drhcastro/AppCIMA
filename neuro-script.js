@@ -63,9 +63,21 @@ document.addEventListener('DOMContentLoaded', () => {
     const edadHitosSelect = document.getElementById('edadHitosSelect');
     const hitosChecklistContainer = document.getElementById('hitos-checklist-container');
 
-    // --- LÓGICA DE INICIALIZACIÓN ---
-    const activePatient = JSON.parse(localStorage.getItem('activePatient'));
+    // --- LÓGICA DE PESTAÑAS (CRUCIAL PARA SOLUCIONAR EL ERROR) ---
+    tabButtons.forEach(button => {
+        button.addEventListener('click', () => {
+            // Quita la clase 'active' de todos los botones y contenidos
+            tabButtons.forEach(btn => btn.classList.remove('active'));
+            tabContents.forEach(content => content.classList.remove('active'));
 
+            // Añade la clase 'active' al botón presionado y al contenido correspondiente
+            button.classList.add('active');
+            document.getElementById(button.dataset.tab).classList.add('active');
+        });
+    });
+
+    // --- INICIALIZACIÓN ---
+    const activePatient = JSON.parse(localStorage.getItem('activePatient'));
     if (!activePatient) {
         patientBanner.textContent = "ERROR: No hay un paciente activo.";
         backToVisorBtn.href = 'index.html';
@@ -80,24 +92,12 @@ document.addEventListener('DOMContentLoaded', () => {
     loadNeuroHistory();
 
     // --- MANEJO DE EVENTOS ---
-    tabButtons.forEach(button => {
-        button.addEventListener('click', () => {
-            tabButtons.forEach(btn => btn.classList.remove('active'));
-            button.classList.add('active');
-            tabContents.forEach(content => {
-                content.classList.remove('active');
-                if (content.id === button.dataset.tab) content.classList.add('active');
-            });
-        });
-    });
-    
     puntuacionInputs.forEach(input => input.addEventListener('input', updateTotalScore));
     edadHitosSelect.addEventListener('change', renderHitosChecklist);
     formAmiel.addEventListener('submit', handleAmielSubmit);
     formHitos.addEventListener('submit', handleHitosSubmit);
     
     // --- FUNCIONES ---
-
     function updateTotalScore() {
         let total = 0;
         puntuacionInputs.forEach(input => {
@@ -154,7 +154,6 @@ document.addEventListener('DOMContentLoaded', () => {
             });
             const data = await response.json();
             if (data.status !== 'success') throw new Error(data.message);
-
             responseMsgAmiel.textContent = 'Valoración Amiel-Tyson guardada con éxito.';
             responseMsgAmiel.className = 'success';
             formAmiel.reset();
@@ -196,7 +195,6 @@ document.addEventListener('DOMContentLoaded', () => {
             });
             const data = await response.json();
             if (data.status !== 'success') throw new Error(data.message);
-
             responseMsgHitos.textContent = 'Hitos guardados con éxito.';
             responseMsgHitos.className = 'success';
             formHitos.reset();
@@ -220,7 +218,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 fetch(`${API_URL}?action=getNeuro&codigo=${activePatient.codigoUnico}`),
                 fetch(`${API_URL}?action=getAmielTyson&codigo=${activePatient.codigoUnico}`)
             ]);
-
             const neuroData = await neuroRes.json();
             const amielData = await amielRes.json();
 
@@ -245,7 +242,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 let detailsHtml;
                 let valoracionType = valoracion.tipoValoracion;
 
-                if (valoracion.puntuacionTotal !== undefined) { // Es una valoración Amiel-Tyson
+                if (valoracion.puntuacionTotal !== undefined) {
                     valoracionType = `Amiel-Tyson (Total: ${valoracion.puntuacionTotal})`;
                     detailsHtml = `
                         <p><strong>Tono Pasivo:</strong> Puntuación ${valoracion.tonoPasivoPuntuacion}. ${valoracion.tonoPasivoObs}</p>
@@ -254,13 +251,12 @@ document.addEventListener('DOMContentLoaded', () => {
                         <hr><p><strong>Puntuación Total: ${valoracion.puntuacionTotal}</strong></p>
                         <p><strong>Conclusión:</strong> ${valoracion.conclusion}</p>
                     `;
-                } else { // Es una nota genérica o de Hitos
+                } else {
                     detailsHtml = `
                         <p><strong>Resultados:</strong><br>${(valoracion.resultados || '').replace(/\n/g, '<br>')}</p>
                         <p><strong>Observaciones:</strong><br>${(valoracion.observaciones || '').replace(/\n/g, '<br>')}</p>
                     `;
                 }
-
                 card.innerHTML = `
                     <details>
                         <summary class="consulta-summary">
