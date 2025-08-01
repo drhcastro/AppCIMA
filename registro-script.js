@@ -1,15 +1,11 @@
 document.addEventListener('DOMContentLoaded', () => {
-    // --- CONFIGURACIÓN ---
     const API_URL = 'https://script.google.com/macros/s/AKfycbw6jZIjBoeSlIRF-lAMPNqmbxRsncqulzZEi8f7q2AyOawxbpSZRIUxsx9UgZwe/exec';
-
-    // --- ELEMENTOS DEL DOM ---
     const form = document.getElementById('registro-form');
     const submitBtn = document.getElementById('submit-btn');
     const responseMsg = document.getElementById('response-message');
-    
-    // --- LÓGICA DE PESTAÑAS ---
     const tabButtons = document.querySelectorAll('.tab-button');
     const tabContents = document.querySelectorAll('.tab-content');
+    
     tabButtons.forEach(button => {
         button.addEventListener('click', () => {
             tabButtons.forEach(btn => btn.classList.remove('active'));
@@ -23,18 +19,14 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-
-    // --- LÓGICA DEL FORMULARIO ---
     form.addEventListener('submit', function(e) {
         e.preventDefault(); 
         submitBtn.disabled = true;
         submitBtn.textContent = 'Registrando...';
         responseMsg.style.display = 'none';
 
-        // Crear un objeto con los datos de TODOS los campos del formulario
         const formData = {
             action: 'registrarPaciente',
-            // Pestaña 1: Identidad
             nombre: document.getElementById('nombre').value,
             apellidoPaterno: document.getElementById('apellidoPaterno').value,
             apellidoMaterno: document.getElementById('apellidoMaterno').value,
@@ -46,20 +38,16 @@ document.addEventListener('DOMContentLoaded', () => {
             nombrePapa: document.getElementById('nombrePapa').value,
             correo: document.getElementById('correo').value,
             alergias: document.getElementById('alergias').value,
-            // Pestañas de Antecedentes
             antecedentesHeredofamiliares: document.getElementById('antecedentesHeredofamiliares').value,
             antecedentesPerinatales: document.getElementById('antecedentesPerinatales').value,
             antecedentesPatologicos: document.getElementById('antecedentesPatologicos').value,
             antecedentesNoPatologicos: document.getElementById('antecedentesNoPatologicos').value
         };
 
-        // Enviar los datos a la API de Google Apps Script
         fetch(API_URL, {
             method: 'POST',
             body: JSON.stringify(formData),
-            headers: {
-                'Content-Type': 'text/plain;charset=utf-8',
-            },
+            headers: {'Content-Type': 'text/plain;charset=utf-8'},
         })
         .then(res => res.json())
         .then(data => {
@@ -67,7 +55,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 responseMsg.innerHTML = `¡Paciente registrado con éxito!<br><strong>Código Único: ${data.codigo}</strong><br>(Guarda este código para futuras consultas)`;
                 responseMsg.className = 'success';
                 form.reset();
-                // Volver a la primera pestaña
                 tabButtons.forEach(btn => btn.classList.remove('active'));
                 document.querySelector('.tab-button[data-tab="identidad"]').classList.add('active');
                 tabContents.forEach(content => content.classList.remove('active'));
