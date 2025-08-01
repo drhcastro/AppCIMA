@@ -407,3 +407,32 @@ details[open] > .consulta-summary::before {
 #vacunas-table tbody tr:hover {
     background-color: #f1f3f5;
 }
+/* ... al final de registro-style.css ... */
+
+/* --- Estilos para Checklist de Hitos --- */
+.checklist {
+    margin-top: 16px;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 16px;
+}
+.check-item {
+    display: flex;
+    align-items: center;
+    margin-bottom: 12px;
+}
+.check-item:last-child {
+    margin-bottom: 0;
+}
+.check-item input[type="checkbox"] {
+    width: 1.2em;
+    height: 1.2em;
+    margin-right: 12px;
+    cursor: pointer;
+}
+.check-item label {
+    margin-bottom: 0;
+    font-weight: normal;
+    color: var(--text-color);
+    cursor: pointer;
+}
