@@ -10,13 +10,11 @@
     <link rel="stylesheet" href="registro-style.css">
 </head>
 <body>
-
 <div class="form-container">
     <header class="form-header">
         <h1>📂 Expediente del Paciente</h1>
         <p id="patient-code-display">Cargando...</p>
     </header>
-
     <form id="patient-data-form">
         <div class="tab-nav">
             <button type="button" class="tab-button active" data-tab="identidad">Identidad</button>
@@ -25,7 +23,6 @@
             <button type="button" class="tab-button" data-tab="patologicos">Patológicos</button>
             <button type="button" class="tab-button" data-tab="no-patologicos">No Patológicos</button>
         </div>
-
         <div class="tab-content-container">
             <div id="identidad" class="tab-content active">
                 <div class="form-grid">
@@ -42,16 +39,32 @@
                     <div class="form-group"><label>Alergias</label><input type="text" id="alergias"></div>
                 </div>
             </div>
-
-            <div id="heredofamiliares" class="tab-content"><label>Detalles</label><textarea id="antecedentesHeredofamiliares" rows="12"></textarea></div>
-            <div id="perinatales" class="tab-content"><label>Detalles</label><textarea id="antecedentesPerinatales" rows="12"></textarea></div>
-            <div id="patologicos" class="tab-content"><label>Detalles</label><textarea id="antecedentesPatologicos" rows="12"></textarea></div>
-            <div id="no-patologicos" class="tab-content"><label>Detalles</label><textarea id="antecedentesNoPatologicos" rows="12"></textarea></div>
+            <div id="heredofamiliares" class="tab-content"><div class="form-group"><label>Detalles</label><textarea id="antecedentesHeredofamiliares" rows="12"></textarea></div></div>
+            <div id="perinatales" class="tab-content"><div class="form-group"><label>Detalles</label><textarea id="antecedentesPerinatales" rows="12"></textarea></div></div>
+            <div id="patologicos" class="tab-content"><div class="form-group"><label>Detalles</label><textarea id="antecedentesPatologicos" rows="12"></textarea></div></div>
+            <div id="no-patologicos" class="tab-content"><div class="form-group"><label>Detalles</label><textarea id="antecedentesNoPatologicos" rows="12"></textarea></div></div>
         </div>
-
         <button type="submit" id="save-changes-btn" class="button-primary section-divider">💾 Guardar Cambios en el Expediente</button>
         <div id="response-message"></div>
     </form>
-    
     <div class="actions-toolbar section-divider">
         <a href="consulta.html" class="button-primary">➕ Consulta Médica</a>
+        <a href="historial.html" class="button-primary">🧾 Historial Médico</a>
+        <a href="vacunas.html" class="button-primary">💉 Vacunación</a>
+        <a href="consulta-generica.html?tipo=psicologia" class="button-primary">🛋️ Psicología</a>
+        <a href="consulta-generica.html?tipo=nutricion" class="button-primary">🥗 Nutrición</a>
+        <a href="consulta-generica.html?tipo=rehabilitacion" class="button-primary">💪 Rehabilitación</a>
+        <a href="tamizajes.html" class="button-secondary">🧪 Tamizajes</a>
+        <a href="neuro.html" class="button-secondary">🧠 Neurodesarrollo</a>
+        <a href="graficas.html" id="go-to-charts" class="button-secondary">📊 Gráficas</a>
+    </div>
+    <div class="actions-toolbar">
+        <a href="index.html" class="button-secondary">⬅️ Regresar al Menú Principal</a>
+    </div>
+    <footer class="form-footer">
+        <p>CIMA Nahui de Occidente &copy; 2025</p>
+    </footer>
+</div>
+<script src="visor-script.js"></script>
+</body>
+</html>
