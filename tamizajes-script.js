@@ -1,7 +1,10 @@
 document.addEventListener('DOMContentLoaded', () => {
     // --- CONFIGURACIÓN ---
     const API_URL = 'https://script.google.com/macros/s/AKfycbw6jZIjBoeSlIRF-lAMPNqmbxRsncqulzZEi8f7q2AyOawxbpSZRIUxsx9UgZwe/exec';
-    const TIPOS_DE_TAMIZAJES = [ "Cardiológico", "Metabólico", "Visual", "Auditivo", "Genético", "Cadera" ];
+    const TIPOS_DE_TAMIZAJES = [
+        "Cardiológico", "Metabólico", "Visual", 
+        "Auditivo", "Genético", "Cadera"
+    ];
 
     // --- ELEMENTOS DEL DOM ---
     const patientBanner = document.getElementById('patient-banner');
@@ -13,15 +16,25 @@ document.addEventListener('DOMContentLoaded', () => {
     const closeModalBtn = document.getElementById('close-modal-btn');
     const responseMsg = document.getElementById('response-message');
 
-    // --- LÓGICA DE INICIALIZACIÓN ---
+    // --- LÓGICA DE INICIALIZACIÓN Y PERMISOS ---
     const activePatient = JSON.parse(localStorage.getItem('activePatient'));
+    const currentUser = JSON.parse(sessionStorage.getItem('currentUser'));
+
+    // Regla 1: Bloquear acceso total a 'asistente'
+    if (currentUser && currentUser.profile === 'asistente') {
+        document.body.innerHTML = '<div style="text-align: center; padding: 40px; font-family: Poppins, sans-serif;"><h1>Acceso Denegado</h1><p>Tu perfil no tiene permiso para ver esta sección.</p><a href="javascript:history.back()" style="color: #005f73;">Regresar</a></div>';
+        return;
+    }
+
     if (!activePatient) {
         patientBanner.textContent = "ERROR: No hay un paciente activo.";
         backToVisorBtn.href = 'index.html';
         return;
     }
+
     patientBanner.innerHTML = `Mostrando tamizajes para: <strong>${activePatient.nombre} ${activePatient.apellidoPaterno}</strong>`;
     backToVisorBtn.href = `visor.html?codigo=${activePatient.codigoUnico}`;
+
     loadAndDisplayTamizajes();
 
     // --- MANEJO DE EVENTOS ---
@@ -41,9 +54,13 @@ document.addEventListener('DOMContentLoaded', () => {
             const tamizajesGuardados = data.data;
             listContainer.innerHTML = '';
 
+            const userRole = currentUser ? currentUser.profile : null;
+            const hasEditPermission = (userRole === 'medico' || userRole === 'superusuario');
+
             TIPOS_DE_TAMIZAJES.forEach(tipo => {
                 const registroExistente = tamizajesGuardados.find(t => t.tipoTamiz === tipo);
-                const card = createTamizajeCard(tipo, registroExistente);
+                // Pasamos el permiso de edición a la función que crea la tarjeta
+                const card = createTamizajeCard(tipo, registroExistente, hasEditPermission);
                 listContainer.appendChild(card);
             });
         } catch (error) {
@@ -51,14 +68,12 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    function createTamizajeCard(tipo, registro) {
+    function createTamizajeCard(tipo, registro, canEdit) {
         const card = document.createElement('div');
         card.className = 'tamizaje-card';
         card.dataset.tipo = tipo;
 
-        // --- AJUSTE AQUÍ ---
-        // Ahora podemos formatear la fecha de forma segura, añadiendo 'T00:00:00' para evitar problemas de zona horaria
-        const statusText = registro ? `Realizado: ${new Date(registro.fechaRealizacion + 'T00:00:00').toLocaleDateString('es-ES')}` : 'Pendiente';
+        const statusText = registro ? `Realizado: ${new Date(registro.fechaRealizacion).toLocaleDateString('es-ES')}` : 'Pendiente';
         const statusClass = registro ? 'status-completado' : 'status-pendiente';
         const resultadoText = registro ? `Resultado: ${registro.resultado}` : '';
 
@@ -71,19 +86,23 @@ document.addEventListener('DOMContentLoaded', () => {
                 <span class="${statusClass}">${statusText}</span>
             </div>
         `;
-        card.addEventListener('click', () => openModal(tipo, registro));
+
+        // Regla 2 y 3: Solo añadir el evento de clic si el usuario tiene permiso
+        if (canEdit) {
+            card.addEventListener('click', () => openModal(tipo, registro));
+        } else {
+            card.classList.add('view-only'); // Añadir clase para cambiar el cursor
+        }
         return card;
     }
 
     function openModal(tipo, registro) {
         responseMsg.style.display = 'none';
         modalTitle.textContent = `${registro ? 'Editar' : 'Registrar'} Tamizaje ${tipo}`;
+        
         tamizajeForm.reset();
         document.getElementById('tipoTamiz').value = tipo;
-        
         if (registro) {
-            // --- AJUSTE AQUÍ ---
-            // Ya no se necesita .substring(0, 10) porque el formato es correcto
             document.getElementById('fechaRealizacion').value = registro.fechaRealizacion;
             document.getElementById('numeroFolio').value = registro.numeroFolio || '';
             document.getElementById('resultado').value = registro.resultado || '';
