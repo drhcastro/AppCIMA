@@ -145,6 +145,19 @@ input {
     cursor: pointer;
     transition: all 0.3s;
 }
+/* ... al final de registro-style.css ... */
+.section-divider {
+    margin-top: 24px;
+    padding-top: 24px;
+    border-top: 1px solid var(--border-color);
+}
+
+.actions-toolbar a {
+    text-decoration: none;
+    text-align: center;
+    display: block;
+}
+
 
 .button-secondary:hover {
     background-color: var(--primary-color);
