@@ -323,3 +323,46 @@ details[open] > .consulta-summary::before {
 .modal-actions button {
     width: 100%;
 }
+/* ... al final de registro-style.css ... */
+
+/* --- Estilos para Pestañas (Tabs) --- */
+.tabs-container {
+    width: 100%;
+}
+.tab-nav {
+    display: flex;
+    border-bottom: 2px solid var(--border-color);
+    margin-bottom: 24px;
+}
+.tab-button {
+    padding: 12px 20px;
+    cursor: pointer;
+    background-color: transparent;
+    border: none;
+    font-family: var(--font-family);
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--muted-text-color);
+    border-bottom: 3px solid transparent;
+    transition: all 0.3s;
+}
+.tab-button:hover {
+    color: var(--primary-color);
+}
+.tab-button.active {
+    color: var(--primary-color);
+    border-bottom: 3px solid var(--primary-color);
+}
+.tab-content {
+    display: none;
+}
+.tab-content.active {
+    display: block;
+}
+.section-title {
+    color: var(--secondary-color);
+    margin-top: 24px;
+    margin-bottom: 16px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--border-color);
+}
