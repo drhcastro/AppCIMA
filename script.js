@@ -28,30 +28,41 @@ const clearBtn = document.getElementById('clear-btn');
 const measureDateInput = document.getElementById('measure-date');
 const summaryContainer = document.getElementById('history-summary-container');
 const summaryCard = document.getElementById('summary-card');
+const dobInput = document.getElementById('dob');
+
 
 // --- INICIALIZACIÓN ---
 document.addEventListener('DOMContentLoaded', () => {
     measureDateInput.valueAsDate = new Date();
     
-    // ¡NUEVA LÓGICA! Cargar paciente activo desde localStorage
-    const activePatient = JSON.parse(localStorage.getItem('activePatient'));
+    // --- LÓGICA CORREGIDA PARA CARGAR PACIENTE ACTIVO ---
+    const activePatientString = localStorage.getItem('activePatient');
     
-    if (activePatient) {
+    if (activePatientString) {
+        const activePatient = JSON.parse(activePatientString);
+        
         // Si hay un paciente, rellenar los campos
-        document.getElementById('dob').value = activePatient.fechaNacimiento;
-        document.getElementById('sex').value = activePatient.sexo.toLowerCase(); // Asegura que sea 'boys' o 'girls'
+        dobInput.value = activePatient.fechaNacimiento;
+        
+        // CORRECCIÓN: "Traducir" el valor del sexo para el menú desplegable
+        if (activePatient.sexo) {
+            const genderValue = activePatient.sexo.toLowerCase() === 'niño' ? 'boys' : 'girls';
+            sexSelect.value = genderValue;
+        }
         
         // Deshabilitar los campos para evitar cambios accidentales
-        document.getElementById('dob').disabled = true;
-        document.getElementById('sex').disabled = true;
+        dobInput.disabled = true;
+        sexSelect.disabled = true;
         
         // Mostrar el banner con el nombre del paciente
         const banner = document.getElementById('active-patient-banner');
         banner.innerHTML = `<p>Paciente Activo: <span class="patient-name">${activePatient.nombre} ${activePatient.apellidoPaterno}</span> | Código: ${activePatient.codigoUnico}</p>`;
     } else {
-        // Si no hay paciente, limpiar los campos por si acaso
-        document.getElementById('dob').value = '';
-        document.getElementById('sex').value = 'boys';
+        // Si no hay paciente, limpiar los campos
+        dobInput.value = '';
+        sexSelect.value = 'boys';
+        dobInput.disabled = false;
+        sexSelect.disabled = false;
     }
 
     initializeChart();
@@ -63,6 +74,7 @@ document.addEventListener('DOMContentLoaded', () => {
     printBtn.addEventListener('click', () => window.print());
     saveImgBtn.addEventListener('click', saveChartAsImage);
 });
+
 
 // --- FUNCIONES PRINCIPALES ---
 
@@ -77,9 +89,9 @@ function updateUI(chartKey) {
 function addMeasurement() {
     const chartKey = chartTypeSelect.value;
     const config = chartConfig[chartKey];
-    const sex = document.getElementById('sex').value;
+    const sex = sexSelect.value;
     const measurement = parseFloat(document.getElementById('measurement').value);
-    const measureDate = document.getElementById('measure-date').value;
+    const measureDate = measureDateInput.value;
 
     if (!measureDate || isNaN(measurement)) {
         alert('Por favor, complete el valor y la fecha de la medición.');
@@ -88,7 +100,7 @@ function addMeasurement() {
 
     let xValue, ageInDays = null;
     if (config.requires === 'age') {
-        const dob = document.getElementById('dob').value;
+        const dob = dobInput.value;
         if (!dob) { alert('Por favor, ingrese la fecha de nacimiento.'); return; }
         ageInDays = Math.floor((new Date(measureDate) - new Date(dob)) / (1000 * 60 * 60 * 24));
         if (ageInDays < 0) { alert('La fecha de medición no puede ser anterior a la de nacimiento.'); return; }
@@ -124,6 +136,14 @@ function clearAll() {
     updateChart();
     summaryContainer.innerHTML = '';
     summaryCard.style.display = 'none';
+
+    // También reactiva los campos de paciente
+    dobInput.value = '';
+    sexSelect.value = 'boys';
+    dobInput.disabled = false;
+    sexSelect.disabled = false;
+    document.getElementById('active-patient-banner').innerHTML = '<p>Modo: Usar Sin Registro</p>';
+    localStorage.removeItem('activePatient');
 }
 
 function updateHistorySummary() {
@@ -172,22 +192,13 @@ function updateHistorySummary() {
     summaryCard.style.display = 'block';
 }
 
-/**
- * FUNCIÓN ACTUALIZADA PARA GUARDAR COMO IMAGEN
- */
 function saveChartAsImage() {
-    const chartColumn = document.querySelector('.chart-column'); // Selecciona toda la columna derecha
+    const chartColumn = document.querySelector('.chart-column');
     if (!chartColumn) return;
-
-    // Opciones para html2canvas para mejorar la calidad de la imagen
-    const options = {
-        scale: 2, // Aumenta la resolución
-        useCORS: true, // Para cargar imágenes si las hubiera
-        logging: false,
-    };
+    
+    const options = { scale: 2, useCORS: true, logging: false };
 
     html2canvas(chartColumn, options).then(canvas => {
-        // Crear un enlace temporal para descargar la imagen
         const link = document.createElement('a');
         link.download = 'grafica-crecimiento-cima-nahui.png';
         link.href = canvas.toDataURL('image/png');
@@ -195,9 +206,7 @@ function saveChartAsImage() {
     });
 }
 
-
 // --- FUNCIONES DE GRÁFICA ---
-
 function initializeChart() {
     const pdf = (x) => Math.exp(-0.5 * x * x) / Math.sqrt(2 * Math.PI);
     const range = (start, stop, step) => Array.from({ length: (stop - start) / step + 1 }, (_, i) => start + i * step);
@@ -216,7 +225,7 @@ function initializeChart() {
         options: {
             responsive: true,
             maintainAspectRatio: false,
-            animation: false, // Desactivar animación para que html2canvas capture el estado final
+            animation: false,
             plugins: {
                 title: { display: true, text: 'Distribución de Puntuación Z', font: { size: 18, family: 'Poppins' } },
                 legend: { display: false },
@@ -232,13 +241,7 @@ function initializeChart() {
                             const config = chartConfig[details.chartKey];
                             let ageString = details.ageInDays !== null ? `Edad: ${Math.floor(details.ageInDays / 30.4375)}m (${details.ageInDays}d)` : '';
                             
-                            return [
-                                `${config.label}`,
-                                `Fecha: ${details.date}`,
-                                ageString,
-                                `Valor: ${details.measurement} ${details.measurementUnit}`,
-                                `Puntuación Z: ${details.zScore.toFixed(2)}`
-                            ].filter(Boolean);
+                            return [`${config.label}`, `Fecha: ${details.date}`, ageString, `Valor: ${details.measurement} ${details.measurementUnit}`, `Puntuación Z: ${details.zScore.toFixed(2)}`].filter(Boolean);
                         }
                     }
                 }
@@ -262,13 +265,11 @@ function initializeChart() {
 
 function updateChart() {
     if (!distributionChart) return;
-
     const groupedHistory = patientHistory.reduce((acc, p) => {
         if (!acc[p.chartKey]) acc[p.chartKey] = [];
         acc[p.chartKey].push(p);
         return acc;
     }, {});
-
     const patientDatasets = Object.keys(groupedHistory).map(key => {
         const config = chartConfig[key];
         const points = groupedHistory[key];
@@ -284,13 +285,11 @@ function updateChart() {
             order: 4
         };
     });
-
     distributionChart.data.datasets = [...baseDatasets, ...patientDatasets];
-    distributionChart.update('none'); // 'none' para evitar animación y asegurar captura correcta
+    distributionChart.update('none');
 }
 
 // --- FUNCIONES AUXILIARES ---
-
 function getLMS(xValue, table) {
     let record = table.find(row => row[0] === xValue);
     if (!record) {
