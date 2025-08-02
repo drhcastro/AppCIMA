@@ -15,7 +15,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (!activePatient) {
         patientBanner.textContent = "ERROR: No hay un paciente activo.";
-        form.style.display = 'none';
+        if (form) form.style.display = 'none';
         backToVisorBtn.href = 'index.html';
         return;
     }
@@ -23,7 +23,6 @@ document.addEventListener('DOMContentLoaded', () => {
     patientBanner.textContent = `Registrando consulta para: ${activePatient.nombre} ${activePatient.apellidoPaterno} (Cód: ${activePatient.codigoUnico})`;
     backToVisorBtn.href = `visor.html?codigo=${activePatient.codigoUnico}`;
 
-    // --- VERIFICAR MODO (CREAR O EDITAR) ---
     const params = new URLSearchParams(window.location.search);
     const mode = params.get('mode');
     const recordId = params.get('id');
@@ -31,25 +30,20 @@ document.addEventListener('DOMContentLoaded', () => {
     if (mode === 'edit' && recordId) {
         document.querySelector('h1').textContent = '✏️ Editar Consulta Médica';
         const recordToEdit = JSON.parse(sessionStorage.getItem('recordToEdit'));
-
         if (recordToEdit && recordToEdit.id == recordId) {
-            // Rellenar el formulario con los datos guardados
             for (const key in recordToEdit) {
                 const element = document.getElementById(key);
-                if (element) {
-                    element.value = recordToEdit[key];
-                }
+                if (element) element.value = recordToEdit[key];
             }
         } else {
             alert("Error: No se encontraron los datos para editar.");
         }
     } else {
-        // Modo creación: valores por defecto
         document.getElementById('fechaConsulta').valueAsDate = new Date();
         document.getElementById('alergiasConsulta').value = activePatient.alergias || 'Ninguna conocida';
     }
     
-    applyPermissions(); // Aplicar permisos al final
+    applyPermissions();
 
     // --- MANEJO DEL FORMULARIO ---
     form.addEventListener('submit', async (e) => {
@@ -77,10 +71,9 @@ document.addEventListener('DOMContentLoaded', () => {
             diagnosticoNosologico: document.getElementById('diagnosticoNosologico').value
         };
         
-        // Decidir si es una acción de guardar o actualizar
         if (mode === 'edit') {
             formData.action = 'actualizarConsulta';
-            formData.id = recordId; // Añadir el ID del registro a actualizar
+            formData.id = recordId;
         } else {
             formData.action = 'guardarConsulta';
         }
@@ -95,7 +88,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (data.status !== 'success') throw new Error(data.message);
             
             alert(`Consulta ${mode === 'edit' ? 'actualizada' : 'guardada'} con éxito.`);
-            sessionStorage.removeItem('recordToEdit'); // Limpiar la memoria
+            sessionStorage.removeItem('recordToEdit');
             window.location.href = `historial.html`;
         } catch (error) {
             responseMsg.textContent = `Error al guardar: ${error.message}`;
@@ -106,21 +99,18 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // --- FUNCIÓN DE PERMISOS ---
     function applyPermissions() {
         if (!currentUser) return;
         const userRole = currentUser.profile;
 
-        // Regla: Solo 'medico' o 'superusuario' pueden registrar o editar.
         if (userRole === 'medico' || userRole === 'superusuario') {
-            // Tiene permiso, no hacer nada.
+            // Permiso concedido
         } else {
-            // No tiene permiso, deshabilitar todo el formulario.
             form.querySelectorAll('input, select, textarea, button').forEach(el => {
                 el.disabled = true;
             });
             submitBtn.textContent = 'Acción no permitida para este perfil';
-            submitBtn.style.backgroundColor = '#6c757d'; // Color gris
+            submitBtn.style.backgroundColor = '#6c757d';
         }
     }
 });
