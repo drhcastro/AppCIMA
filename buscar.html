@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Buscar Paciente - CIMA Nahui</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="registro-style.css"> </head>
+<body>
+
+<div class="form-container">
+    <header class="form-header">
+        <h1>📂 Buscar Paciente</h1>
+        <p>Escribe el nombre, apellido o código del paciente.</p>
+    </header>
+
+    <div class="search-form">
+        <input type="search" id="search-input" placeholder="Buscar..." autocomplete="off">
+    </div>
+
+    <div id="search-results-container">
+        </div>
+    
+    <div class="actions-toolbar">
+        <a href="index.html" class="button-secondary">⬅️ Regresar al Menú Principal</a>
+    </div>
+
+    <footer class="form-footer">
+        <p>CIMA Nahui de Occidente &copy; 2025</p>
+    </footer>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+<script src="auth-guard.js"></script>
+<script src="buscar-script.js"></script>
+
+</body>
+</html>
