@@ -554,3 +554,21 @@ details[open] > .consulta-summary::before {
     font-size: 1.5rem;
     color: var(--secondary-color);
 }
+/* ... al final de registro-style.css ... */
+.delete-btn {
+    display: inline-block;
+    padding: 6px 12px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--danger-color);
+    background-color: transparent;
+    border: 1px solid var(--danger-color);
+    border-radius: 6px;
+    cursor: pointer;
+    float: right; /* Lo alinea a la derecha */
+    transition: all 0.3s;
+}
+.delete-btn:hover {
+    background-color: var(--danger-color);
+    color: white;
+}
