@@ -25,10 +25,10 @@
             <h2>Registrar Nuevo Paciente</h2>
             <p>Crear un nuevo expediente clínico completo.</p>
         </a>
-        <a href="#" class="action-card" id="ver-paciente-btn">
+        <a href="buscar.html" class="action-card">
             <div class="icon">📂</div>
             <h2>Ver Paciente Registrado</h2>
-            <p>Buscar y cargar un expediente existente por su código.</p>
+            <p>Buscar un expediente existente por nombre o código.</p>
         </a>
         <a href="graficas.html" class="action-card">
             <div class="icon">📊</div>
@@ -45,22 +45,14 @@
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
-<script src="auth-guard.js"></script> <script>
-    document.addEventListener('DOMContentLoaded', () => {
-        // Lógica para el botón "Ver Paciente" (sin cambios)
-        document.getElementById('ver-paciente-btn').addEventListener('click', function(e) {
-            e.preventDefault();
-            const codigo = prompt('Por favor, ingrese el Código Único del paciente (ej: CIMA-12345):');
-            if (codigo && codigo.trim() !== '') {
-                window.location.href = 'visor.html?codigo=' + encodeURIComponent(codigo.trim());
-            }
-        });
+<script src="auth-guard.js"></script>
 
-        // Lógica para mostrar saludo y cerrar sesión
+<script>
+    // SCRIPT SIMPLIFICADO: Se eliminó la lógica del prompt
+    document.addEventListener('DOMContentLoaded', () => {
         const logoutBtn = document.getElementById('logout-btn');
         const userWelcome = document.getElementById('user-welcome');
         
-        // Esperar un momento a que el auth-guard.js guarde los datos
         setTimeout(() => {
             const currentUser = JSON.parse(sessionStorage.getItem('currentUser'));
             if (currentUser) {
