@@ -1,11 +1,19 @@
 document.addEventListener('DOMContentLoaded', () => {
+    // --- CONFIGURACIÓN ---
     const API_URL = 'https://script.google.com/macros/s/AKfycbxXXUPOvKK5HRSeFsM3LYVvkweqxKBhxMjxASg_0-7sEyke-LZ2eOPQkaz0quXoN3Mc/exec';
+
+    // --- CORRECCIÓN CLAVE ---
+    // Al entrar a la página de registro, siempre limpiamos al paciente activo anterior.
+    localStorage.removeItem('activePatient');
+
+    // --- ELEMENTOS DEL DOM ---
     const form = document.getElementById('registro-form');
     const submitBtn = document.getElementById('submit-btn');
     const responseMsg = document.getElementById('response-message');
     const tabButtons = document.querySelectorAll('.tab-button');
     const tabContents = document.querySelectorAll('.tab-content');
     
+    // --- LÓGICA DE PESTAÑAS ---
     tabButtons.forEach(button => {
         button.addEventListener('click', () => {
             tabButtons.forEach(btn => btn.classList.remove('active'));
@@ -19,6 +27,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
+    // --- LÓGICA DEL FORMULARIO ---
     form.addEventListener('submit', function(e) {
         e.preventDefault(); 
         submitBtn.disabled = true;
