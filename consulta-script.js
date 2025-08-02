@@ -14,20 +14,42 @@ document.addEventListener('DOMContentLoaded', () => {
     const currentUser = JSON.parse(sessionStorage.getItem('currentUser'));
 
     if (!activePatient) {
-        // Si no hay paciente, bloquear la página
         patientBanner.textContent = "ERROR: No hay un paciente activo.";
         form.style.display = 'none';
-        backToVisorBtn.href = 'index.html'; // Enviar al inicio
+        backToVisorBtn.href = 'index.html';
         return;
     }
 
-    // Poblar la información del paciente
     patientBanner.textContent = `Registrando consulta para: ${activePatient.nombre} ${activePatient.apellidoPaterno} (Cód: ${activePatient.codigoUnico})`;
-    document.getElementById('fechaConsulta').valueAsDate = new Date();
-    document.getElementById('alergiasConsulta').value = activePatient.alergias || 'Ninguna conocida';
     backToVisorBtn.href = `visor.html?codigo=${activePatient.codigoUnico}`;
 
-    applyPermissions(); // <-- Aplicar permisos
+    // --- VERIFICAR MODO (CREAR O EDITAR) ---
+    const params = new URLSearchParams(window.location.search);
+    const mode = params.get('mode');
+    const recordId = params.get('id');
+
+    if (mode === 'edit' && recordId) {
+        document.querySelector('h1').textContent = '✏️ Editar Consulta Médica';
+        const recordToEdit = JSON.parse(sessionStorage.getItem('recordToEdit'));
+
+        if (recordToEdit && recordToEdit.id == recordId) {
+            // Rellenar el formulario con los datos guardados
+            for (const key in recordToEdit) {
+                const element = document.getElementById(key);
+                if (element) {
+                    element.value = recordToEdit[key];
+                }
+            }
+        } else {
+            alert("Error: No se encontraron los datos para editar.");
+        }
+    } else {
+        // Modo creación: valores por defecto
+        document.getElementById('fechaConsulta').valueAsDate = new Date();
+        document.getElementById('alergiasConsulta').value = activePatient.alergias || 'Ninguna conocida';
+    }
+    
+    applyPermissions(); // Aplicar permisos al final
 
     // --- MANEJO DEL FORMULARIO ---
     form.addEventListener('submit', async (e) => {
@@ -36,7 +58,6 @@ document.addEventListener('DOMContentLoaded', () => {
         submitBtn.textContent = 'Guardando...';
 
         const formData = {
-            action: 'guardarConsulta', // Acción para el API
             codigoUnico: activePatient.codigoUnico,
             fechaConsulta: document.getElementById('fechaConsulta').value,
             medicoTratante: document.getElementById('medicoTratante').value,
@@ -55,6 +76,14 @@ document.addEventListener('DOMContentLoaded', () => {
             diagnosticoPresuntivo: document.getElementById('diagnosticoPresuntivo').value,
             diagnosticoNosologico: document.getElementById('diagnosticoNosologico').value
         };
+        
+        // Decidir si es una acción de guardar o actualizar
+        if (mode === 'edit') {
+            formData.action = 'actualizarConsulta';
+            formData.id = recordId; // Añadir el ID del registro a actualizar
+        } else {
+            formData.action = 'guardarConsulta';
+        }
 
         try {
             const response = await fetch(API_URL, {
@@ -65,14 +94,13 @@ document.addEventListener('DOMContentLoaded', () => {
             const data = await response.json();
             if (data.status !== 'success') throw new Error(data.message);
             
-            alert('Consulta guardada con éxito.');
-            // Redirigir de vuelta al historial médico
+            alert(`Consulta ${mode === 'edit' ? 'actualizada' : 'guardada'} con éxito.`);
+            sessionStorage.removeItem('recordToEdit'); // Limpiar la memoria
             window.location.href = `historial.html`;
         } catch (error) {
             responseMsg.textContent = `Error al guardar: ${error.message}`;
             responseMsg.className = 'error';
             responseMsg.style.display = 'block';
-        } finally {
             submitBtn.disabled = false;
             submitBtn.textContent = 'Guardar Consulta';
         }
@@ -83,15 +111,15 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!currentUser) return;
         const userRole = currentUser.profile;
 
-        // Regla: Solo 'medico' o 'superusuario' pueden registrar consultas médicas.
+        // Regla: Solo 'medico' o 'superusuario' pueden registrar o editar.
         if (userRole === 'medico' || userRole === 'superusuario') {
-            // El usuario tiene permiso, no hacer nada.
+            // Tiene permiso, no hacer nada.
         } else {
-            // Si no tiene permiso, deshabilitar todo el formulario.
+            // No tiene permiso, deshabilitar todo el formulario.
             form.querySelectorAll('input, select, textarea, button').forEach(el => {
                 el.disabled = true;
             });
-            submitBtn.textContent = 'Registro no permitido para este perfil';
+            submitBtn.textContent = 'Acción no permitida para este perfil';
             submitBtn.style.backgroundColor = '#6c757d'; // Color gris
         }
     }
