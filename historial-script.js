@@ -1,27 +1,47 @@
-// historial-script.js
 document.addEventListener('DOMContentLoaded', () => {
+    // --- CONFIGURACIÓN ---
     const API_URL = 'https://script.google.com/macros/s/AKfycbxXXUPOvKK5HRSeFsM3LYVvkweqxKBhxMjxASg_0-7sEyke-LZ2eOPQkaz0quXoN3Mc/exec';
+    let loadedConsultas = []; // Variable para guardar las consultas cargadas
+
+    // --- ELEMENTOS DEL DOM ---
     const patientBanner = document.getElementById('patient-banner');
     const historialContainer = document.getElementById('historial-container');
     const backToVisorBtn = document.getElementById('back-to-visor');
+
+    // --- INICIALIZACIÓN ---
     const activePatient = JSON.parse(localStorage.getItem('activePatient'));
 
-    if (!activePatient) { /* ...código de error... */ return; }
+    if (!activePatient) {
+        patientBanner.textContent = "ERROR: No hay un paciente activo.";
+        backToVisorBtn.href = 'index.html';
+        historialContainer.innerHTML = '';
+        return;
+    }
 
     patientBanner.innerHTML = `Mostrando historial para: <strong>${activePatient.nombre} ${activePatient.apellidoPaterno}</strong>`;
     backToVisorBtn.href = `visor.html?codigo=${activePatient.codigoUnico}`;
 
     loadHistory();
 
+    // --- MANEJO DE EVENTOS (Delegación) ---
     historialContainer.addEventListener('click', function(e) {
-        if (e.target.classList.contains('delete-btn')) {
-            const recordId = e.target.dataset.id;
+        const target = e.target.closest('button'); // Busca el botón más cercano al clic
+        if (!target) return;
+
+        const recordId = target.dataset.id;
+
+        if (target.classList.contains('delete-btn')) {
             if (confirm('¿Estás seguro de que deseas eliminar este registro de consulta? Esta acción no se puede deshacer.')) {
                 deleteRecord(recordId);
             }
         }
+
+        if (target.classList.contains('edit-btn')) {
+            editRecord(recordId);
+        }
     });
 
+    // --- FUNCIONES ---
     async function loadHistory() {
         historialContainer.innerHTML = 'Cargando...';
         try {
@@ -29,33 +49,51 @@ document.addEventListener('DOMContentLoaded', () => {
             const data = await response.json();
             if (data.status !== 'success') throw new Error(data.message);
             
+            loadedConsultas = data.data; // Guardar los datos cargados en la variable global
+            
             historialContainer.innerHTML = '';
-            if (data.data.length === 0) {
+            if (loadedConsultas.length === 0) {
                 historialContainer.innerHTML = '<p>No hay consultas registradas para este paciente.</p>';
                 return;
             }
             
-            data.data.forEach(consulta => {
+            loadedConsultas.forEach(consulta => {
                 const consultaCard = document.createElement('div');
                 consultaCard.className = 'consulta-card';
                 const fecha = new Date(consulta.fechaConsulta).toLocaleDateString('es-ES', { year: 'numeric', month: 'long', day: 'numeric' });
                 
-                // El innerHTML ahora incluye el botón de eliminar con el ID
                 consultaCard.innerHTML = `
                     <details>
                         <summary class="consulta-summary">
                             <div class="summary-info">
                                 <strong>${fecha}</strong>
-                                <span class="motivo-preview">${consulta.sintomasSignosMotivo.substring(0, 50)}...</span>
+                                <span class="motivo-preview">${(consulta.sintomasSignosMotivo || '').substring(0, 50)}...</span>
                             </div>
                             <span class="medico-preview">${consulta.medicoTratante || ''}</span>
                         </summary>
                         <div class="consulta-details">
-                            <button class="delete-btn" data-id="${consulta.id}">🗑️ Eliminar Consulta</button>
+                            <div class="details-actions">
+                                <button class="edit-btn" data-id="${consulta.id}">✏️ Editar</button>
+                                <button class="delete-btn" data-id="${consulta.id}">🗑️ Eliminar</button>
+                            </div>
                             <hr>
                             <h4>Interrogatorio (SAMPLE)</h4>
                             <p><strong>Síntomas/Motivo:</strong> ${consulta.sintomasSignosMotivo}</p>
-                            </div>
+                            <p><strong>Alergias:</strong> ${consulta.alergiasConsulta}</p>
+                            <p><strong>Medicamentos:</strong> ${consulta.medicamentosPrevios}</p>
+                            <p><strong>Historial Previo:</strong> ${consulta.historialClinicoPrevio}</p>
+                            <p><strong>Líquidos/Alimentos:</strong> ${consulta.liquidosAlimentos}</p>
+                            <p><strong>Eventos Relacionados:</strong> ${consulta.eventosRelacionados}</p>
+                            <hr>
+                            <h4>Análisis y Diagnóstico</h4>
+                            <p><strong>Análisis/Exploración:</strong> ${consulta.analisis}</p>
+                            <p><strong>Dx. Sindromático:</strong> ${consulta.diagnosticoSindromatico}</p>
+                            <p><strong>Dx. Etiológico:</strong> ${consulta.diagnosticoEtiologico}</p>
+                            <p><strong>Dx. Nutricional:</strong> ${consulta.diagnosticoNutricional}</p>
+                            <p><strong>Dx. Radiológico:</strong> ${consulta.diagnosticoRadiologico}</p>
+                            <p><strong>Dx. Presuntivo:</strong> ${consulta.diagnosticoPresuntivo}</p>
+                            <p><strong>Dx. Nosológico (Final):</strong> ${consulta.diagnosticoNosologico}</p>
+                        </div>
                     </details>`;
                 historialContainer.appendChild(consultaCard);
             });
@@ -64,6 +102,16 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
     
+    function editRecord(id) {
+        const recordToEdit = loadedConsultas.find(c => c.id == id);
+        if (recordToEdit) {
+            sessionStorage.setItem('recordToEdit', JSON.stringify(recordToEdit));
+            window.location.href = `consulta.html?mode=edit&id=${id}`;
+        } else {
+            alert('Error: No se encontró la consulta para editar.');
+        }
+    }
+
     async function deleteRecord(id) {
         try {
             const response = await fetch(API_URL, {
