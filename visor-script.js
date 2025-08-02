@@ -43,24 +43,15 @@ document.addEventListener('DOMContentLoaded', () => {
     patientDataForm.style.display = 'none';
     if (dashboardContainer) dashboardContainer.style.display = 'none';
 
-    // --- LLAMADA AL API PARA OBTENER DATOS DEL DASHBOARD ---
     fetch(`${API_URL}?action=getDashboardData&codigo=${codigo}`)
         .then(res => res.json())
         .then(data => {
             if (data.status === 'success' && data.data) {
                 const dashboardData = data.data;
                 const patient = dashboardData.paciente;
-
-                // 1. Poblar el encabezado
                 patientBanner.innerHTML = `<strong>${patient.nombre} ${patient.apellidoPaterno || ''}</strong> | Código: ${patient.codigoUnico}`;
-                
-                // 2. Poblar el formulario del expediente
                 populatePatientData(patient);
-                
-                // 3. Poblar el nuevo panel de control
                 populateDashboard(dashboardData.resumen);
-
-                // 4. Guardar en memoria y aplicar permisos
                 localStorage.setItem('activePatient', JSON.stringify(patient));
                 patientDataForm.style.display = 'block';
                 if (dashboardContainer) dashboardContainer.style.display = 'grid';
@@ -78,16 +69,20 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- FUNCIONES ---
     function populateDashboard(resumen) {
+        // Tarjeta 1: Última Consulta Médica
         const fechaConsulta = resumen.ultimaConsulta === "Ninguna" 
             ? "Ninguna"
             : new Date(resumen.ultimaConsulta).toLocaleDateString('es-ES');
         document.getElementById('summary-ultima-consulta').textContent = fechaConsulta;
         
+        // --- CORRECCIÓN AQUÍ ---
+        // Se cambió resumen.ultimaVacuna.nombre a resumen.ultimaVacuna.nombreVacuna
         const fechaVacuna = resumen.ultimaVacuna.fecha 
             ? new Date(resumen.ultimaVacuna.fecha).toLocaleDateString('es-ES') 
             : '';
-        document.getElementById('summary-ultima-vacuna').innerHTML = `${resumen.ultimaVacuna.nombre} <small style="display:block; color:#6c757d;">${fechaVacuna}</small>`;
+        document.getElementById('summary-ultima-vacuna').innerHTML = `${resumen.ultimaVacuna.nombreVacuna} <small style="display:block; color:#6c757d;">${fechaVacuna}</small>`;
 
+        // Tarjeta 3: Última Consulta de Especialidad
         const fechaConsultaEsp = resumen.ultimaConsultaEsp.fecha 
             ? new Date(resumen.ultimaConsultaEsp.fecha).toLocaleDateString('es-ES') 
             : '';
@@ -97,8 +92,10 @@ document.addEventListener('DOMContentLoaded', () => {
         if (tipoEsp === "Rehabilitacion") tipoEsp = "Rehabilitación";
         document.getElementById('summary-ultima-consulta-esp').innerHTML = `${tipoEsp} <small style="display:block; color:#6c757d;">${fechaConsultaEsp}</small>`;
 
+        // Tarjeta 4: Planes Activos
         document.getElementById('summary-planes-activos').textContent = resumen.planesActivos;
 
+        // Tarjeta 5: Tamizajes Pendientes
         const tamizajesPendientes = TIPOS_DE_TAMIZAJES.filter(t => !resumen.tamizajesRealizados.includes(t));
         const pendientesText = tamizajesPendientes.length > 0 ? tamizajesPendientes.length.toString() : "Ninguno";
         const pendientesTitle = tamizajesPendientes.length > 0 ? tamizajesPendientes.join(', ') : "Todos los tamizajes registrados";
@@ -167,7 +164,6 @@ document.addEventListener('DOMContentLoaded', () => {
             const data = await response.json();
             if (data.status !== 'success') throw new Error(data.message);
             
-            // Actualizar los datos locales después de guardar
             localStorage.setItem('activePatient', JSON.stringify(formData));
             displayMessage('success', '¡Expediente actualizado con éxito!');
         } catch (error) {
