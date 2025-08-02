@@ -500,3 +500,57 @@ details[open] > .consulta-summary::before {
     border-color: var(--border-color); /* Anula el efecto hover de resaltar borde */
     box-shadow: none; /* Anula el efecto hover de sombra */
 }
+/* ... al final de registro-style.css ... */
+
+/* --- Estilos para la Página de Búsqueda --- */
+#search-input {
+    font-size: 1.2rem;
+    padding: 16px;
+    margin-bottom: 24px;
+}
+
+.info-message, .error-message {
+    text-align: center;
+    padding: 20px;
+    background-color: #f8f9fa;
+    color: var(--muted-text-color);
+    border-radius: 8px;
+}
+.error-message {
+    background-color: #f8d7da;
+    color: #721c24;
+}
+
+.result-card {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    margin-bottom: 12px;
+    text-decoration: none;
+    color: var(--text-color);
+    transition: all 0.3s;
+}
+.result-card:hover {
+    border-color: var(--secondary-color);
+    box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+    transform: translateX(5px);
+}
+.result-info {
+    display: flex;
+    flex-direction: column;
+}
+.result-name {
+    font-weight: 600;
+    color: var(--primary-color);
+}
+.result-details {
+    font-size: 0.85rem;
+    color: var(--muted-text-color);
+}
+.result-arrow {
+    font-size: 1.5rem;
+    color: var(--secondary-color);
+}
