@@ -15,7 +15,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (!activePatient) {
         patientBanner.textContent = "ERROR: No hay un paciente activo.";
-        if (form) form.style.display = 'none';
+        if(form) form.style.display = 'none';
         backToVisorBtn.href = 'index.html';
         return;
     }
@@ -72,10 +72,10 @@ document.addEventListener('DOMContentLoaded', () => {
         };
         
         if (mode === 'edit') {
-            formData.action = 'actualizarConsulta';
+            formData.action = 'actualizarConsulta'; // Acción para editar
             formData.id = recordId;
         } else {
-            formData.action = 'guardarConsulta';
+            formData.action = 'guardarConsulta'; // Acción para guardar
         }
 
         try {
@@ -94,6 +94,7 @@ document.addEventListener('DOMContentLoaded', () => {
             responseMsg.textContent = `Error al guardar: ${error.message}`;
             responseMsg.className = 'error';
             responseMsg.style.display = 'block';
+        } finally {
             submitBtn.disabled = false;
             submitBtn.textContent = 'Guardar Consulta';
         }
