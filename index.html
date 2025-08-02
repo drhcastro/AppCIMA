@@ -48,8 +48,12 @@
 <script src="auth-guard.js"></script>
 
 <script>
-    // SCRIPT SIMPLIFICADO: Se eliminó la lógica del prompt
     document.addEventListener('DOMContentLoaded', () => {
+        // --- CORRECCIÓN CLAVE ---
+        // Al volver al menú principal, limpiamos cualquier paciente activo.
+        localStorage.removeItem('activePatient');
+
+        // Lógica para mostrar saludo y cerrar sesión
         const logoutBtn = document.getElementById('logout-btn');
         const userWelcome = document.getElementById('user-welcome');
         
@@ -64,6 +68,7 @@
             e.preventDefault();
             firebase.auth().signOut().then(() => {
                 sessionStorage.removeItem('currentUser');
+                localStorage.removeItem('activePatient'); // Limpiar también al cerrar sesión
                 window.location.href = 'login.html';
             });
         });
