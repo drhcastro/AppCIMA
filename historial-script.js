@@ -1,84 +1,65 @@
+// historial-script.js (Actualizado)
 document.addEventListener('DOMContentLoaded', () => {
-    // --- CONFIGURACIÓN ---
     const API_URL = 'https://script.google.com/macros/s/AKfycbw6jZIjBoeSlIRF-lAMPNqmbxRsncqulzZEi8f7q2AyOawxbpSZRIUxsx9UgZwe/exec';
-
-    // --- ELEMENTOS DEL DOM ---
     const patientBanner = document.getElementById('patient-banner');
     const historialContainer = document.getElementById('historial-container');
     const backToVisorBtn = document.getElementById('back-to-visor');
-
-    // --- LÓGICA DE INICIALIZACIÓN ---
     const activePatient = JSON.parse(localStorage.getItem('activePatient'));
 
-    if (!activePatient) {
-        patientBanner.textContent = "ERROR: No hay un paciente activo.";
-        backToVisorBtn.href = 'index.html';
-        return;
-    }
+    // ... (Código de inicialización sin cambios) ...
 
-    patientBanner.innerHTML = `Mostrando historial para: <strong>${activePatient.nombre} ${activePatient.apellidoPaterno}</strong>`;
-    backToVisorBtn.href = `visor.html?codigo=${activePatient.codigoUnico}`;
+    loadHistory();
 
-    // Llamar al API para obtener el historial de consultas
-    fetch(`${API_URL}?action=getConsultas&codigo=${activePatient.codigoUnico}`)
-        .then(res => res.json())
-        .then(data => {
-            if (data.status === 'success' && data.data) {
-                displayHistorial(data.data);
-            } else {
-                throw new Error(data.message);
+    // --- NUEVO: Event listener para los botones de eliminar ---
+    historialContainer.addEventListener('click', function(e) {
+        if (e.target.classList.contains('delete-btn')) {
+            const recordId = e.target.dataset.id;
+            if (confirm('¿Estás seguro de que deseas eliminar este registro de consulta? Esta acción no se puede deshacer.')) {
+                deleteRecord(recordId);
             }
-        })
-        .catch(error => {
-            historialContainer.innerHTML = `<p class="error-message">Error al cargar el historial: ${error.message}</p>`;
-        });
-
-    // --- FUNCIÓN PARA MOSTRAR LOS DATOS ---
-    function displayHistorial(consultas) {
-        if (consultas.length === 0) {
-            historialContainer.innerHTML = '<p>No hay consultas registradas para este paciente.</p>';
-            return;
         }
+    });
 
-        consultas.forEach(consulta => {
+    async function loadHistory() {
+        // ... (código de loadHistory sin cambios, pero ahora el HTML que genera es diferente)
+        // ...
+        data.data.forEach(consulta => {
             const consultaCard = document.createElement('div');
             consultaCard.className = 'consulta-card';
-
-            // --- CORRECCIÓN AQUÍ ---
-            // Simplemente creamos la fecha directamente desde el valor que viene del API,
-            // sin añadirle nada más.
-            const fecha = new Date(consulta.fechaConsulta).toLocaleDateString('es-ES', { year: 'numeric', month: 'long', day: 'numeric' });
-
+            // ...
+            // El innerHTML ahora incluye el botón de eliminar
             consultaCard.innerHTML = `
                 <details>
                     <summary class="consulta-summary">
-                        <div class="summary-info">
-                            <strong>${fecha}</strong>
-                            <span class="motivo-preview">${consulta.sintomasSignosMotivo.substring(0, 50)}...</span>
-                        </div>
-                        <span class="medico-preview">${consulta.medicoTratante || ''}</span>
+                        ...
                     </summary>
                     <div class="consulta-details">
-                        <h4>Interrogatorio (SAMPLE)</h4>
-                        <p><strong>Síntomas/Motivo:</strong> ${consulta.sintomasSignosMotivo}</p>
-                        <p><strong>Alergias:</strong> ${consulta.alergiasConsulta}</p>
-                        <p><strong>Medicamentos:</strong> ${consulta.medicamentosPrevios}</p>
-                        <p><strong>Historial Previo:</strong> ${consulta.historialClinicoPrevio}</p>
-                        <p><strong>Líquidos/Alimentos:</strong> ${consulta.liquidosAlimentos}</p>
-                        <p><strong>Eventos Relacionados:</strong> ${consulta.eventosRelacionados}</p>
+                        <button class="delete-btn" data-id="${consulta.id}">🗑️ Eliminar Consulta</button>
                         <hr>
-                        <h4>Análisis y Diagnóstico</h4>
-                        <p><strong>Análisis/Exploración:</strong> ${consulta.analisis}</p>
-                        <p><strong>Dx. Sindromático:</strong> ${consulta.diagnosticoSindromatico}</p>
-                        <p><strong>Dx. Etiológico:</strong> ${consulta.diagnosticoEtiologico}</p>
-                        <p><strong>Dx. Nutricional:</strong> ${consulta.diagnosticoNutricional}</p>
-                        <p><strong>Dx. Radiológico:</strong> ${consulta.diagnosticoRadiologico}</p>
-                        <p><strong>Dx. Presuntivo:</strong> ${consulta.diagnosticoPresuntivo}</p>
-                        <p><strong>Dx. Nosológico (Final):</strong> ${consulta.diagnosticoNosologico}</p>
+                        ... (resto de los detalles)
                     </div>
-                </details>
-            `;
+                </details>`;
             historialContainer.appendChild(consultaCard);
         });
     }
+    
+    // --- NUEVA: Función para llamar al API y eliminar ---
+    async function deleteRecord(id) {
+        try {
+            const response = await fetch(API_URL, {
+                method: 'POST',
+                body: JSON.stringify({ action: 'eliminarConsulta', id: id }),
+                headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+            });
+            const data = await response.json();
+            if (data.status !== 'success') throw new Error(data.message);
+            
+            alert('Registro eliminado con éxito.');
+            loadHistory(); // Recargar la lista
+        } catch (error) {
+            alert(`Error al eliminar: ${error.message}`);
+        }
+    }
+    
+    /* ... Pega aquí el resto de las funciones de tu historial-script.js ... */
 });
