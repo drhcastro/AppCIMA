@@ -1,6 +1,6 @@
 // historial-script.js
 document.addEventListener('DOMContentLoaded', () => {
-    const API_URL = 'https://script.google.com/macros/s/AKfycbw6jZIjBoeSlIRF-lAMPNqmbxRsncqulzZEi8f7q2AyOawxbpSZRIUxsx9UgZwe/exec';
+    const API_URL = 'https://script.google.com/macros/s/AKfycbxXXUPOvKK5HRSeFsM3LYVvkweqxKBhxMjxASg_0-7sEyke-LZ2eOPQkaz0quXoN3Mc/exec';
     const patientBanner = document.getElementById('patient-banner');
     const historialContainer = document.getElementById('historial-container');
     const backToVisorBtn = document.getElementById('back-to-visor');
