@@ -12,8 +12,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const dashboardContainer = document.querySelector('.dashboard-summary');
 
     // --- VERIFICACIÓN DE PÁGINA ---
+    // Si el formulario principal de esta página no existe, detenemos el script por completo.
     if (!patientDataForm) {
-        return; // Si no estamos en visor.html, no hacer nada más.
+        return; 
     }
 
     // --- LÓGICA DE PESTAÑAS ---
@@ -43,54 +44,54 @@ document.addEventListener('DOMContentLoaded', () => {
     patientDataForm.style.display = 'none';
     if (dashboardContainer) dashboardContainer.style.display = 'none';
 
+    // --- LLAMADA AL API PARA OBTENER DATOS DEL DASHBOARD ---
     fetch(`${API_URL}?action=getDashboardData&codigo=${codigo}`)
         .then(res => res.json())
         .then(data => {
             if (data.status === 'success' && data.data) {
-                const patient = data.data.paciente;
-                
-                // --- PUNTO DE DIAGNÓSTICO #1 ---
-                console.log("VISOR: Datos del paciente recibidos del API:", patient);
+                const dashboardData = data.data;
+                const patient = dashboardData.paciente;
 
+                // 1. Poblar el encabezado
                 patientBanner.innerHTML = `<strong>${patient.nombre} ${patient.apellidoPaterno || ''}</strong> | Código: ${patient.codigoUnico}`;
                 
+                // 2. Poblar el formulario del expediente
                 populatePatientData(patient);
-                populateDashboard(data.data.resumen);
                 
-                // --- PUNTO CRÍTICO DE LA PRUEBA ---
-                try {
-                    console.log("PASO 2: Intentando guardar en localStorage...");
-                    localStorage.setItem('activePatient', JSON.stringify(patient));
-                    console.log("PASO 3: ¡ÉXITO! Paciente guardado en memoria.");
-                    // Si ves esta alerta, significa que se guardó bien.
-                    alert("¡Paciente guardado en memoria con éxito!"); 
-                } catch (error) {
-                    console.error("VISOR: ¡ERROR FATAL AL GUARDAR EN MEMORIA!", error);
-                    alert("ERROR: No se pudo guardar la sesión del paciente. Mira la consola (F12) para ver el detalle del error.");
-                }
+                // 3. Poblar el nuevo panel de control
+                populateDashboard(dashboardData.resumen);
 
+                // 4. Guardar en memoria y aplicar permisos
+                localStorage.setItem('activePatient', JSON.stringify(patient));
                 patientDataForm.style.display = 'block';
                 if (dashboardContainer) dashboardContainer.style.display = 'grid';
                 applyPermissions();
             } else {
-                throw new Error(data.message || 'Error al cargar datos.');
+                throw new Error(data.message || 'Error al cargar los datos del paciente.');
             }
         })
         .catch(error => {
             displayError(error.message);
+            localStorage.removeItem('activePatient');
         });
 
     patientDataForm.addEventListener('submit', handleSaveChanges);
 
     // --- FUNCIONES ---
     function populateDashboard(resumen) {
-        const fechaConsulta = resumen.ultimaConsulta === "Ninguna" ? "Ninguna" : new Date(resumen.ultimaConsulta).toLocaleDateString('es-ES');
+        const fechaConsulta = resumen.ultimaConsulta === "Ninguna" 
+            ? "Ninguna"
+            : new Date(resumen.ultimaConsulta).toLocaleDateString('es-ES');
         document.getElementById('summary-ultima-consulta').textContent = fechaConsulta;
         
-        const fechaVacuna = resumen.ultimaVacuna.fecha ? new Date(resumen.ultimaVacuna.fecha).toLocaleDateString('es-ES') : '';
+        const fechaVacuna = resumen.ultimaVacuna.fecha 
+            ? new Date(resumen.ultimaVacuna.fecha).toLocaleDateString('es-ES') 
+            : '';
         document.getElementById('summary-ultima-vacuna').innerHTML = `${resumen.ultimaVacuna.nombreVacuna} <small style="display:block; color:#6c757d;">${fechaVacuna}</small>`;
 
-        const fechaConsultaEsp = resumen.ultimaConsultaEsp.fecha ? new Date(resumen.ultimaConsultaEsp.fecha).toLocaleDateString('es-ES') : '';
+        const fechaConsultaEsp = resumen.ultimaConsultaEsp.fecha 
+            ? new Date(resumen.ultimaConsultaEsp.fecha).toLocaleDateString('es-ES') 
+            : '';
         let tipoEsp = resumen.ultimaConsultaEsp.tipo || "Ninguna";
         if (tipoEsp === "Psicologia") tipoEsp = "Psicología";
         if (tipoEsp === "Nutricion") tipoEsp = "Nutrición";
@@ -111,6 +112,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!currentUser) return;
         const userRole = currentUser.profile;
         const saveChangesBtn = document.getElementById('save-changes-btn');
+
         if (userRole === 'asistente') {
             saveChangesBtn.disabled = true;
             saveChangesBtn.textContent = 'Guardado no permitido para este perfil';
@@ -122,11 +124,8 @@ document.addEventListener('DOMContentLoaded', () => {
         for (const key in patient) {
             const element = document.getElementById(key);
             if (element) {
-                if (key === 'fechaNacimiento' && patient[key]) {
-                    element.value = patient[key];
-                } else {
-                    element.value = patient[key];
-                }
+                // El API ya formatea la fecha a AAAA-MM-DD
+                element.value = patient[key];
             }
         }
     }
@@ -136,6 +135,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const submitBtn = document.getElementById('save-changes-btn');
         submitBtn.disabled = true;
         submitBtn.textContent = 'Guardando...';
+
         const formData = {
             action: 'actualizarPaciente',
             codigoUnico: codigo,
@@ -155,6 +155,7 @@ document.addEventListener('DOMContentLoaded', () => {
             antecedentesPatologicos: document.getElementById('antecedentesPatologicos').value,
             antecedentesNoPatologicos: document.getElementById('antecedentesNoPatologicos').value
         };
+
         try {
             const response = await fetch(API_URL, {
                 method: 'POST',
@@ -163,6 +164,8 @@ document.addEventListener('DOMContentLoaded', () => {
             });
             const data = await response.json();
             if (data.status !== 'success') throw new Error(data.message);
+            
+            // Actualizar los datos locales después de guardar para mantener consistencia
             localStorage.setItem('activePatient', JSON.stringify(formData));
             displayMessage('success', '¡Expediente actualizado con éxito!');
         } catch (error) {
