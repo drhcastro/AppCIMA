@@ -5,58 +5,47 @@
     --accent-color: #ee9b00;
     --danger-color: #d9534f;
     --success-color: #5cb85c;
-    --bg-color: #f4f7f5;
+    --bg-color: #f8f9fa; /* Un gris muy claro */
     --card-bg-color: #ffffff;
-    --text-color: #333;
+    --text-color: #212529; /* Casi negro */
     --muted-text-color: #6c757d;
     --border-color: #dee2e6;
     --font-family: 'Poppins', sans-serif;
-    --card-shadow: 0 4px 15px rgba(0, 0, 0, 0.07);
-    --border-radius: 12px;
+    --card-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    --border-radius: 15px;
 }
 
-* {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
-}
+* { box-sizing: border-box; margin: 0; padding: 0; }
 
 body {
     font-family: var(--font-family);
     background-color: var(--bg-color);
     color: var(--text-color);
     line-height: 1.6;
-}
-
-/* --- Estructura Principal --- */
-.page-container {
-    max-width: 1600px;
-    margin: 0 auto;
     padding: 24px;
 }
 
-.main-header {
+.page-container, .form-container {
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+/* --- Estilos de Encabezado --- */
+.main-header, .form-header {
     text-align: center;
     margin-bottom: 32px;
 }
-
-.main-header h1 {
+.main-header h1, .form-header h1 {
     color: var(--primary-color);
     font-size: 2.25rem;
     font-weight: 700;
 }
-
-.main-header p {
+.main-header p, .form-header p {
     color: var(--muted-text-color);
     font-size: 1.1rem;
 }
 
-.main-content {
-    display: grid;
-    grid-template-columns: 400px 1fr;
-    gap: 24px;
-}
-
+/* --- Estilo de Tarjeta Base --- */
 .card {
     background-color: var(--card-bg-color);
     border-radius: var(--border-radius);
@@ -66,260 +55,102 @@ body {
     margin-bottom: 24px;
 }
 
-.chart-card {
-    height: 500px;
-    position: relative;
+/* --- Encabezado de Paciente en Visor --- */
+.patient-header-card {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 24px;
 }
+.patient-details { flex-grow: 1; }
+.patient-details h2 { margin: 0 0 8px 0; color: var(--primary-color); }
+.patient-meta { display: flex; flex-wrap: wrap; gap: 8px 24px; color: var(--muted-text-color); font-size: 0.9rem; }
+.patient-meta span { font-weight: 600; color: var(--text-color); }
 
-#chart-container {
-    position: relative;
-    height: 100%;
+/* --- Grid de Acciones (Recuadros Estilizados) --- */
+.actions-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px;
+    margin-top: 24px;
 }
-
-/* --- Formularios y Controles --- */
-.form-group {
-    margin-bottom: 16px;
-}
-
-.form-group label {
-    display: block;
-    font-weight: 600;
-    color: var(--primary-color);
-    margin-bottom: 8px;
-    font-size: 0.9rem;
-}
-
-input, select {
-    width: 100%;
-    padding: 12px;
+.action-card {
+    background-color: var(--card-bg-color);
+    padding: 1.5rem;
+    border-radius: var(--border-radius);
+    box-shadow: var(--card-shadow);
+    text-decoration: none;
+    color: var(--text-color);
+    transition: transform 0.3s, box-shadow 0.3s;
     border: 1px solid var(--border-color);
-    border-radius: 8px;
-    font-family: var(--font-family);
-    font-size: 1rem;
-    transition: border-color 0.3s, box-shadow 0.3s;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
 }
+.action-card:hover { transform: translateY(-5px); box-shadow: 0 8px 30px rgba(0, 95, 115, 0.12); }
+.action-card .icon { font-size: 2.5rem; margin-bottom: 1rem; color: var(--secondary-color); }
+.action-card h3 { font-size: 1.2rem; color: var(--primary-color); margin: 0; }
 
-input:focus, select:focus {
-    outline: none;
-    border-color: var(--secondary-color);
-    box-shadow: 0 0 0 3px rgba(10, 147, 150, 0.2);
-}
-
-.input-group:not(.active) {
-    display: none;
-}
+/* --- Formularios --- */
+.form-group { margin-bottom: 16px; }
+.form-group label { display: block; font-weight: 600; color: var(--primary-color); margin-bottom: 8px; font-size: 0.9rem; }
+input, select, textarea { width: 100%; padding: 12px; border: 1px solid var(--border-color); border-radius: 8px; font-family: var(--font-family); font-size: 1rem; }
+input:focus, select:focus, textarea:focus { outline: none; border-color: var(--secondary-color); box-shadow: 0 0 0 3px rgba(10, 147, 150, 0.2); }
+.form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+.form-group.full-width { grid-column: 1 / -1; }
 
 /* --- Botones --- */
-.button-primary {
-    width: 100%;
-    padding: 14px;
-    background-color: var(--secondary-color);
-    color: white;
-    font-weight: 600;
-    font-size: 1rem;
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
-    transition: background-color 0.3s, transform 0.2s;
-}
-.button-primary:hover {
-    background-color: var(--primary-color);
-    transform: translateY(-2px);
-}
-
-.actions-toolbar {
-    display: flex;
-    gap: 16px;
-    margin-top: 16px;
-}
-.actions-toolbar button {
-    flex-grow: 1;
-    padding: 12px;
-    font-family: var(--font-family);
-    font-size: 0.9rem;
+.button-primary, .button-secondary, .button-danger {
+    padding: 12px 24px;
     font-weight: 600;
     border-radius: 8px;
-    border: 1px solid var(--border-color);
-    background-color: var(--card-bg-color);
+    border: 2px solid transparent;
     cursor: pointer;
+    text-decoration: none;
+    display: inline-block;
     transition: all 0.3s;
 }
-.actions-toolbar button:hover {
-    background-color: var(--primary-color);
-    color: white;
-    border-color: var(--primary-color);
-}
+.button-primary { background-color: var(--secondary-color); border-color: var(--secondary-color); color: white; }
+.button-primary:hover { background-color: var(--primary-color); border-color: var(--primary-color); }
+.button-secondary { background-color: transparent; border-color: var(--primary-color); color: var(--primary-color); }
+.button-secondary:hover { background-color: var(--primary-color); color: white; }
+.button-danger { background-color: transparent; border-color: var(--danger-color); color: var(--danger-color); }
+.button-danger:hover { background-color: var(--danger-color); color: white; }
+button:disabled { background-color: #ccc; border-color: #ccc; cursor: not-allowed; }
 
-.button-danger {
-    color: var(--danger-color);
-    border-color: var(--danger-color);
-}
-.button-danger:hover {
-    background-color: var(--danger-color);
-    border-color: var(--danger-color);
-    color: white;
-}
+/* --- Estilos para Páginas de Módulos (Historial, Vacunas, etc.) --- */
+.card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; }
+.card-header h3 { margin: 0; color: var(--primary-color); }
+.card-header .button-primary { width: auto; padding: 10px 16px; font-size: 0.9rem; }
+.table-container { width: 100%; overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; }
+th, td { padding: 12px 15px; text-align: left; border-bottom: 1px solid var(--border-color); }
+th { background-color: #f8f9fa; font-weight: 600; color: var(--primary-color); }
+tbody tr:hover { background-color: #f1f3f5; }
 
-/* --- Recuadro de Resumen (AHORA HISTORIAL) --- */
-#summary-card h3 {
-    text-align: center;
-    color: var(--primary-color);
-    margin-bottom: 16px;
-}
+/* --- Pestañas (Tabs) --- */
+.tab-nav { display: flex; border-bottom: 2px solid var(--border-color); margin-bottom: 24px; }
+.tab-button { padding: 12px 20px; cursor: pointer; background-color: transparent; border: none; font-family: var(--font-family); font-size: 1rem; font-weight: 600; color: var(--muted-text-color); border-bottom: 3px solid transparent; transition: all 0.3s; }
+.tab-button:hover { color: var(--primary-color); }
+.tab-button.active { color: var(--primary-color); border-bottom: 3px solid var(--primary-color); }
+.tab-content { display: none; }
+.tab-content.active { display: block; }
+.section-title { color: var(--secondary-color); margin-top: 24px; margin-bottom: 16px; padding-bottom: 8px; border-bottom: 1px solid var(--border-color); }
 
-#history-summary-container {
-    max-height: 400px;
-    overflow-y: auto;
-    padding-right: 10px; /* Espacio para la barra de scroll */
-}
-
-.summary-group {
-    margin-bottom: 16px;
-}
-
-.summary-group-header {
-    font-weight: 700;
-    color: var(--secondary-color);
-    padding-bottom: 8px;
-    border-bottom: 2px solid var(--secondary-color);
-    margin-bottom: 12px;
-}
-
-.summary-item {
-    display: grid;
-    grid-template-columns: auto 1fr auto;
-    gap: 12px;
-    align-items: center;
-    padding: 8px;
-    border-radius: 6px;
-    transition: background-color 0.3s;
-}
-
-.summary-item:not(:last-child) {
-    border-bottom: 1px solid #f0f0f0;
-}
-
-.summary-item:hover {
-    background-color: #f8f9fa;
-}
-
-.summary-color-tag {
-    width: 12px;
-    height: 12px;
-    border-radius: 50%;
-}
-
-.summary-details .item-label {
-    font-weight: 600;
-}
-.summary-details .item-age {
-    font-size: 0.8rem;
-    color: var(--muted-text-color);
-}
-
-.summary-zscore {
-    font-weight: 700;
-    font-size: 1.1rem;
-    text-align: right;
-}
-
-
-/* --- Diseño Responsivo --- */
-@media (max-width: 1200px) {
-    .main-content {
-        grid-template-columns: 350px 1fr;
-    }
-}
-@media (max-width: 992px) {
-    .main-content {
-        grid-template-columns: 1fr;
-    }
-    .chart-card {
-        height: 400px;
-    }
-}
+/* --- Modal (Ventana Emergente) --- */
+.modal-backdrop { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.6); display: flex; justify-content: center; align-items: center; z-index: 1000; }
+.modal-backdrop.hidden { display: none; }
+.modal-content { background-color: white; padding: 30px; border-radius: var(--border-radius); width: 90%; max-width: 600px; box-shadow: 0 5px 25px rgba(0,0,0,0.2); }
+.modal-content h2 { text-align: center; color: var(--primary-color); margin-bottom: 24px; }
+.modal-actions { display: flex; gap: 16px; margin-top: 24px; }
+.modal-actions button { width: 100%; }
 
 /* --- Estilos de Impresión --- */
 @media print {
-    body {
-        background-color: #fff;
-        font-size: 10pt; /* Reducir tamaño de letra para mejor ajuste */
-    }
-
-    .page-container {
-        padding: 0;
-    }
-
-    .controls-column, .actions-toolbar, .main-header p {
-        display: none; /* Oculta elementos no necesarios */
-    }
-
-    .main-content {
-        grid-template-columns: 1fr; /* Una sola columna */
-    }
-
-    .card {
-        box-shadow: none;
-        border: 1px solid #ccc;
-        page-break-inside: avoid; /* Evita que una tarjeta se corte entre páginas */
-    }
-
-    .main-header h1 {
-        font-size: 1.5rem;
-        margin-bottom: 1rem;
-    }
-    
-    /* --- REGLAS NUEVAS PARA CORREGIR LA GRÁFICA --- */
-
-    .chart-card {
-        height: auto !important; /* Permite que la tarjeta se ajuste a su contenido */
-        overflow: hidden; /* Evita cualquier desbordamiento visual */
-    }
-
-    #chart-container {
-        /* Define una altura fija y una relación de aspecto para la impresión */
-        height: 350px !important; 
-        width: 100% !important;
-        position: relative;
-    }
-}
-/* ... al final de style.css ... */
-
-/* Estilo para el banner del paciente activo */
-#active-patient-banner {
-    background-color: #e7f5ff;
-    color: var(--primary-color);
-    padding: 8px 16px;
-    border-radius: 8px;
-    margin: 16px auto 0;
-    max-width: 800px;
-    font-weight: 600;
-}
-
-#active-patient-banner .patient-name {
-    font-weight: 700;
-}
-
-/* Estilo para el botón secundario de regreso */
-.button-secondary {
-    display: block;
-    width: 100%;
-    padding: 14px;
-    text-align: center;
-    text-decoration: none;
-    font-weight: 600;
-    font-size: 1rem;
-    color: var(--primary-color);
-    background-color: transparent;
-    border: 2px solid var(--primary-color);
-    border-radius: 8px;
-    cursor: pointer;
-    transition: all 0.3s;
-}
-.button-secondary:hover {
-    background-color: var(--primary-color);
-    color: white;
-}
-.full-width-btn {
-    margin-top: 16px;
+    body { background-color: #fff; padding: 1cm; }
+    .page-container, .form-container { max-width: 100%; }
+    .no-print, .actions-toolbar, .main-header, .form-header, .tab-nav, footer { display: none; }
+    .card { box-shadow: none; border: 1px solid #ccc; page-break-inside: avoid; }
 }
