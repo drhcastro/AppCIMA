@@ -1,23 +1,19 @@
 document.addEventListener('DOMContentLoaded', () => {
-    // --- CONFIGURACIÓN ---
-    const API_URL = 'https://script.google.com/macros/s/AKfycbxXXUPOvKK5HRSeFsM3LYVvkweqxKBhxMjxASg_0-7sEyke-LZ2eOPQkaz0quXoN3Mc/exec';
-
+    // La conexión 'db' ya está disponible gracias a auth-guard.js
+    
     // --- ELEMENTOS DEL DOM ---
     const patientBanner = document.getElementById('patient-banner');
     const historialContainer = document.getElementById('planes-historial-container');
     const backToVisorBtn = document.getElementById('back-to-visor');
 
-    // --- LÓGICA DE PERMISOS ---
+    // --- LÓGICA DE PERMISOS E INICIALIZACIÓN ---
+    const activePatient = JSON.parse(localStorage.getItem('activePatient'));
     const currentUser = JSON.parse(sessionStorage.getItem('currentUser'));
 
-    // Regla: El perfil 'asistente' no puede acceder a esta página.
     if (currentUser && currentUser.profile === 'asistente') {
         document.body.innerHTML = '<div style="text-align: center; padding: 40px; font-family: Poppins, sans-serif;"><h1>Acceso Denegado</h1><p>Tu perfil no tiene permiso para ver esta sección.</p><a href="javascript:history.back()" style="color: #005f73;">Regresar</a></div>';
-        return; // Detener la ejecución del script
+        return;
     }
-
-    // --- LÓGICA DE INICIALIZACIÓN ---
-    const activePatient = JSON.parse(localStorage.getItem('activePatient'));
 
     if (!activePatient) {
         patientBanner.textContent = "ERROR: No hay un paciente activo.";
@@ -34,23 +30,26 @@ document.addEventListener('DOMContentLoaded', () => {
     async function loadHistory() {
         historialContainer.innerHTML = 'Cargando historial...';
         try {
-            const response = await fetch(`${API_URL}?action=getPlanes&codigo=${activePatient.codigoUnico}`);
-            const data = await response.json();
-            if (data.status !== 'success') throw new Error(data.message);
+            const querySnapshot = await db.collection('planesTratamiento')
+                .where('codigoUnico', '==', activePatient.codigoUnico)
+                .orderBy('fechaPlan', 'desc')
+                .get();
+            
+            const plans = querySnapshot.docs.map(doc => doc.data());
 
-            if (data.data.length === 0) {
+            if (plans.length === 0) {
                 historialContainer.innerHTML = '<p>No hay planes de tratamiento registrados para este paciente.</p>';
                 return;
             }
 
-            // Guardamos los planes en la memoria de la sesión para la página de impresión
-            sessionStorage.setItem('patientPlans', JSON.stringify(data.data));
+            // Guardamos los planes en la memoria para que la página de impresión los use
+            sessionStorage.setItem('patientPlans', JSON.stringify(plans));
 
             historialContainer.innerHTML = '';
-            data.data.forEach((plan, index) => {
+            plans.forEach((plan, index) => {
                 const card = document.createElement('div');
-                card.className = 'consulta-card'; // Reutilizamos estilo
-                const fecha = new Date(plan.fechaPlan + 'T00:00:00').toLocaleDateString('es-ES', { year: 'numeric', month: 'long', day: 'numeric' });
+                card.className = 'consulta-card';
+                const fecha = new Date(plan.fechaPlan).toLocaleDateString('es-ES', { year: 'numeric', month: 'long', day: 'numeric' });
                 
                 card.innerHTML = `
                     <div class="plan-summary">
