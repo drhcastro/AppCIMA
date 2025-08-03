@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Editar Expediente - CIMA Nahui</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css"> </head>
+<body>
+
+<div class="form-container">
+    <header class="form-header">
+        <h1>✏️ Editar Expediente del Paciente</h1>
+        <p id="patient-banner">Cargando datos...</p>
+    </header>
+
+    <form id="edit-patient-form">
+        <div class="tab-nav">
+            <button type="button" class="tab-button active" data-tab="identidad">Identidad</button>
+            <button type="button" class="tab-button" data-tab="heredofamiliares">Heredofamiliares</button>
+            <button type="button" class="tab-button" data-tab="perinatales">Perinatales</button>
+            <button type="button" class="tab-button" data-tab="patologicos">Patológicos</button>
+            <button type="button" class="tab-button" data-tab="no-patologicos">No Patológicos</button>
+        </div>
+
+        <div class="tab-content-container">
+            <div id="identidad" class="tab-content active">
+                <div class="form-grid">
+                    <div class="form-group"><label for="nombre">Nombre(s)</label><input type="text" id="nombre" required></div>
+                    <div class="form-group"><label for="apellidoPaterno">Apellido Paterno</label><input type="text" id="apellidoPaterno" required></div>
+                    <div class="form-group"><label for="apellidoMaterno">Apellido Materno</label><input type="text" id="apellidoMaterno"></div>
+                    <div class="form-group"><label for="fechaNacimiento">Fecha de Nacimiento</label><input type="date" id="fechaNacimiento" required></div>
+                    <div class="form-group"><label for="sexo">Sexo Biológico</label><select id="sexo" required><option value="Niño">Niño</option><option value="Niña">Niña</option></select></div>
+                    <div class="form-group"><label for="telefono">Teléfono</label><input type="tel" id="telefono"></div>
+                    <div class="form-group full-width"><label for="domicilio">Domicilio</label><input type="text" id="domicilio"></div>
+                    <div class="form-group"><label for="nombreMama">Nombre de la Madre</label><input type="text" id="nombreMama"></div>
+                    <div class="form-group"><label for="nombrePapa">Nombre del Padre</label><input type="text" id="nombrePapa"></div>
+                    <div class="form-group"><label for="correo">Correo Electrónico</label><input type="email" id="correo"></div>
+                    <div class="form-group"><label for="alergias">Alergias Conocidas</label><input type="text" id="alergias"></div>
+                </div>
+            </div>
+
+            <div id="heredofamiliares" class="tab-content">
+                <div class="form-group">
+                    <label for="antecedentesHeredofamiliares">Detalles de Antecedentes Heredofamiliares</label>
+                    <textarea id="antecedentesHeredofamiliares" rows="15"></textarea>
+                </div>
+            </div>
+
+            <div id="perinatales" class="tab-content">
+                <div class="form-group">
+                    <label for="antecedentesPerinatales">Detalles de Antecedentes Perinatales y Natales</label>
+                    <textarea id="antecedentesPerinatales" rows="15"></textarea>
+                </div>
+            </div>
+            
+            <div id="patologicos" class="tab-content">
+                 <div class="form-group">
+                    <label for="antecedentesPatologicos">Detalles de Antecedentes Personales Patológicos</label>
+                    <textarea id="antecedentesPatologicos" rows="15"></textarea>
+                </div>
+            </div>
+
+            <div id="no-patologicos" class="tab-content">
+                <div class="form-group">
+                    <label for="antecedentesNoPatologicos">Detalles de Antecedentes Personales No Patológicos</label>
+                    <textarea id="antecedentesNoPatologicos" rows="15"></textarea>
+                </div>
+            </div>
+        </div>
+
+        <button type="submit" id="submit-btn" class="button-primary" style="margin-top: 24px;">💾 Guardar Cambios</button>
+        <div id="response-message"></div>
+    </form>
+
+    <div class="actions-toolbar" style="margin-top: 16px;">
+        <a href="#" id="back-to-visor" class="button-secondary">⬅️ Regresar al Expediente</a>
+    </div>
+
+    <footer class="form-footer" style="margin-top: 32px;">
+        <p>CIMA Nahui de Occidente &copy; 2025</p>
+    </footer>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+<script src="auth-guard.js"></script>
+<script src="editar-paciente-script.js"></script> </body>
+</html>
