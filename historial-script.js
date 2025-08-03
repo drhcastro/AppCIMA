@@ -1,4 +1,8 @@
 document.addEventListener('DOMContentLoaded', () => {
+    // --- LÍNEA DE DIAGNÓSTICO ---
+    // Si ves este mensaje en la consola (F12), estás ejecutando la versión correcta de este archivo.
+    console.log("Cargando historial-script.js vFinal...");
+
     // La conexión a Firebase ('db') ya está disponible gracias a auth-guard.js
     let loadedConsultas = [];
 
@@ -38,9 +42,10 @@ document.addEventListener('DOMContentLoaded', () => {
     async function loadHistory() {
         historialContainer.innerHTML = 'Cargando...';
         try {
+            // --- ESTA ES LA SINTAXIS CORRECTA PARA FIREBASE WEB ---
             const querySnapshot = await db.collection('consultas')
                 .where('codigoUnico', '==', activePatient.codigoUnico)
-                .orderBy('fechaConsulta', 'desc') // Ordenar por fecha, la más reciente primero
+                .orderBy('fechaConsulta', 'desc')
                 .get();
 
             loadedConsultas = querySnapshot.docs.map(doc => doc.data());
@@ -72,21 +77,21 @@ document.addEventListener('DOMContentLoaded', () => {
                             </div>
                             <hr>
                             <h4>Interrogatorio (SAMPLE)</h4>
-                            <p><strong>Síntomas/Motivo:</strong> ${consulta.sintomasSignosMotivo}</p>
-                            <p><strong>Alergias:</strong> ${consulta.alergiasConsulta}</p>
-                            <p><strong>Medicamentos:</strong> ${consulta.medicamentosPrevios}</p>
-                            <p><strong>Historial Previo:</strong> ${consulta.historialClinicoPrevio}</p>
-                            <p><strong>Líquidos/Alimentos:</strong> ${consulta.liquidosAlimentos}</p>
-                            <p><strong>Eventos Relacionados:</strong> ${consulta.eventosRelacionados}</p>
+                            <p><strong>Síntomas/Motivo:</strong> ${consulta.sintomasSignosMotivo || ''}</p>
+                            <p><strong>Alergias:</strong> ${consulta.alergiasConsulta || ''}</p>
+                            <p><strong>Medicamentos:</strong> ${consulta.medicamentosPrevios || ''}</p>
+                            <p><strong>Historial Previo:</strong> ${consulta.historialClinicoPrevio || ''}</p>
+                            <p><strong>Líquidos/Alimentos:</strong> ${consulta.liquidosAlimentos || ''}</p>
+                            <p><strong>Eventos Relacionados:</strong> ${consulta.eventosRelacionados || ''}</p>
                             <hr>
                             <h4>Análisis y Diagnóstico</h4>
-                            <p><strong>Análisis/Exploración:</strong> ${consulta.analisis}</p>
-                            <p><strong>Dx. Sindromático:</strong> ${consulta.diagnosticoSindromatico}</p>
-                            <p><strong>Dx. Etiológico:</strong> ${consulta.diagnosticoEtiologico}</p>
-                            <p><strong>Dx. Nutricional:</strong> ${consulta.diagnosticoNutricional}</p>
-                            <p><strong>Dx. Radiológico:</strong> ${consulta.diagnosticoRadiologico}</p>
-                            <p><strong>Dx. Presuntivo:</strong> ${consulta.diagnosticoPresuntivo}</p>
-                            <p><strong>Dx. Nosológico (Final):</strong> ${consulta.diagnosticoNosologico}</p>
+                            <p><strong>Análisis/Exploración:</strong> ${consulta.analisis || ''}</p>
+                            <p><strong>Dx. Sindromático:</strong> ${consulta.diagnosticoSindromatico || ''}</p>
+                            <p><strong>Dx. Etiológico:</strong> ${consulta.diagnosticoEtiologico || ''}</p>
+                            <p><strong>Dx. Nutricional:</strong> ${consulta.diagnosticoNutricional || ''}</p>
+                            <p><strong>Dx. Radiológico:</strong> ${consulta.diagnosticoRadiologico || ''}</p>
+                            <p><strong>Dx. Presuntivo:</strong> ${consulta.diagnosticoPresuntivo || ''}</p>
+                            <p><strong>Dx. Nosológico (Final):</strong> ${consulta.diagnosticoNosologico || ''}</p>
                         </div>
                     </details>`;
                 historialContainer.appendChild(consultaCard);
