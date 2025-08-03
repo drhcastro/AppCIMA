@@ -1,4 +1,8 @@
 document.addEventListener('DOMContentLoaded', () => {
+    // --- LÍNEA DE DIAGNÓSTICO #1 ---
+    // Si ves este mensaje en la consola (F12), estás ejecutando la versión correcta de este archivo.
+    console.log("Cargando tamizajes-script.js vDiagnostico...");
+
     // La conexión 'db' ya está disponible gracias a auth-guard.js
     const TIPOS_DE_TAMIZAJES = ["Cardiológico", "Metabólico", "Visual", "Auditivo", "Genético", "Cadera"];
     let loadedTamizajes = [];
@@ -11,7 +15,13 @@ document.addEventListener('DOMContentLoaded', () => {
     const modalTitle = document.getElementById('modal-title');
     const tamizajeForm = document.getElementById('tamizaje-form');
     const closeModalBtn = document.getElementById('close-modal-btn');
-    const hiddenIdInput = document.getElementById('tamizajeId');
+    const responseMsg = document.getElementById('response-message');
+    
+    // Añadir un input oculto para el ID en el formulario
+    const hiddenIdInput = document.createElement('input');
+    hiddenIdInput.type = 'hidden';
+    hiddenIdInput.id = 'tamizajeId';
+    if(tamizajeForm) tamizajeForm.prepend(hiddenIdInput);
 
     // --- INICIALIZACIÓN Y PERMISOS ---
     const activePatient = JSON.parse(localStorage.getItem('activePatient'));
@@ -31,26 +41,33 @@ document.addEventListener('DOMContentLoaded', () => {
     loadAndDisplayTamizajes();
 
     // --- MANEJO DE EVENTOS ---
-    tamizajeForm.addEventListener('submit', handleFormSubmit);
-    closeModalBtn.addEventListener('click', closeModal);
-    listContainer.addEventListener('click', (e) => {
-        const target = e.target.closest('button');
-        if (!target) return;
-        const tipoTamiz = target.dataset.tipo;
-        const recordId = target.dataset.id;
-        if (target.classList.contains('register-btn')) {
-            openModal(tipoTamiz);
-        }
-        if (target.classList.contains('edit-btn')) {
-            const registro = loadedTamizajes.find(t => t.id == recordId);
-            openModal(tipoTamiz, registro);
-        }
-        if (target.classList.contains('delete-btn')) {
-            if (confirm('¿Estás seguro de que deseas eliminar este registro?')) {
-                deleteRecord(recordId);
-            }
-        }
+    if(tamizajeForm) tamizajeForm.addEventListener('submit', handleFormSubmit);
+    if(closeModalBtn) closeModalBtn.addEventListener('click', closeModal);
+    if(modalBackdrop) modalBackdrop.addEventListener('click', (e) => {
+        if (e.target === modalBackdrop) closeModal();
     });
+    if(listContainer) {
+        listContainer.addEventListener('click', (e) => {
+            const target = e.target.closest('button');
+            if (!target) return;
+
+            const tipoTamiz = target.dataset.tipo;
+            const recordId = target.dataset.id;
+            
+            if (target.classList.contains('register-btn')) {
+                openModal(tipoTamiz);
+            }
+            if (target.classList.contains('edit-btn')) {
+                const registro = loadedTamizajes.find(t => t.id == recordId);
+                openModal(tipoTamiz, registro);
+            }
+            if (target.classList.contains('delete-btn')) {
+                if (confirm('¿Estás seguro de que deseas eliminar este registro?')) {
+                    deleteRecord(recordId);
+                }
+            }
+        });
+    }
 
     // --- FUNCIONES ---
     async function loadAndDisplayTamizajes() {
@@ -86,9 +103,17 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function openModal(tipo, registro = null) {
-        tamizajeForm.reset();
+        // --- LÍNEA DE DIAGNÓSTICO #2 ---
+        console.log("Intentando abrir modal. ¿Existe el campo #tipoTamiz?", document.getElementById('tipoTamiz'));
+        
+        responseMsg.style.display = 'none';
         modalTitle.textContent = `${registro ? 'Editar' : 'Registrar'} Tamizaje ${tipo}`;
-        document.getElementById('tipoTamiz').value = tipo;
+        
+        // El script se detiene aquí si el elemento es nulo
+        document.getElementById('tipoTamiz').value = tipo; 
+        
+        tamizajeForm.reset();
+        
         if (registro) {
             hiddenIdInput.value = registro.id;
             document.getElementById('fechaRealizacion').value = registro.fechaRealizacion;
@@ -101,6 +126,7 @@ document.addEventListener('DOMContentLoaded', () => {
             hiddenIdInput.value = '';
             document.getElementById('fechaRealizacion').valueAsDate = new Date();
         }
+        
         modalBackdrop.classList.remove('hidden');
     }
 
@@ -137,7 +163,9 @@ document.addEventListener('DOMContentLoaded', () => {
             closeModal();
             loadAndDisplayTamizajes();
         } catch (error) {
-            // ... (manejo de error)
+            responseMsg.textContent = `Error: ${error.message}`;
+            responseMsg.className = 'error';
+            responseMsg.style.display = 'block';
         } finally {
             submitBtn.disabled = false;
             submitBtn.textContent = 'Guardar Cambios';
