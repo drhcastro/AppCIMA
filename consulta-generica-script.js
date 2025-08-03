@@ -1,33 +1,20 @@
 document.addEventListener('DOMContentLoaded', () => {
-    // --- CONFIGURACIÓN ---
-    const API_URL = 'https://script.google.com/macros/s/AKfycbxXXUPOvKK5HRSeFsM3LYVvkweqxKBhxMjxASg_0-7sEyke-LZ2eOPQkaz0quXoN3Mc/exec';
-    let loadedHistory = []; // Variable para guardar el historial cargado
+    // La conexión 'db' ya está disponible gracias a auth-guard.js
+    let loadedHistory = [];
 
     // Configuración para cada tipo de especialidad
     const specialtyConfig = {
         psicologia: {
             title: "Psicología",
-            getAction: "getPsicologia",
-            saveAction: "guardarPsicologia",
-            updateAction: "actualizarPsicologia",
-            deleteAction: "eliminarPsicologia",
-            allowedProfile: "psicologo"
+            collectionName: "psicologia"
         },
         nutricion: {
             title: "Nutrición",
-            getAction: "getNutricion",
-            saveAction: "guardarNutricion",
-            updateAction: "actualizarNutricion",
-            deleteAction: "eliminarNutricion",
-            allowedProfile: "nutricionista"
+            collectionName: "nutricion"
         },
         rehabilitacion: {
             title: "Rehabilitación",
-            getAction: "getRehabilitacion",
-            saveAction: "guardarRehabilitacion",
-            updateAction: "actualizarRehabilitacion",
-            deleteAction: "eliminarRehabilitacion",
-            allowedProfile: "rehabilitador"
+            collectionName: "rehabilitacion"
         }
     };
 
@@ -39,7 +26,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const historialContainer = document.getElementById('historial-container');
     const submitBtn = notaForm.querySelector('button[type="submit"]');
 
-    // --- LÓGICA DE INICIALIZACIÓN ---
+    // --- INICIALIZACIÓN ---
     const params = new URLSearchParams(window.location.search);
     const tipo = params.get('tipo');
     const mode = params.get('mode');
@@ -82,7 +69,6 @@ document.addEventListener('DOMContentLoaded', () => {
     historialContainer.addEventListener('click', (e) => {
         const target = e.target.closest('button');
         if (!target) return;
-
         const id = target.dataset.id;
         if (target.classList.contains('delete-btn')) {
             if (confirm('¿Estás seguro de que deseas eliminar esta nota?')) {
@@ -98,9 +84,9 @@ document.addEventListener('DOMContentLoaded', () => {
     function applyPermissions() {
         if (!currentUser) return;
         const userRole = currentUser.profile;
-        const hasPermission = [config.allowedProfile, 'medico', 'superusuario'].includes(userRole);
-
-        if (!hasPermission) {
+        const allowedProfiles = ['medico', 'superusuario', tipo]; // El especialista mismo
+        
+        if (!allowedProfiles.includes(userRole)) {
             notaForm.querySelectorAll('input, textarea, button').forEach(el => {
                 el.disabled = true;
             });
@@ -122,23 +108,14 @@ document.addEventListener('DOMContentLoaded', () => {
             planSeguimiento: document.getElementById('planSeguimiento').value,
         };
 
-        if (mode === 'edit') {
-            formData.action = config.updateAction;
-            formData.id = recordId;
-        } else {
-            formData.action = config.saveAction;
-        }
-
         try {
-            const response = await fetch(API_URL, {
-                method: 'POST',
-                body: JSON.stringify(formData),
-                headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-            });
-            const data = await response.json();
-            if (data.status !== 'success') throw new Error(data.message);
-            
-            alert(`Nota ${mode === 'edit' ? 'actualizada' : 'guardada'} con éxito.`);
+            if (mode === 'edit') {
+                await db.collection(config.collectionName).doc(recordId).update(formData);
+            } else {
+                formData.id = new Date().getTime().toString();
+                await db.collection(config.collectionName).doc(formData.id).set(formData);
+            }
+            alert(`Nota de ${config.title} ${mode === 'edit' ? 'actualizada' : 'guardada'} con éxito.`);
             sessionStorage.removeItem('recordToEdit');
             window.location.href = `consulta-generica.html?tipo=${tipo}`;
         } catch (error) {
@@ -154,11 +131,12 @@ document.addEventListener('DOMContentLoaded', () => {
     async function loadHistory() {
         historialContainer.innerHTML = 'Cargando historial...';
         try {
-            const response = await fetch(`${API_URL}?action=${config.getAction}&codigo=${activePatient.codigoUnico}`);
-            const data = await response.json();
-            if (data.status !== 'success') throw new Error(data.message);
-            
-            loadedHistory = data.data; // Guardar historial en la variable global
+            const querySnapshot = await db.collection(config.collectionName)
+                .where('codigoUnico', '==', activePatient.codigoUnico)
+                .orderBy('fechaConsulta', 'desc')
+                .get();
+
+            loadedHistory = querySnapshot.docs.map(doc => doc.data());
 
             if (loadedHistory.length === 0) {
                 historialContainer.innerHTML = `<p>No hay notas de ${config.title} registradas.</p>`;
@@ -209,13 +187,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     async function deleteRecord(id) {
         try {
-            const response = await fetch(API_URL, {
-                method: 'POST',
-                body: JSON.stringify({ action: config.deleteAction, id: id }),
-                headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-            });
-            const data = await response.json();
-            if (data.status !== 'success') throw new Error(data.message);
+            await db.collection(config.collectionName).doc(id).delete();
             alert('Nota eliminada con éxito.');
             loadHistory();
         } catch (error) {
