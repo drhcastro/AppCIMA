@@ -49,10 +49,23 @@ document.addEventListener('DOMContentLoaded', () => {
             if (data.status === 'success' && data.data) {
                 const dashboardData = data.data;
                 const patient = dashboardData.paciente;
+
+                // --- PUNTO DE DIAGNÓSTICO #1 ---
+                console.log("VISOR: Datos del paciente recibidos del API:", patient);
+
                 patientBanner.innerHTML = `<strong>${patient.nombre} ${patient.apellidoPaterno || ''}</strong> | Código: ${patient.codigoUnico}`;
+                
                 populatePatientData(patient);
                 populateDashboard(dashboardData.resumen);
-                localStorage.setItem('activePatient', JSON.stringify(patient));
+                
+                try {
+                    localStorage.setItem('activePatient', JSON.stringify(patient));
+                    console.log("VISOR: Paciente guardado en memoria con éxito.");
+                } catch (error) {
+                    console.error("VISOR: ¡ERROR FATAL AL GUARDAR EN MEMORIA!", error);
+                    alert("Hubo un error al guardar la sesión del paciente. La navegación a otros módulos podría fallar.");
+                }
+
                 patientDataForm.style.display = 'block';
                 if (dashboardContainer) dashboardContainer.style.display = 'grid';
                 applyPermissions();
@@ -69,33 +82,21 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- FUNCIONES ---
     function populateDashboard(resumen) {
-        // Tarjeta 1: Última Consulta Médica
-        const fechaConsulta = resumen.ultimaConsulta === "Ninguna" 
-            ? "Ninguna"
-            : new Date(resumen.ultimaConsulta).toLocaleDateString('es-ES');
+        const fechaConsulta = resumen.ultimaConsulta === "Ninguna" ? "Ninguna" : new Date(resumen.ultimaConsulta).toLocaleDateString('es-ES');
         document.getElementById('summary-ultima-consulta').textContent = fechaConsulta;
         
-        // --- CORRECCIÓN AQUÍ ---
-        // Se cambió resumen.ultimaVacuna.nombre a resumen.ultimaVacuna.nombreVacuna
-        const fechaVacuna = resumen.ultimaVacuna.fecha 
-            ? new Date(resumen.ultimaVacuna.fecha).toLocaleDateString('es-ES') 
-            : '';
+        const fechaVacuna = resumen.ultimaVacuna.fecha ? new Date(resumen.ultimaVacuna.fecha).toLocaleDateString('es-ES') : '';
         document.getElementById('summary-ultima-vacuna').innerHTML = `${resumen.ultimaVacuna.nombreVacuna} <small style="display:block; color:#6c757d;">${fechaVacuna}</small>`;
 
-        // Tarjeta 3: Última Consulta de Especialidad
-        const fechaConsultaEsp = resumen.ultimaConsultaEsp.fecha 
-            ? new Date(resumen.ultimaConsultaEsp.fecha).toLocaleDateString('es-ES') 
-            : '';
+        const fechaConsultaEsp = resumen.ultimaConsultaEsp.fecha ? new Date(resumen.ultimaConsultaEsp.fecha).toLocaleDateString('es-ES') : '';
         let tipoEsp = resumen.ultimaConsultaEsp.tipo || "Ninguna";
         if (tipoEsp === "Psicologia") tipoEsp = "Psicología";
         if (tipoEsp === "Nutricion") tipoEsp = "Nutrición";
         if (tipoEsp === "Rehabilitacion") tipoEsp = "Rehabilitación";
         document.getElementById('summary-ultima-consulta-esp').innerHTML = `${tipoEsp} <small style="display:block; color:#6c757d;">${fechaConsultaEsp}</small>`;
 
-        // Tarjeta 4: Planes Activos
         document.getElementById('summary-planes-activos').textContent = resumen.planesActivos;
 
-        // Tarjeta 5: Tamizajes Pendientes
         const tamizajesPendientes = TIPOS_DE_TAMIZAJES.filter(t => !resumen.tamizajesRealizados.includes(t));
         const pendientesText = tamizajesPendientes.length > 0 ? tamizajesPendientes.length.toString() : "Ninguno";
         const pendientesTitle = tamizajesPendientes.length > 0 ? tamizajesPendientes.join(', ') : "Todos los tamizajes registrados";
@@ -108,7 +109,6 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!currentUser) return;
         const userRole = currentUser.profile;
         const saveChangesBtn = document.getElementById('save-changes-btn');
-
         if (userRole === 'asistente') {
             saveChangesBtn.disabled = true;
             saveChangesBtn.textContent = 'Guardado no permitido para este perfil';
@@ -134,7 +134,6 @@ document.addEventListener('DOMContentLoaded', () => {
         const submitBtn = document.getElementById('save-changes-btn');
         submitBtn.disabled = true;
         submitBtn.textContent = 'Guardando...';
-
         const formData = {
             action: 'actualizarPaciente',
             codigoUnico: codigo,
@@ -154,7 +153,6 @@ document.addEventListener('DOMContentLoaded', () => {
             antecedentesPatologicos: document.getElementById('antecedentesPatologicos').value,
             antecedentesNoPatologicos: document.getElementById('antecedentesNoPatologicos').value
         };
-
         try {
             const response = await fetch(API_URL, {
                 method: 'POST',
@@ -163,7 +161,6 @@ document.addEventListener('DOMContentLoaded', () => {
             });
             const data = await response.json();
             if (data.status !== 'success') throw new Error(data.message);
-            
             localStorage.setItem('activePatient', JSON.stringify(formData));
             displayMessage('success', '¡Expediente actualizado con éxito!');
         } catch (error) {
