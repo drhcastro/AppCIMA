@@ -47,35 +47,37 @@ document.addEventListener('DOMContentLoaded', () => {
         .then(res => res.json())
         .then(data => {
             if (data.status === 'success' && data.data) {
-                const dashboardData = data.data;
-                const patient = dashboardData.paciente;
-
+                const patient = data.data.paciente;
+                
                 // --- PUNTO DE DIAGNÓSTICO #1 ---
                 console.log("VISOR: Datos del paciente recibidos del API:", patient);
 
                 patientBanner.innerHTML = `<strong>${patient.nombre} ${patient.apellidoPaterno || ''}</strong> | Código: ${patient.codigoUnico}`;
                 
                 populatePatientData(patient);
-                populateDashboard(dashboardData.resumen);
+                populateDashboard(data.data.resumen);
                 
+                // --- PUNTO CRÍTICO DE LA PRUEBA ---
                 try {
+                    console.log("PASO 2: Intentando guardar en localStorage...");
                     localStorage.setItem('activePatient', JSON.stringify(patient));
-                    console.log("VISOR: Paciente guardado en memoria con éxito.");
+                    console.log("PASO 3: ¡ÉXITO! Paciente guardado en memoria.");
+                    // Si ves esta alerta, significa que se guardó bien.
+                    alert("¡Paciente guardado en memoria con éxito!"); 
                 } catch (error) {
                     console.error("VISOR: ¡ERROR FATAL AL GUARDAR EN MEMORIA!", error);
-                    alert("Hubo un error al guardar la sesión del paciente. La navegación a otros módulos podría fallar.");
+                    alert("ERROR: No se pudo guardar la sesión del paciente. Mira la consola (F12) para ver el detalle del error.");
                 }
 
                 patientDataForm.style.display = 'block';
                 if (dashboardContainer) dashboardContainer.style.display = 'grid';
                 applyPermissions();
             } else {
-                throw new Error(data.message || 'Error al cargar los datos del paciente.');
+                throw new Error(data.message || 'Error al cargar datos.');
             }
         })
         .catch(error => {
             displayError(error.message);
-            localStorage.removeItem('activePatient');
         });
 
     patientDataForm.addEventListener('submit', handleSaveChanges);
