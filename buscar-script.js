@@ -1,4 +1,4 @@
-document.addEventListener('DOMContentLoaded', () => {
+    document.addEventListener('DOMContentLoaded', () => {
     // --- CONFIGURACIÓN ---
     const API_URL = 'https://script.google.com/macros/s/AKfycbxXXUPOvKK5HRSeFsM3LYVvkweqxKBhxMjxASg_0-7sEyke-LZ2eOPQkaz0quXoN3Mc/exec';
 
@@ -6,34 +6,52 @@ document.addEventListener('DOMContentLoaded', () => {
     const searchInput = document.getElementById('search-input');
     const resultsContainer = document.getElementById('search-results-container');
     let searchTimeout;
+    let lastResults = []; // Variable para guardar los resultados de la búsqueda
 
     // --- MANEJO DE EVENTOS ---
     searchInput.addEventListener('keyup', () => {
-        // Espera 300ms después de que el usuario deja de teclear para buscar
         clearTimeout(searchTimeout);
         searchTimeout = setTimeout(() => {
             performSearch();
         }, 300);
     });
+    
+    // --- NUEVO: Manejador de clics en los resultados ---
+    resultsContainer.addEventListener('click', (e) => {
+        const card = e.target.closest('.result-card');
+        if (card) {
+            e.preventDefault(); // Prevenir la navegación normal del enlace
+            const codigo = card.dataset.codigo;
+            
+            // Buscar el objeto completo del paciente en los resultados guardados
+            const patientData = lastResults.find(p => p.codigoUnico === codigo);
+            
+            if (patientData) {
+                // Guardar el objeto COMPLETO en localStorage
+                localStorage.setItem('activePatient', JSON.stringify(patientData));
+                // Ahora sí, navegar a la página del visor
+                window.location.href = `visor.html?codigo=${codigo}`;
+            } else {
+                alert('Error: No se encontraron los datos completos del paciente.');
+            }
+        }
+    });
 
     // --- FUNCIONES ---
     async function performSearch() {
         const searchTerm = searchInput.value.trim();
-
         if (searchTerm.length < 3) {
             resultsContainer.innerHTML = '<p class="info-message">Escribe al menos 3 caracteres para buscar.</p>';
             return;
         }
-
         resultsContainer.innerHTML = '<p class="info-message">Buscando...</p>';
-
         try {
             const response = await fetch(`${API_URL}?action=buscarPacientes&termino=${encodeURIComponent(searchTerm)}`);
             const data = await response.json();
-
             if (data.status !== 'success') throw new Error(data.message);
-
-            displayResults(data.data);
+            
+            lastResults = data.data; // Guardar los resultados completos
+            displayResults(lastResults);
 
         } catch (error) {
             resultsContainer.innerHTML = `<p class="error-message">Error en la búsqueda: ${error.message}</p>`;
@@ -41,19 +59,19 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function displayResults(results) {
-        resultsContainer.innerHTML = ''; // Limpiar resultados anteriores
-
+        resultsContainer.innerHTML = '';
         if (results.length === 0) {
             resultsContainer.innerHTML = '<p class="info-message">No se encontraron pacientes con ese criterio.</p>';
             return;
         }
-
         results.forEach(patient => {
             const resultCard = document.createElement('a');
+            // La URL del href sigue siendo útil, pero manejaremos el clic con JS
             resultCard.href = `visor.html?codigo=${patient.codigoUnico}`;
             resultCard.className = 'result-card';
+            resultCard.dataset.codigo = patient.codigoUnico; // Guardar el código en un atributo de datos
             
-            const dob = new Date(patient.fechaNacimiento + 'T00:00:00').toLocaleDateString('es-ES');
+            const dob = new Date(patient.fechaNacimiento).toLocaleDateString('es-ES');
 
             resultCard.innerHTML = `
                 <div class="result-info">
