@@ -1,6 +1,5 @@
 document.addEventListener('DOMContentLoaded', () => {
-    // --- CONFIGURACIÓN ---
-    const API_URL = 'https://script.google.com/macros/s/AKfycbxXXUPOvKK5HRSeFsM3LYVvkweqxKBhxMjxASg_0-7sEyke-LZ2eOPQkaz0quXoN3Mc/exec';
+    // La conexión a Firebase ('db') ya está disponible gracias a auth-guard.js
     let loadedVaccines = [];
 
     // --- ELEMENTOS DEL DOM ---
@@ -14,11 +13,10 @@ document.addEventListener('DOMContentLoaded', () => {
     const responseMsg = document.getElementById('response-message');
     const modalTitle = document.getElementById('vacuna-modal').querySelector('h2');
     
-    // Añadir un input oculto para el ID en el formulario
     const hiddenIdInput = document.createElement('input');
     hiddenIdInput.type = 'hidden';
     hiddenIdInput.id = 'vacunaId';
-    vacunaForm.prepend(hiddenIdInput);
+    if(vacunaForm) vacunaForm.prepend(hiddenIdInput);
 
     // --- LÓGICA DE INICIALIZACIÓN Y PERMISOS ---
     const activePatient = JSON.parse(localStorage.getItem('activePatient'));
@@ -37,19 +35,19 @@ document.addEventListener('DOMContentLoaded', () => {
 
     patientBanner.innerHTML = `Esquema de: <strong>${activePatient.nombre} ${activePatient.apellidoPaterno}</strong>`;
     backToVisorBtn.href = `visor.html?codigo=${activePatient.codigoUnico}`;
+    document.getElementById('fechaAplicacion').valueAsDate = new Date();
 
     applyPermissions();
     loadVaccineHistory();
 
     // --- MANEJO DE EVENTOS ---
-    addVaccineBtn.addEventListener('click', () => openModal()); // Abrir modal para crear
+    addVaccineBtn.addEventListener('click', () => openModal());
     closeModalBtn.addEventListener('click', () => closeModal());
     modalBackdrop.addEventListener('click', (e) => {
         if (e.target === modalBackdrop) closeModal();
     });
     vacunaForm.addEventListener('submit', handleFormSubmit);
 
-    // Eventos para Editar y Eliminar
     tableBody.addEventListener('click', (e) => {
         const target = e.target.closest('button');
         if (!target) return;
@@ -79,11 +77,12 @@ document.addEventListener('DOMContentLoaded', () => {
     async function loadVaccineHistory() {
         tableBody.innerHTML = '<tr><td colspan="6">Cargando historial...</td></tr>';
         try {
-            const response = await fetch(`${API_URL}?action=getVacunas&codigo=${activePatient.codigoUnico}`);
-            const data = await response.json();
-            if (data.status !== 'success') throw new Error(data.message);
-
-            loadedVaccines = data.data; // Guardar datos cargados
+            const querySnapshot = await db.collection('vacunas')
+                .where('codigoUnico', '==', activePatient.codigoUnico)
+                .orderBy('fechaAplicacion', 'desc')
+                .get();
+            
+            loadedVaccines = querySnapshot.docs.map(doc => doc.data());
 
             if (loadedVaccines.length === 0) {
                 tableBody.innerHTML = '<tr><td colspan="6">No hay vacunas registradas para este paciente.</td></tr>';
@@ -98,11 +97,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 const tr = document.createElement('tr');
                 const fecha = new Date(vacuna.fechaAplicacion).toLocaleDateString('es-ES');
                 tr.innerHTML = `
-                    <td>${vacuna.nombreVacuna}</td>
-                    <td>${vacuna.dosis}</td>
+                    <td>${vacuna.nombreVacuna || ''}</td>
+                    <td>${vacuna.dosis || ''}</td>
                     <td>${fecha}</td>
-                    <td>${vacuna.lote}</td>
-                    <td>${vacuna.profesional}</td>
+                    <td>${vacuna.lote || ''}</td>
+                    <td>${vacuna.profesional || ''}</td>
                     <td class="actions-cell">
                         ${canEditOrDelete ? `
                         <button class="edit-btn small-btn" data-id="${vacuna.id}">✏️</button>
@@ -122,7 +121,6 @@ document.addEventListener('DOMContentLoaded', () => {
         responseMsg.style.display = 'none';
         
         if (recordToEdit) {
-            // Modo Edición
             modalTitle.textContent = "Editar Dosis de Vacuna";
             hiddenIdInput.value = recordToEdit.id;
             document.getElementById('nombreVacuna').value = recordToEdit.nombreVacuna;
@@ -131,7 +129,6 @@ document.addEventListener('DOMContentLoaded', () => {
             document.getElementById('lote').value = recordToEdit.lote;
             document.getElementById('profesional').value = recordToEdit.profesional;
         } else {
-            // Modo Creación
             modalTitle.textContent = "Registrar Nueva Dosis";
             hiddenIdInput.value = '';
             document.getElementById('fechaAplicacion').valueAsDate = new Date();
@@ -162,21 +159,13 @@ document.addEventListener('DOMContentLoaded', () => {
             profesional: document.getElementById('profesional').value,
         };
         
-        if (isEditing) {
-            formData.action = 'actualizarVacuna';
-            formData.id = recordId;
-        } else {
-            formData.action = 'guardarVacuna';
-        }
-
         try {
-            const response = await fetch(API_URL, {
-                method: 'POST',
-                body: JSON.stringify(formData),
-                headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-            });
-            const data = await response.json();
-            if (data.status !== 'success') throw new Error(data.message);
+            if (isEditing) {
+                await db.collection('vacunas').doc(recordId).update(formData);
+            } else {
+                formData.id = new Date().getTime().toString();
+                await db.collection('vacunas').doc(formData.id).set(formData);
+            }
             
             closeModal();
             loadVaccineHistory();
@@ -199,14 +188,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     async function deleteRecord(id) {
         try {
-            const response = await fetch(API_URL, {
-                method: 'POST',
-                body: JSON.stringify({ action: 'eliminarVacuna', id: id }),
-                headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-            });
-            const data = await response.json();
-            if (data.status !== 'success') throw new Error(data.message);
-            
+            await db.collection('vacunas').doc(id).delete();
             alert('Registro de vacuna eliminado.');
             loadVaccineHistory();
         } catch (error) {
