@@ -10,8 +10,12 @@ const firebaseConfig = {
   appId: "1:614606087766:web:cff473aa6d4a3f533efdf7"
 };
 
-// Inicializar Firebase
-firebase.initializeApp(firebaseConfig);
+// Inicializar Firebase (solo si no se ha inicializado antes)
+if (!firebase.apps.length) {
+    firebase.initializeApp(firebaseConfig);
+}
+
+// Poner las herramientas de Firebase a disposición global
 const auth = firebase.auth();
 const db = firebase.firestore();
 
@@ -24,7 +28,7 @@ auth.onAuthStateChanged(user => {
                 if (doc.exists) {
                     const userProfile = doc.data();
                     // Guardamos los datos del usuario actual en la memoria de la sesión
-                    // para que otras páginas puedan acceder a ellos fácilmente.
+                    // para que los scripts de cada página puedan acceder a ellos.
                     sessionStorage.setItem('currentUser', JSON.stringify({
                         uid: user.uid,
                         email: user.email,
@@ -33,8 +37,8 @@ auth.onAuthStateChanged(user => {
                     }));
                 } else {
                     // Si el usuario existe en Auth pero no en Firestore, es un error.
-                    console.error("Error: No se encontró el perfil del usuario.");
-                    auth.signOut(); // Forzar cierre de sesión
+                    console.error("Error: No se encontró el perfil del usuario en la base de datos.");
+                    auth.signOut(); // Forzar cierre de sesión para evitar inconsistencias.
                 }
             })
             .catch(error => {
@@ -43,8 +47,19 @@ auth.onAuthStateChanged(user => {
             });
     } else {
         // No hay usuario con sesión iniciada.
-        // Redirigir a la página de login, a menos que ya estemos ahí.
-        if (window.location.pathname.indexOf('login.html') === -1 && window.location.pathname.indexOf('registro-usuario.html') === -1) {
+        
+        // Definir las páginas que NO necesitan login
+        const publicPages = [
+            'login.html',
+            'registro-usuario.html',
+            'graficas.html' // Permitimos el uso sin registro de las gráficas
+        ];
+
+        // Verificar si la página actual está en la lista de páginas públicas
+        const isCurrentPagePublic = publicPages.some(page => window.location.pathname.endsWith(page));
+
+        if (!isCurrentPagePublic) {
+            // Si la página no es pública y no hay usuario, redirigir al login.
             alert("Acceso denegado. Por favor, inicie sesión.");
             window.location.href = 'login.html';
         }
