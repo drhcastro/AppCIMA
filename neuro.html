@@ -20,7 +20,7 @@
     <div class="tabs-container">
         <div class="tab-nav">
             <button type="button" class="tab-button active" data-tab="historial">Historial</button>
-            <button type="button" class="tab-button" data-tab="amiel-tyson">Valoración Amiel-Tyson</button>
+            <button type="button" class="tab-button" data-tab="amiel-tison">Valoración Amiel-Tison</button>
             <button type="button" class="tab-button" data-tab="hitos">Hitos por Edad</button>
         </div>
         
@@ -29,9 +29,9 @@
             <div id="neuro-historial-container"></div>
         </div>
 
-        <div id="amiel-tyson" class="tab-content">
-            <h2>Registrar Valoración Neurológica (Amiel-Tyson)</h2>
-            <form id="neuro-form-amiel">
+        <div id="amiel-tison" class="tab-content">
+            <h2>Registrar Valoración Neurológica (Amiel-Tison)</h2>
+            <form id="neuro-form-amiel-tison">
                 <div class="form-grid">
                     <div class="form-group"><label for="fechaValoracionAmiel">Fecha de Valoración</label><input type="date" id="fechaValoracionAmiel" required></div>
                     <div class="form-group"><label for="edadMesesAmiel">Edad en la Valoración (meses)</label><input type="number" id="edadMesesAmiel" required></div>
@@ -77,7 +77,7 @@
                     </div>
                 </div>
                
-                <button type="submit" class="button-primary">Guardar Valoración Amiel-Tyson</button>
+                <button type="submit" class="button-primary">Guardar Valoración Amiel-Tison</button>
                 <div id="response-message-amiel"></div>
             </form>
         </div>
@@ -126,9 +126,7 @@
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
-    
 <script src="auth-guard.js"></script>
-    
 <script src="neuro-script.js"></script>
 
 </body>
