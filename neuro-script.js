@@ -1,12 +1,44 @@
 document.addEventListener('DOMContentLoaded', () => {
     // La conexión 'db' ya está disponible gracias a auth-guard.js
+
+    // Base de datos de Hitos del Desarrollo
     const hitosPorEdad = {
-        rn: [ { id: 'reflejo_succion', label: 'Reflejo de succión presente y fuerte' }, { id: 'reflejo_moro', label: 'Reflejo de Moro simétrico' }, { id: 'postura_flexion', label: 'Postura en flexión predominante' }, { id: 'fija_mirada', label: 'Fija la mirada brevemente' } ],
-        '2m': [ { id: 'levanta_cabeza', label: 'En prono, levanta la cabeza 45°' }, { id: 'sonrisa_social', label: 'Sonrisa social en respuesta' }, { id: 'sigue_objetos', label: 'Sigue objetos más allá de la línea media' }, { id: 'vocaliza', label: 'Vocaliza sonidos (gorjeos)' } ],
-        '4m': [ { id: 'sosten_cefalico', label: 'Sostén cefálico completo' }, { id: 'rueda_prono_supino', label: 'Rueda de prono a supino' }, { id: 'rie_carcajadas', label: 'Ríe a carcajadas' }, { id: 'alcanza_objetos', label: 'Alcanza objetos con ambas manos' } ],
-        '6m': [ { id: 'sedestacion_apoyo', label: 'Sedestación con apoyo' }, { id: 'transfiere_objetos', label: 'Transfiere objetos de una mano a otra' }, { id: 'balbuceo', label: 'Balbuceo monosilábico (ma, pa, da)' }, { id: 'reconoce_rostros', label: 'Reconoce rostros familiares' } ],
-        '9m': [ { id: 'sedestacion_sin_apoyo', label: 'Sedestación sin apoyo, estable' }, { id: 'gateo', label: 'Gatea o se arrastra' }, { id: 'pinza_inmadura', label: 'Pinza inferior (rastrillo) o inmadura' }, { id: 'angustia_separacion', label: 'Angustia de separación' } ],
-        '12m': [ { id: 'bipedestacion_apoyo', label: 'Se para con apoyo y da pasos laterales' }, { id: 'pinza_fina', label: 'Pinza fina madura (pulgar-índice)' }, { id: 'primeras_palabras', label: 'Dice 1-2 palabras con significado (mamá, papá)' }, { id: 'entiende_ordenes', label: 'Entiende órdenes simples ("dame", "ven")' } ]
+        rn: [
+            { id: 'reflejo_succion', label: 'Reflejo de succión presente y fuerte' },
+            { id: 'reflejo_moro', label: 'Reflejo de Moro simétrico' },
+            { id: 'postura_flexion', label: 'Postura en flexión predominante' },
+            { id: 'fija_mirada', label: 'Fija la mirada brevemente' }
+        ],
+        '2m': [
+            { id: 'levanta_cabeza', label: 'En prono, levanta la cabeza 45°' },
+            { id: 'sonrisa_social', label: 'Sonrisa social en respuesta' },
+            { id: 'sigue_objetos', label: 'Sigue objetos más allá de la línea media' },
+            { id: 'vocaliza', label: 'Vocaliza sonidos (gorjeos)' }
+        ],
+        '4m': [
+            { id: 'sosten_cefalico', label: 'Sostén cefálico completo' },
+            { id: 'rueda_prono_supino', label: 'Rueda de prono a supino' },
+            { id: 'rie_carcajadas', label: 'Ríe a carcajadas' },
+            { id: 'alcanza_objetos', label: 'Alcanza objetos con ambas manos' }
+        ],
+        '6m': [
+            { id: 'sedestacion_apoyo', label: 'Sedestación con apoyo' },
+            { id: 'transfiere_objetos', label: 'Transfiere objetos de una mano a otra' },
+            { id: 'balbuceo', label: 'Balbuceo monosilábico (ma, pa, da)' },
+            { id: 'reconoce_rostros', label: 'Reconoce rostros familiares' }
+        ],
+        '9m': [
+            { id: 'sedestacion_sin_apoyo', label: 'Sedestación sin apoyo, estable' },
+            { id: 'gateo', label: 'Gatea o se arrastra' },
+            { id: 'pinza_inmadura', label: 'Pinza inferior (rastrillo) o inmadura' },
+            { id: 'angustia_separacion', label: 'Angustia de separación' }
+        ],
+        '12m': [
+            { id: 'bipedestacion_apoyo', label: 'Se para con apoyo y da pasos laterales' },
+            { id: 'pinza_fina', label: 'Pinza fina madura (pulgar-índice)' },
+            { id: 'primeras_palabras', label: 'Dice 1-2 palabras con significado (mamá, papá)' },
+            { id: 'entiende_ordenes', label: 'Entiende órdenes simples ("dame", "ven")' }
+        ]
     };
 
     // --- ELEMENTOS DEL DOM ---
@@ -62,7 +94,6 @@ document.addEventListener('DOMContentLoaded', () => {
     formHitos.addEventListener('submit', (e) => handleFormSubmit(e, 'hitos'));
     
     // --- FUNCIONES ---
-
     function applyPermissions() {
         if (!currentUser) return;
         const userRole = currentUser.profile;
@@ -82,7 +113,21 @@ document.addEventListener('DOMContentLoaded', () => {
         puntuacionTotalInput.value = total;
     }
     
-    function renderHitosChecklist() { /* ...código sin cambios... */ }
+    function renderHitosChecklist() {
+        const selectedAge = edadHitosSelect.value;
+        hitosChecklistContainer.innerHTML = '';
+        if (!selectedAge) return;
+        const hitos = hitosPorEdad[selectedAge];
+        const checklist = document.createElement('div');
+        checklist.className = 'checklist';
+        hitos.forEach(hito => {
+            const item = document.createElement('div');
+            item.className = 'check-item';
+            item.innerHTML = `<input type="checkbox" id="${hito.id}" name="hitos" value="${hito.label}"><label for="${hito.id}">${hito.label}</label>`;
+            checklist.appendChild(item);
+        });
+        hitosChecklistContainer.appendChild(checklist);
+    }
 
     async function handleFormSubmit(e, formType) {
         e.preventDefault();
@@ -109,7 +154,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 reflejosPuntuacion: document.getElementById('reflejosPuntuacion').value,
                 reflejosObs: document.getElementById('reflejosObs').value,
                 puntuacionTotal: document.getElementById('puntuacionTotal').value,
-                conclusion: document.getElementById('conclusion').value
+                conclusion: document.getElementById('conclusion').value,
+                tipoValoracion: 'Amiel-Tison'
             };
         } else { // 'hitos'
             formElement = formHitos;
@@ -177,7 +223,36 @@ document.addEventListener('DOMContentLoaded', () => {
 
             historialContainer.innerHTML = '';
             combinedHistory.forEach(valoracion => {
-                // ... (código para crear la tarjeta de historial sin cambios)
+                const card = document.createElement('div');
+                card.className = 'consulta-card';
+                const fecha = new Date(valoracion.fechaValoracion).toLocaleDateString('es-ES', { year: 'numeric', month: 'long', day: 'numeric' });
+                let detailsHtml;
+                let valoracionType = valoracion.tipoValoracion;
+
+                if (valoracion.tipoValoracion === 'Amiel-Tison') {
+                    valoracionType = `Amiel-Tison (Total: ${valoracion.puntuacionTotal})`;
+                    detailsHtml = `
+                        <p><strong>Tono Pasivo:</strong> Puntuación ${valoracion.tonoPasivoPuntuacion || 'N/A'}. ${valoracion.tonoPasivoObs || ''}</p>
+                        <p><strong>Tono Activo:</strong> Puntuación ${valoracion.tonoActivoPuntuacion || 'N/A'}. ${valoracion.tonoActivoObs || ''}</p>
+                        <p><strong>Reflejos:</strong> Puntuación ${valoracion.reflejosPuntuacion || 'N/A'}. ${valoracion.reflejosObs || ''}</p>
+                        <hr><p><strong>Puntuación Total: ${valoracion.puntuacionTotal}</strong></p>
+                        <p><strong>Conclusión:</strong> ${valoracion.conclusion || ''}</p>`;
+                } else {
+                    detailsHtml = `
+                        <p><strong>Resultados:</strong><br>${(valoracion.resultados || '').replace(/\n/g, '<br>')}</p>
+                        <p><strong>Observaciones:</strong><br>${(valoracion.observaciones || '').replace(/\n/g, '<br>')}</p>`;
+                }
+                card.innerHTML = `
+                    <details>
+                        <summary class="consulta-summary">
+                            <div class="summary-info">
+                                <strong>${fecha}</strong>
+                                <span class="motivo-preview">${valoracionType}</span>
+                            </div>
+                        </summary>
+                        <div class="consulta-details">${detailsHtml}</div>
+                    </details>`;
+                historialContainer.appendChild(card);
             });
         } catch (error) {
             historialContainer.innerHTML = `<p class="error-message">Error al cargar el historial: ${error.message}</p>`;
