@@ -1,13 +1,19 @@
 document.addEventListener('DOMContentLoaded', () => {
     // La conexión a Firebase ('db') ya está disponible globalmente gracias a auth-guard.js
 
+    // --- CONFIGURACIÓN ---
+    const TIPOS_DE_TAMIZAJES = ["Cardiológico", "Metabólico", "Visual", "Auditivo", "Genético", "Cadera"];
+
+    // --- ELEMENTOS DEL DOM ---
     const patientHeaderPlaceholder = document.getElementById('patient-header-placeholder');
     const dashboardContainer = document.querySelector('.dashboard-summary');
 
+    // Si no estamos en la página del visor, no hacer nada.
     if (!patientHeaderPlaceholder) {
         return; 
     }
 
+    // --- LÓGICA PRINCIPAL ---
     const activePatient = JSON.parse(localStorage.getItem('activePatient'));
 
     if (!activePatient) {
@@ -20,7 +26,10 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- LÓGICA DE CARGA ---
     async function loadPageData() {
         try {
+            // Poblar el encabezado inmediatamente con los datos que ya tenemos en memoria
             populateHeader(activePatient);
+            
+            // Cargar los datos adicionales para el dashboard directamente desde Firestore
             if (dashboardContainer) {
                 await loadDashboardData(codigo);
             }
@@ -32,7 +41,11 @@ document.addEventListener('DOMContentLoaded', () => {
     
     async function loadDashboardData(patientId) {
         try {
-            const [consultasSnap, vacunasSnap, planesSnap, tamizajesSnap, psicoSnap, nutriSnap, rehabSnap] = await Promise.all([
+            // --- CORRECCIÓN AQUÍ: Añadir las colecciones de especialidad a la consulta ---
+            const [
+                consultasSnap, vacunasSnap, planesSnap, tamizajesSnap, 
+                psicoSnap, nutriSnap, rehabSnap
+            ] = await Promise.all([
                 db.collection('consultas').where('codigoUnico', '==', patientId).orderBy('fechaConsulta', 'desc').get(),
                 db.collection('vacunas').where('codigoUnico', '==', patientId).orderBy('fechaAplicacion', 'desc').get(),
                 db.collection('planesTratamiento').where('codigoUnico', '==', patientId).get(),
@@ -62,6 +75,7 @@ document.addEventListener('DOMContentLoaded', () => {
             };
             
             populateDashboard(resumen);
+
         } catch (error) {
             console.error("Error cargando datos del dashboard:", error);
             if(dashboardContainer) dashboardContainer.innerHTML = `<p class="error-message">No se pudo cargar el resumen del paciente.</p>`;
@@ -102,6 +116,7 @@ document.addEventListener('DOMContentLoaded', () => {
     function populateDashboard(resumen) {
         const TIPOS_DE_TAMIZAJES = ["Cardiológico", "Metabólico", "Visual", "Auditivo", "Genético", "Cadera"];
         document.getElementById('summary-ultima-consulta').textContent = resumen.ultimaConsulta === "Ninguna" ? "Ninguna" : new Date(resumen.ultimaConsulta).toLocaleDateString('es-ES');
+        
         const fechaVacuna = resumen.ultimaVacuna.fecha ? new Date(resumen.ultimaVacuna.fecha).toLocaleDateString('es-ES') : '';
         document.getElementById('summary-ultima-vacuna').innerHTML = `${resumen.ultimaVacuna.nombreVacuna} <small style="display:block; color:#6c757d;">${fechaVacuna}</small>`;
         
@@ -109,6 +124,7 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('summary-ultima-consulta-esp').innerHTML = `${resumen.ultimaConsultaEsp.tipo} <small style="display:block; color:#6c757d;">${fechaConsultaEsp}</small>`;
 
         document.getElementById('summary-planes-activos').textContent = resumen.planesActivos;
+        
         const tamizajesPendientes = TIPOS_DE_TAMIZAJES.filter(t => !resumen.tamizajesRealizados.includes(t));
         const pendientesText = tamizajesPendientes.length > 0 ? tamizajesPendientes.length.toString() : "Ninguno";
         const pendientesTitle = tamizajesPendientes.length > 0 ? tamizajesPendientes.join(', ') : "Todos los tamizajes registrados";
