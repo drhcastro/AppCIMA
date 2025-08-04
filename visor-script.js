@@ -27,7 +27,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- LÓGICA DE CARGA DIRECTA DESDE FIRESTORE ---
     async function loadDashboard() {
         try {
-            // 1. Cargar todos los datos necesarios para el dashboard
+            // Cargar todos los datos necesarios para el dashboard
             const [
                 consultasSnap,
                 vacunasSnap,
@@ -45,7 +45,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const planes = planesSnap.docs.map(doc => doc.data());
             const tamizajes = tamizajesSnap.docs.map(doc => doc.data());
             
-            // 2. Crear objeto de resumen
+            // Crear objeto de resumen
             const resumen = {
                 ultimaConsulta: consultas.length > 0 ? consultas[0].fechaConsulta : "Ninguna",
                 tamizajesRealizados: tamizajes.map(t => t.tipoTamiz),
@@ -53,8 +53,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 ultimaVacuna: vacunas.length > 0 ? { nombreVacuna: vacunas[0].nombreVacuna, fecha: vacunas[0].fechaAplicacion } : { nombreVacuna: "Ninguna", fecha: "" }
             };
 
-            // 3. Poblar el encabezado y el dashboard (aún no implementado, lo haremos después)
             populateHeader(activePatientFromStorage);
+            // La función para poblar el dashboard ahora la llamaremos aquí, pero aún no está creada. La crearemos en el siguiente paso.
 
         } catch (error) {
             console.error("Error cargando datos del dashboard:", error);
@@ -63,13 +63,13 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function populateHeader(patient) {
-        // Función para calcular la edad
+        // --- FUNCIÓN CORREGIDA ---
         function getAge(dateString) {
-            const birthDate = new Date(dateString);
+            const birthDate = new Date(dateString); // Usar la variable correcta: birthDate
             const today = new Date();
-            let years = today.getFullYear() - birth.getFullYear();
-            let months = today.getMonth() - birth.getMonth();
-            if (months < 0 || (months === 0 && today.getDate() < birth.getDate())) {
+            let years = today.getFullYear() - birthDate.getFullYear();
+            let months = today.getMonth() - birthDate.getMonth();
+            if (months < 0 || (months === 0 && today.getDate() < birthDate.getDate())) {
                 years--;
                 months += 12;
             }
