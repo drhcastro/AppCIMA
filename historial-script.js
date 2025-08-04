@@ -59,7 +59,7 @@ document.addEventListener('DOMContentLoaded', () => {
             loadedConsultas.forEach(consulta => {
                 const consultaCard = document.createElement('div');
                 consultaCard.className = 'consulta-card';
-                const fecha = new Date(consulta.fechaConsulta).toLocaleDateString('es-ES', { year: 'numeric', month: 'long', day: 'numeric' });
+                const fecha = new Date(consulta.fechaConsulta + 'T00:00:00').toLocaleDateString('es-ES', { year: 'numeric', month: 'long', day: 'numeric' });
                 
                 consultaCard.innerHTML = `
                     <details>
