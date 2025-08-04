@@ -95,7 +95,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             loadedVaccines.forEach(vacuna => {
                 const tr = document.createElement('tr');
-                const fecha = new Date(vacuna.fechaAplicacion).toLocaleDateString('es-ES');
+                const fecha = new Date(vacuna.fechaAplicacion + 'T00:00:00').toLocaleDateString('es-ES');
                 tr.innerHTML = `
                     <td>${vacuna.nombreVacuna || ''}</td>
                     <td>${vacuna.dosis || ''}</td>
