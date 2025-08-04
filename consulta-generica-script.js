@@ -84,8 +84,7 @@ document.addEventListener('DOMContentLoaded', () => {
     function applyPermissions() {
         if (!currentUser) return;
         const userRole = currentUser.profile;
-        const allowedProfiles = ['medico', 'superusuario', tipo]; // El especialista mismo
-        
+        const allowedProfiles = ['medico', 'superusuario', tipo];
         if (!allowedProfiles.includes(userRole)) {
             notaForm.querySelectorAll('input, textarea, button').forEach(el => {
                 el.disabled = true;
@@ -131,6 +130,8 @@ document.addEventListener('DOMContentLoaded', () => {
     async function loadHistory() {
         historialContainer.innerHTML = 'Cargando historial...';
         try {
+            // --- CORRECCIÓN CLAVE AQUÍ ---
+            // Se usa la sintaxis correcta de Firebase Web SDK
             const querySnapshot = await db.collection(config.collectionName)
                 .where('codigoUnico', '==', activePatient.codigoUnico)
                 .orderBy('fechaConsulta', 'desc')
@@ -147,7 +148,8 @@ document.addEventListener('DOMContentLoaded', () => {
             loadedHistory.forEach(nota => {
                 const card = document.createElement('div');
                 card.className = 'consulta-card';
-                const fecha = new Date(consulta.fechaConsulta + 'T00:00:00').toLocaleDateString('es-ES', { year: 'numeric', month: 'long', day: 'numeric' });
+                // Corrección de la fecha para evitar problemas de zona horaria
+                const fecha = new Date(nota.fechaConsulta + 'T00:00:00').toLocaleDateString('es-ES', { year: 'numeric', month: 'long', day: 'numeric' });
                 card.innerHTML = `
                     <details>
                         <summary class="consulta-summary">
