@@ -5,62 +5,29 @@ document.addEventListener('DOMContentLoaded', () => {
     const TIPOS_DE_TAMIZAJES = ["Cardiológico", "Metabólico", "Visual", "Auditivo", "Genético", "Cadera"];
 
     // --- ELEMENTOS DEL DOM ---
-    const responseMsg = document.getElementById('response-message');
-    const patientDataForm = document.getElementById('edit-patient-form'); // Corregido al ID del formulario de edición
-    const patientBanner = document.getElementById('patient-banner');
-    const tabButtons = document.querySelectorAll('.tab-button');
-    const tabContents = document.querySelectorAll('.tab-content');
-    const dashboardContainer = document.querySelector('.dashboard-summary');
+    const patientHeaderPlaceholder = document.getElementById('patient-header-placeholder');
+    const actionsGrid = document.querySelector('.actions-grid');
 
     // --- VERIFICACIÓN DE PÁGINA ---
-    // Si no estamos en una página que tenga el banner del paciente, no hacer nada.
-    if (!patientBanner) {
+    // Si no estamos en la página del visor (que tiene el placeholder del encabezado), no hacer nada.
+    if (!patientHeaderPlaceholder) {
         return; 
     }
 
-    // --- INICIALIZACIÓN Y PERMISOS ---
-    const activePatient = JSON.parse(localStorage.getItem('activePatient'));
-    const currentUser = JSON.parse(sessionStorage.getItem('currentUser'));
+    // --- LÓGICA PRINCIPAL ---
+    const activePatientFromStorage = JSON.parse(localStorage.getItem('activePatient'));
 
-    if (!activePatient) {
-        patientBanner.textContent = "ERROR: No hay un paciente activo. Por favor, cargue uno desde el menú de búsqueda.";
-        if(document.querySelector('.actions-grid')) document.querySelector('.actions-grid').style.display = 'none';
+    if (!activePatientFromStorage) {
+        displayError("No se ha cargado un paciente. Por favor, regrese al menú y busque uno.");
         return;
     }
 
-    // --- LÓGICA DE PESTAÑAS (Solo para la página de edición) ---
-    if (patientDataForm) {
-        tabButtons.forEach(button => {
-            button.addEventListener('click', () => {
-                tabButtons.forEach(btn => btn.classList.remove('active'));
-                tabContents.forEach(content => content.classList.remove('active'));
-                button.classList.add('active');
-                document.getElementById(button.dataset.tab).classList.add('active');
-            });
-        });
-    }
-
-    // --- LÓGICA PRINCIPAL ---
+    const codigo = activePatientFromStorage.codigoUnico;
     
-    // Si estamos en la página del visor (dashboard), cargamos todos los datos.
-    if (dashboardContainer) {
-        patientBanner.textContent = `Cargando datos para: ${activePatient.nombre} ${activePatient.apellidoPaterno || ''}...`;
-        loadDashboardData(activePatient.codigoUnico);
-    }
-    
-    // Si estamos en la página de edición, solo poblamos el formulario.
-    if (patientDataForm) {
-        patientBanner.textContent = `Editando a: ${activePatient.nombre} ${activePatient.apellidoPaterno || ''}`;
-        populateEditForm(activePatient);
-        applyEditPermissions();
-        patientDataForm.addEventListener('submit', handleSaveChanges);
-    }
-    
-    // --- FUNCIONES ---
-
-    async function loadDashboardData(codigo) {
+    // --- LÓGICA DE CARGA DIRECTA DESDE FIRESTORE ---
+    async function loadDashboard() {
         try {
-            // Cargar todos los datos para el dashboard directamente desde Firestore
+            // 1. Cargar todos los datos necesarios para el dashboard
             const [
                 consultasSnap,
                 vacunasSnap,
@@ -77,7 +44,8 @@ document.addEventListener('DOMContentLoaded', () => {
             const vacunas = vacunasSnap.docs.map(doc => doc.data());
             const planes = planesSnap.docs.map(doc => doc.data());
             const tamizajes = tamizajesSnap.docs.map(doc => doc.data());
-
+            
+            // 2. Crear objeto de resumen
             const resumen = {
                 ultimaConsulta: consultas.length > 0 ? consultas[0].fechaConsulta : "Ninguna",
                 tamizajesRealizados: tamizajes.map(t => t.tipoTamiz),
@@ -85,61 +53,53 @@ document.addEventListener('DOMContentLoaded', () => {
                 ultimaVacuna: vacunas.length > 0 ? { nombreVacuna: vacunas[0].nombreVacuna, fecha: vacunas[0].fechaAplicacion } : { nombreVacuna: "Ninguna", fecha: "" }
             };
 
-            populateDashboard(resumen);
+            // 3. Poblar el encabezado y el dashboard (aún no implementado, lo haremos después)
+            populateHeader(activePatientFromStorage);
 
         } catch (error) {
             console.error("Error cargando datos del dashboard:", error);
-            document.querySelector('.dashboard-summary').innerHTML = `<p class="error-message">No se pudo cargar el resumen del paciente.</p>`;
+            displayError(`Error al cargar los datos del resumen: ${error.message}`);
         }
     }
 
-    function populateDashboard(resumen) {
-        // ... (Pega aquí la función populateDashboard de la respuesta anterior, no ha cambiado)
-    }
-
-    function applyEditPermissions() {
-        if (!currentUser) return;
-        const userRole = currentUser.profile;
-        const saveChangesBtn = document.getElementById('submit-btn');
-
-        if (userRole === 'asistente') {
-            saveChangesBtn.disabled = true;
-            saveChangesBtn.textContent = 'Guardado no permitido';
-            patientDataForm.querySelectorAll('input, select, textarea').forEach(el => el.disabled = true);
-        }
-    }
-
-    function populateEditForm(patient) {
-        for (const key in patient) {
-            const element = document.getElementById(key);
-            if (element) {
-                element.value = patient[key] || '';
+    function populateHeader(patient) {
+        // Función para calcular la edad
+        function getAge(dateString) {
+            const birthDate = new Date(dateString);
+            const today = new Date();
+            let years = today.getFullYear() - birth.getFullYear();
+            let months = today.getMonth() - birth.getMonth();
+            if (months < 0 || (months === 0 && today.getDate() < birth.getDate())) {
+                years--;
+                months += 12;
             }
+            return `${years} años, ${months} meses`;
+        }
+
+        const headerHTML = `
+            <div class="card patient-header-card">
+                <div class="patient-details">
+                    <h2>${patient.nombre} ${patient.apellidoPaterno || ''}</h2>
+                    <div class="patient-meta">
+                        <div>Edad: <span>${getAge(patient.fechaNacimiento)}</span></div>
+                        <div>F. Nacimiento: <span>${new Date(patient.fechaNacimiento + 'T00:00:00').toLocaleDateString('es-ES')}</span></div>
+                        <div>Mamá: <span>${patient.nombreMama || 'N/A'}</span></div>
+                        <div>Código: <span>${patient.codigoUnico}</span></div>
+                    </div>
+                </div>
+                <a href="editar-paciente.html" class="button-primary">✏️ Editar Ficha</a>
+            </div>
+        `;
+        patientHeaderPlaceholder.innerHTML = headerHTML;
+    }
+
+    function displayError(message) {
+        const container = document.querySelector('.page-container');
+        if (container) {
+            container.innerHTML = `<div class="card"><p class="error-message">${message}</p><a href="index.html" class="button-secondary">Regresar al Inicio</a></div>`;
         }
     }
 
-    async function handleSaveChanges(e) {
-        e.preventDefault();
-        const submitBtn = document.getElementById('submit-btn');
-        submitBtn.disabled = true;
-        submitBtn.textContent = 'Guardando...';
-
-        const formData = {
-            codigoUnico: activePatient.codigoUnico,
-            nombre: document.getElementById('nombre').value,
-            // ... (resto de los campos del formulario)
-        };
-        
-        try {
-            await db.collection('pacientes').doc(activePatient.codigoUnico).set(formData, { merge: true });
-            localStorage.setItem('activePatient', JSON.stringify(formData));
-            alert('Expediente actualizado con éxito.');
-            window.location.href = `visor.html?codigo=${activePatient.codigoUnico}`;
-        } catch (error) {
-            // ... (manejo de error)
-        } finally {
-            submitBtn.disabled = false;
-            submitBtn.textContent = 'Guardar Cambios';
-        }
-    }
+    // Iniciar la carga de la página
+    loadDashboard();
 });
