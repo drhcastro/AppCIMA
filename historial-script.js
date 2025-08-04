@@ -1,9 +1,5 @@
 document.addEventListener('DOMContentLoaded', () => {
-    // --- LÍNEA DE DIAGNÓSTICO ---
-    // Si ves este mensaje en la consola (F12), estás ejecutando la versión correcta de este archivo.
-    console.log("Cargando historial-script.js vFinal...");
-
-    // La conexión a Firebase ('db') ya está disponible gracias a auth-guard.js
+    // La conexión 'db' ya está disponible gracias a auth-guard.js
     let loadedConsultas = [];
 
     // --- ELEMENTOS DEL DOM ---
@@ -42,7 +38,6 @@ document.addEventListener('DOMContentLoaded', () => {
     async function loadHistory() {
         historialContainer.innerHTML = 'Cargando...';
         try {
-            // --- ESTA ES LA SINTAXIS CORRECTA PARA FIREBASE WEB ---
             const querySnapshot = await db.collection('consultas')
                 .where('codigoUnico', '==', activePatient.codigoUnico)
                 .orderBy('fechaConsulta', 'desc')
@@ -56,9 +51,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 return;
             }
             
+            // --- CORRECCIÓN CLAVE AQUÍ ---
+            // Asegurarse de que la variable 'consulta' está definida en el forEach.
             loadedConsultas.forEach(consulta => {
                 const consultaCard = document.createElement('div');
                 consultaCard.className = 'consulta-card';
+                // Corrección de la fecha para evitar problemas de zona horaria
                 const fecha = new Date(consulta.fechaConsulta + 'T00:00:00').toLocaleDateString('es-ES', { year: 'numeric', month: 'long', day: 'numeric' });
                 
                 consultaCard.innerHTML = `
