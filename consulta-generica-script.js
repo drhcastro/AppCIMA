@@ -147,7 +147,7 @@ document.addEventListener('DOMContentLoaded', () => {
             loadedHistory.forEach(nota => {
                 const card = document.createElement('div');
                 card.className = 'consulta-card';
-                const fecha = new Date(nota.fechaConsulta).toLocaleDateString('es-ES', { year: 'numeric', month: 'long', day: 'numeric' });
+                const fecha = new Date(consulta.fechaConsulta + 'T00:00:00').toLocaleDateString('es-ES', { year: 'numeric', month: 'long', day: 'numeric' });
                 card.innerHTML = `
                     <details>
                         <summary class="consulta-summary">
