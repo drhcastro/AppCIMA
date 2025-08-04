@@ -1,7 +1,7 @@
+// editar-paciente-script.js (Versión Final para el Formulario de Edición)
 document.addEventListener('DOMContentLoaded', () => {
     // La conexión 'db' ya está disponible gracias a auth-guard.js
 
-    // --- ELEMENTOS DEL DOM ---
     const patientBanner = document.getElementById('patient-banner');
     const form = document.getElementById('edit-patient-form');
     const submitBtn = document.getElementById('submit-btn');
@@ -19,7 +19,6 @@ document.addEventListener('DOMContentLoaded', () => {
         return;
     }
 
-    // Poblar la información y aplicar permisos
     patientBanner.innerHTML = `Editando a: <strong>${activePatient.nombre} ${activePatient.apellidoPaterno}</strong>`;
     backToVisorBtn.href = `visor.html?codigo=${activePatient.codigoUnico}`;
     populateForm(activePatient);
@@ -68,7 +67,7 @@ document.addEventListener('DOMContentLoaded', () => {
         responseMsg.style.display = 'none';
 
         const formData = {
-            codigoUnico: activePatient.codigoUnico, // Es crucial mantener el código
+            codigoUnico: activePatient.codigoUnico,
             nombre: document.getElementById('nombre').value,
             apellidoPaterno: document.getElementById('apellidoPaterno').value,
             apellidoMaterno: document.getElementById('apellidoMaterno').value,
@@ -87,16 +86,10 @@ document.addEventListener('DOMContentLoaded', () => {
         };
 
         try {
-            // Actualizar el documento en Firestore
             await db.collection('pacientes').doc(activePatient.codigoUnico).set(formData, { merge: true });
-
-            // Actualizar la memoria del navegador con los nuevos datos
             localStorage.setItem('activePatient', JSON.stringify(formData));
-            
             alert('Expediente actualizado con éxito.');
-            // Redirigir de vuelta al expediente para ver los cambios
             window.location.href = `visor.html?codigo=${activePatient.codigoUnico}`;
-
         } catch (error) {
             responseMsg.textContent = `Error al guardar: ${error.message}`;
             responseMsg.className = 'error';
