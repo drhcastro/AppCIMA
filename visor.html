@@ -11,9 +11,9 @@
 </head>
 <body>
 <div class="page-container">
-    <div id="patient-header-placeholder"></div>
-
-    <div id="alerts-container"></div>
+    <div id="patient-header-placeholder">
+        <div class="card"><p>Cargando datos del paciente...</p></div>
+    </div>
 
     <div class="dashboard-summary card">
         <div class="stat-card"><h4>Última Consulta Médica</h4><p id="summary-ultima-consulta">--</p></div>
@@ -23,17 +23,24 @@
         <div class="stat-card"><h4>Tamizajes Pendientes</h4><p id="summary-tamizajes-pendientes">--</p></div>
     </div>
 
-    <div id="last-measurement-card" class="card" style="display: none;">
-        <h3>Última Antropometría Registrada</h3>
-        <div id="last-measurement-details" class="patient-meta"></div>
-    </div>
-    
     <div class="actions-grid">
         <a href="consulta.html" class="action-card"><div class="icon">➕</div><h3>Consulta Médica</h3></a>
         <a href="historial.html" class="action-card"><div class="icon">🧾</div><h3>Historial Médico</h3></a>
         <a href="planeacion.html" class="action-card"><div class="icon">📋</div><h3>Planeación Siguiente Consulta</h3></a>
-        </div>
+        <a href="vacunas.html" class="action-card"><div class="icon">💉</div><h3>Vacunación</h3></a>
+        <a href="tamizajes.html" class="action-card"><div class="icon">🧪</div><h3>Tamizajes</h3></a>
+        <a href="neuro.html" class="action-card"><div class="icon">🧠</div><h3>Neurodesarrollo</h3></a>
+        <a href="graficas.html" class="action-card"><div class="icon">📊</div><h3>Gráficas Crecimiento</h3></a>
+        <a href="consulta-generica.html?tipo=psicologia" class="action-card"><div class="icon">🛋️</div><h3>Psicología</h3></a>
+        <a href="consulta-generica.html?tipo=nutricion" class="action-card"><div class="icon">🥗</div><h3>Nutrición</h3></a>
+        <a href="consulta-generica.html?tipo=rehabilitacion" class="action-card"><div class="icon">💪</div><h3>Rehabilitación</h3></a>
+    </div>
     
+    <div id="specialty-diagnostics-container" class="card" style="display: none;">
+        <h3>Diagnósticos Recientes de Especialidades</h3>
+        <ul id="diagnostics-list"></ul>
+    </div>
+
     <div style="text-align: center; margin-top: 32px;">
          <a href="index.html" class="button-secondary">⬅️ Regresar al Menú Principal</a>
     </div>
