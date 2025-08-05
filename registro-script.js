@@ -41,6 +41,7 @@ document.addEventListener('DOMContentLoaded', () => {
             apellidoMaterno: document.getElementById('apellidoMaterno').value,
             fechaNacimiento: document.getElementById('fechaNacimiento').value,
             sexo: document.getElementById('sexo').value,
+            edadGestacionalNacimiento: document.getElementById('edadGestacionalNacimiento').value,
             domicilio: document.getElementById('domicilio').value,
             telefono: document.getElementById('telefono').value,
             nombreMama: document.getElementById('nombreMama').value,
