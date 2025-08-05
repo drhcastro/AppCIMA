@@ -7,7 +7,17 @@ document.addEventListener('DOMContentLoaded', () => {
     const responseMsg = document.getElementById('response-message');
     const patientBanner = document.getElementById('patient-banner');
     const backToVisorBtn = document.getElementById('back-to-visor');
-
+    // --- FUNCIÓN DE CÁLCULO DE Z-SCORE (Portado desde gráficas.html) ---
+    function getLMS(ageInDays, sex, table) {
+        const data = table[sex];
+        if (!data) return null;
+        let closest = data.reduce((prev, curr) => (Math.abs(curr[0] - ageInDays) < Math.abs(prev[0] - ageInDays) ? curr : prev));
+        return closest;
+    }
+    function calculateZScore(value, L, M, S) {
+        if (!L || !M || !S) return null;
+        return (((value / M) ** L) - 1) / (L * S);
+    }
     // --- LÓGICA DE INICIALIZACIÓN ---
     const activePatient = JSON.parse(localStorage.getItem('activePatient'));
     const currentUser = JSON.parse(sessionStorage.getItem('currentUser'));
@@ -49,7 +59,7 @@ document.addEventListener('DOMContentLoaded', () => {
         e.preventDefault();
         submitBtn.disabled = true;
         submitBtn.textContent = 'Guardando...';
-
+        const newConsultId = mode === 'edit' ? recordId : new Date().getTime().toString();
         const formData = {
             codigoUnico: activePatient.codigoUnico,
             fechaConsulta: document.getElementById('fechaConsulta').value,
@@ -69,7 +79,47 @@ document.addEventListener('DOMContentLoaded', () => {
             diagnosticoPresuntivo: document.getElementById('diagnosticoPresuntivo').value,
             diagnosticoNosologico: document.getElementById('diagnosticoNosologico').value
         };
-        
+        // 2. Recolectar datos de antropometría
+        const peso = parseFloat(document.getElementById('consulta-peso').value);
+        const talla = parseFloat(document.getElementById('consulta-talla').value);
+        const pc = parseFloat(document.getElementById('consulta-pc').value);
+        const ageInDays = Math.floor((new Date(formData.fechaConsulta) - new Date(activePatient.fechaNacimiento)) / (1000 * 60 * 60 * 24));
+        const sex = activePatient.sexo.toLowerCase() === 'niño' ? 'boys' : 'girls';
+
+        const measurementData = {
+            id: new Date().getTime().toString(),
+            codigoUnico: activePatient.codigoUnico,
+            fechaMedicion: formData.fechaConsulta,
+            idConsulta: newConsultId
+        };
+
+        // 3. Calcular Z-Scores si hay datos
+        if (peso) {
+            measurementData.peso = peso;
+            const lms = getLMS(ageInDays, sex, whoData.weightForAge);
+            if (lms) measurementData.pesoZScore = calculateZScore(peso, lms[1], lms[2], lms[3]);
+        }
+        if (talla) {
+            measurementData.talla = talla;
+            // ... (lógica similar para talla, pc, imc)
+        }
+
+        try {
+            // 4. Guardar ambos registros
+            const consultPromise = mode === 'edit' 
+                ? db.collection('consultas').doc(recordId).update(formData)
+                : db.collection('consultas').doc(newConsultId).set({ ...formData, id: newConsultId });
+
+            const measurementPromise = db.collection('medicionesCrecimiento').doc(measurementData.id).set(measurementData);
+
+            await Promise.all([consultPromise, measurementPromise]);
+            
+            alert(`Consulta ${mode === 'edit' ? 'actualizada' : 'guardada'} con éxito.`);
+            // ... (resto de la lógica de éxito)
+
+        } catch (error) { /* ... (manejo de error) */ }
+    });
+});
         try {
             if (mode === 'edit') {
                 // Actualizar un documento existente en Firestore
