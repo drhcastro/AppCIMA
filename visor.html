@@ -4,29 +4,20 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Expediente del Paciente - CIMA Nahui</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
-</head>
+    </head>
 <body>
 <div class="page-container">
-    <div id="patient-header-placeholder">
-        <div class="card"><p>Cargando datos del paciente...</p></div>
+    <div id="patient-header-placeholder" class="card patient-header-card">
+        Cargando datos del paciente...
     </div>
 
-    <div class="dashboard-summary card">
-        <div class="stat-card"><h4>Última Consulta Médica</h4><p id="summary-ultima-consulta">--</p></div>
-        <div class="stat-card"><h4>Última Vacuna</h4><p id="summary-ultima-vacuna">--</p></div>
-        <div class="stat-card"><h4>Consulta Especialidad</h4><p id="summary-ultima-consulta-esp">--</p></div>
-        <div class="stat-card"><h4>Planes Activos</h4><p id="summary-planes-activos">--</p></div>
-        <div class="stat-card"><h4>Tamizajes Pendientes</h4><p id="summary-tamizajes-pendientes">--</p></div>
-    </div>
+    <div id="alerts-container"></div>
 
     <div class="actions-grid">
         <a href="consulta.html" class="action-card"><div class="icon">➕</div><h3>Consulta Médica</h3></a>
         <a href="historial.html" class="action-card"><div class="icon">🧾</div><h3>Historial Médico</h3></a>
-        <a href="planes.html" class="action-card"><div class="icon">📋</div><h3>Planes de Tratamiento</h3></a>
+        <a href="planeacion.html" class="action-card"><div class="icon">📋</div><h3>Planeación de Consultas</h3></a>
         <a href="vacunas.html" class="action-card"><div class="icon">💉</div><h3>Vacunación</h3></a>
         <a href="tamizajes.html" class="action-card"><div class="icon">🧪</div><h3>Tamizajes</h3></a>
         <a href="neuro.html" class="action-card"><div class="icon">🧠</div><h3>Neurodesarrollo</h3></a>
@@ -36,6 +27,11 @@
         <a href="consulta-generica.html?tipo=rehabilitacion" class="action-card"><div class="icon">💪</div><h3>Rehabilitación</h3></a>
     </div>
 
+    <div id="specialty-diagnostics-container" class="card" style="display: none;">
+        <h3>Diagnósticos Recientes de Especialidades</h3>
+        <ul id="diagnostics-list"></ul>
+    </div>
+    
     <div style="text-align: center; margin-top: 32px;">
          <a href="index.html" class="button-secondary">⬅️ Regresar al Menú Principal</a>
     </div>
