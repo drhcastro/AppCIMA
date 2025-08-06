@@ -13,6 +13,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const pcInput = document.getElementById('calc-pc');
     const tricipitalInput = document.getElementById('calc-tricipital');
     const subescapularInput = document.getElementById('calc-subescapular');
+    const bicipitalInput = document.getElementById('calc-bicipital'); // Nuevo
+    const suprailiacoInput = document.getElementById('calc-suprailiaco'); // Nuevo
     const perBraquialInput = document.getElementById('calc-per-braquial');
     const sexoInput = document.getElementById('calc-sexo');
     const edadInput = document.getElementById('calc-edad');
@@ -63,19 +65,21 @@ document.addEventListener('DOMContentLoaded', () => {
         const talla = parseFloat(tallaInput.value) || null;
         const edad = parseFloat(edadInput.value) || null;
         const sexo = sexoInput.value;
-        const pal = parseFloat(palInput.value) || 1.0; // Factor de actividad física
-        const pc = parseFloat(pcInput.value) || null;
+        const pal = parseFloat(palInput.value) || 1.0;
         const plTricipital = parseFloat(tricipitalInput.value) || null;
         const plSubescapular = parseFloat(subescapularInput.value) || null;
+        const plBicipital = parseFloat(bicipitalInput.value) || null;
+        const plSuprailiaco = parseFloat(suprailiacoInput.value) || null;
         const perBraquial = parseFloat(perBraquialInput.value) || null;
 
-        // 2. Realizar los cálculos
         let results = {};
-
-        // IMC
-        if (peso && talla) {
+        
+        // Indices básicos
+       if (peso && talla) {
             results.imc = (peso / Math.pow(talla / 100, 2)).toFixed(2);
+            results.sc = (Math.sqrt((talla * peso) / 3600)).toFixed(2); // Superficie Corporal (Mosteller)
         }
+
 
         // Z-Scores (solo si hay un paciente activo con fecha de nacimiento)
         if (activePatient && activePatient.fechaNacimiento) {
@@ -94,6 +98,35 @@ document.addEventListener('DOMContentLoaded', () => {
         if (plTricipital && plSubescapular) {
             const sumPliegues = plTricipital + plSubescapular;
             results.grasaCorporal = (1.33 * sumPliegues - 0.013 * Math.pow(sumPliegues, 2) - 2.5).toFixed(2);
+        }
+        
+// Composición Corporal (con 4 pliegues)
+        if (plTricipital && plBicipital && plSubescapular && plSuprailiaco && edad) {
+            const sumPliegues = plTricipital + plBicipital + plSubescapular + plSuprailiaco;
+            let c, m;
+            // Constantes de Durnin & Womersley por edad y sexo
+            if (sexo === 'masculino') {
+                if (edad < 17) { c=1.1533; m=0.0643; }
+                else if (edad <= 19) { c=1.1620; m=0.0630; }
+                else if (edad <= 29) { c=1.1631; m=0.0632; }
+                else if (edad <= 39) { c=1.1422; m=0.0544; }
+                else if (edad <= 49) { c=1.1620; m=0.0700; }
+                else { c=1.1715; m=0.0779; }
+            } else { // Femenino
+                if (edad < 17) { c=1.1369; m=0.0598; }
+                else if (edad <= 19) { c=1.1549; m=0.0678; }
+                else if (edad <= 29) { c=1.1599; m=0.0717; }
+                else if (edad <= 39) { c=1.1423; m=0.0632; }
+                else if (edad <= 49) { c=1.1333; m=0.0612; }
+                else { c=1.1339; m=0.0645; }
+            }
+            const densidad = c - (m * Math.log10(sumPliegues));
+            results.densidadCorporal = densidad.toFixed(4);
+            results.grasaCorporalSiri = ((495 / densidad) - 450).toFixed(2); // Fórmula de Siri
+            if(peso) {
+                results.masaGrasa = (peso * (results.grasaCorporalSiri / 100)).toFixed(2);
+                results.masaLibreGrasa = (peso - results.masaGrasa).toFixed(2);
+            }
         }
 
         // Áreas Braquiales
@@ -115,26 +148,37 @@ document.addEventListener('DOMContentLoaded', () => {
             results.getHarrisBenedict = (geb * pal).toFixed(2); // Gasto Energético Total
         }
         
-        // 3. Generar el HTML para mostrar los resultados
+        // 3. Mostrar resultados
         renderResults(results);
     }
 
     function renderResults(results) {
         resultsContainer.innerHTML = `
+            <h4>Índices Generales</h4>
             <div class="result-grid">
                 ${createResultItem('IMC', results.imc, 'kg/m²')}
-                ${createResultItem('Z-Score Peso/Edad', results.pesoZScore, 'DE')}
-                ${createResultItem('Z-Score Talla/Edad', results.tallaZScore, 'DE')}
-                <hr>
-                ${createResultItem('% Grasa Corporal (Slaughter)', results.grasaCorporal, '%')}
-                ${createResultItem('Área Grasa Braquial', results.areaGrasaBraquial, 'cm²')}
-                ${createResultItem('Área Muscular Braquial', results.areaMuscularBraquial, 'cm²')}
-                <hr>
+                ${createResultItem('Superficie Corporal (SC)', results.sc, 'm²')}
+            </div>
+            <h4>Z-Scores (requiere paciente activo)</h4>
+            <div class="result-grid">
+                 ${createResultItem('Z-Score Peso/Edad', results.pesoZScore, 'DE')}
+                 ${createResultItem('Z-Score Talla/Edad', results.tallaZScore, 'DE')}
+            </div>
+            <h4>Composición Corporal</h4>
+            <div class="result-grid">
+                ${createResultItem('Densidad Corporal (D&W)', results.densidadCorporal, 'g/cm³')}
+                ${createResultItem('% Grasa Corporal (Siri)', results.grasaCorporalSiri, '%')}
+                ${createResultItem('Masa Grasa', results.masaGrasa, 'kg')}
+                ${createResultItem('Masa Libre de Grasa', results.masaLibreGrasa, 'kg')}
+            </div>
+            <h4>Gasto Energético (Harris-Benedict)</h4>
+             <div class="result-grid">
                 ${createResultItem('Gasto Energético Basal (GEB)', results.gebHarrisBenedict, 'kcal/día')}
                 ${createResultItem('Gasto Energético Total (GET)', results.getHarrisBenedict, 'kcal/día')}
             </div>
         `;
     }
+
 
     function createResultItem(label, value, unit) {
         if (value === undefined || value === null) {
