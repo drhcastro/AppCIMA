@@ -1,24 +1,24 @@
 document.addEventListener('DOMContentLoaded', () => {
-    // La conexión 'db' ya está disponible gracias a auth-guard.js
     let loadedPlans = [];
-
-    // --- ELEMENTOS DEL DOM ---
     const patientBanner = document.getElementById('patient-banner');
     const historialContainer = document.getElementById('planes-historial-container');
     const backToVisorBtn = document.getElementById('back-to-visor');
-
-    // --- INICIALIZACIÓN Y PERMISOS ---
     const activePatient = JSON.parse(localStorage.getItem('activePatient'));
     const currentUser = JSON.parse(sessionStorage.getItem('currentUser'));
 
-    if (currentUser && currentUser.profile === 'asistente') { /* ... (código de acceso denegado) */ return; }
-    if (!activePatient) { /* ... (código de no hay paciente activo) */ return; }
-
+    if (currentUser && currentUser.profile === 'asistente') {
+        document.body.innerHTML = '<div style="text-align: center; padding: 40px; font-family: Poppins, sans-serif;"><h1>Acceso Denegado</h1><p>Tu perfil no tiene permiso para ver esta sección.</p><a href="javascript:history.back()" style="color: #005f73;">Regresar</a></div>';
+        return;
+    }
+    if (!activePatient) {
+        patientBanner.textContent = "ERROR: No hay un paciente activo.";
+        backToVisorBtn.href = 'index.html';
+        return;
+    }
     patientBanner.innerHTML = `Planes para: <strong>${activePatient.nombre} ${activePatient.apellidoPaterno}</strong>`;
     backToVisorBtn.href = `visor.html?codigo=${activePatient.codigoUnico}`;
     loadHistory();
 
-    // --- MANEJO DE EVENTOS ---
     historialContainer.addEventListener('click', (e) => {
         const target = e.target.closest('button');
         if (!target) return;
@@ -31,18 +31,15 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // --- FUNCIONES ---
     async function loadHistory() {
         historialContainer.innerHTML = 'Cargando historial...';
         try {
             const querySnapshot = await db.collection('planeacionConsultas').where('codigoUnico', '==', activePatient.codigoUnico).orderBy('fechaPlan', 'desc').get();
             loadedPlans = querySnapshot.docs.map(doc => doc.data());
-
             if (loadedPlans.length === 0) {
                 historialContainer.innerHTML = '<p>No hay planeaciones registradas.</p>';
                 return;
             }
-
             historialContainer.innerHTML = '';
             loadedPlans.forEach(plan => {
                 const card = document.createElement('div');
@@ -69,7 +66,10 @@ document.addEventListener('DOMContentLoaded', () => {
                     </details>`;
                 historialContainer.appendChild(card);
             });
-        } catch (error) { /* ... (manejo de error) */ }
+        } catch (error) { 
+            console.error("Error al cargar historial de planeaciones:", error);
+            historialContainer.innerHTML = `<p class="error-message">Error al cargar el historial. Es posible que falte un índice en Firestore.</p>`;
+        }
     }
     
     function editRecord(id) {
