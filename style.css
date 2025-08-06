@@ -55,6 +55,40 @@ body {
     margin-bottom: 24px;
 }
 
+/* --- PORTAL DE INICIO (NUEVO) --- */
+.portal-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    min-height: calc(100vh - 48px); /* Restar el padding del body para centrar verticalmente */
+}
+.portal-actions {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 2rem;
+    width: 100%;
+    max-width: 1100px; /* Ancho máximo para el grid de botones */
+}
+.action-card {
+    background-color: var(--card-bg-color);
+    padding: 2.5rem 2rem;
+    border-radius: var(--border-radius);
+    box-shadow: var(--card-shadow);
+    text-decoration: none;
+    color: var(--text-color);
+    transition: transform 0.3s, box-shadow 0.3s;
+    border: 1px solid var(--border-color);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+}
+.action-card:hover { transform: translateY(-10px); box-shadow: 0 10px 30px rgba(0, 95, 115, 0.15); }
+.action-card .icon { font-size: 3rem; margin-bottom: 1rem; }
+.action-card h2, .action-card h3 { font-size: 1.5rem; color: var(--primary-color); margin-bottom: 0.5rem; }
+.action-card p { font-size: 1rem; color: #666; }
+
 /* --- Encabezado de Paciente en Visor --- */
 .patient-header-card {
     display: flex;
