@@ -20,7 +20,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- INICIALIZACIÓN ---
     const activePatient = JSON.parse(localStorage.getItem('activePatient'));
     measureDateInput.valueAsDate = new Date();
-    initializeChart();
+    initializeChart(); // Inicializa la gráfica vacía
 
     if (activePatient) {
         // MODO PACIENTE REGISTRADO
@@ -30,13 +30,11 @@ document.addEventListener('DOMContentLoaded', () => {
         dobInput.disabled = true;
         sexInput.disabled = true;
         historyCard.style.display = 'block';
-        backBtn.href = `visor.html?codigo=${activePatient.codigoUnico}`; // Botón de regreso dinámico
+        backBtn.href = `visor.html?codigo=${activePatient.codigoUnico}`;
         backBtn.textContent = '⬅️ Regresar al Expediente';
         loadPatientHistory();
     } else {
         // MODO SIN REGISTRO
-        dobInput.disabled = false;
-        sexInput.disabled = false;
         backBtn.textContent = '⬅️ Regresar al Menú Principal';
     }
 
@@ -66,8 +64,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 .orderBy('fechaMedicion', 'desc')
                 .get();
             
-            loadedMeasurements = querySnapshot.docs.map(doc => doc.data());
-            displayHistoryTable(loadedMeasurements);
+            const measurements = querySnapshot.docs.map(doc => doc.data());
+            displayHistoryTable(measurements);
         } catch (error) {
             console.error("Error cargando historial de mediciones:", error);
             historyTableBody.innerHTML = '<tr><td colspan="4">Error al cargar historial. Es posible que falte un índice en Firestore.</td></tr>';
@@ -112,7 +110,6 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!dob || !sex || !measureDate || isNaN(measurementValue)) {
             alert("Por favor, complete todos los campos."); return;
         }
-
         const ageInDays = Math.floor((new Date(measureDate) - new Date(dob)) / (1000 * 60 * 60 * 24));
         const chartTypeKey = chartTypeSelect.value;
         
@@ -139,9 +136,8 @@ document.addEventListener('DOMContentLoaded', () => {
             };
             
             const metricKey = chartConfig[chartTypeKey].dataKey;
-            const zScoreKey = `${metricKey}ZScore`;
             newMeasurement[metricKey] = measurementValue;
-            newMeasurement[zScoreKey] = zScore;
+            newMeasurement[`${metricKey}ZScore`] = zScore;
             
             try {
                 await db.collection('medicionesCrecimiento').doc(newMeasurement.id).set(newMeasurement);
@@ -190,7 +186,8 @@ document.addEventListener('DOMContentLoaded', () => {
             type: 'line',
             data: {
                 datasets: [
-                    { data: range(-1, 1, 0.1).map(x => ({ x: y, y: pdf(x) })), backgroundColor: 'rgba(92, 184, 92, 0.5)', pointRadius: 0, fill: 'origin', order: 2, label: '' },
+                    // --- CORRECCIÓN AQUÍ: x: y -> x: x ---
+                    { data: range(-1, 1, 0.1).map(x => ({ x: x, y: pdf(x) })), backgroundColor: 'rgba(92, 184, 92, 0.5)', pointRadius: 0, fill: 'origin', order: 2, label: '' },
                     { data: [...range(-2, -1, 0.1), NaN, ...range(1, 2, 0.1)].map(x => ({ x: x, y: pdf(x) })), backgroundColor: 'rgba(240, 173, 78, 0.5)', pointRadius: 0, fill: 'origin', order: 1, label: '' },
                     { data: [...range(-3, -2, 0.1), NaN, ...range(2, 3, 0.1)].map(x => ({ x: x, y: pdf(x) })), backgroundColor: 'rgba(217, 83, 79, 0.5)', pointRadius: 0, fill: 'origin', order: 0, label: '' },
                     { label: 'Distribución Normal', data: curveData, borderColor: 'rgba(0, 0, 0, 0.8)', borderWidth: 2, pointRadius: 0, fill: false, tension: 0.4, order: 3 }
@@ -216,7 +213,6 @@ document.addEventListener('DOMContentLoaded', () => {
         if (activeChart.data.datasets.length > 4) {
             activeChart.data.datasets.pop();
         }
-
         activeChart.data.datasets.push({
             label: 'Paciente', data: patientPoint, type: 'scatter',
             pointRadius: 10, pointHoverRadius: 12,
@@ -227,8 +223,8 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function getUnitFromChartType(type) {
-        if (type.includes('weight') || type.includes('bmi')) return 'kg';
-        if (type.includes('length') || type.includes('head')) return 'cm';
+        if (type.toLowerCase().includes('peso') || type.toLowerCase().includes('imc')) return 'kg/m²';
+        if (type.toLowerCase().includes('talla') || type.toLowerCase().includes('cabeza')) return 'cm';
         return '';
     }
 
@@ -238,4 +234,18 @@ document.addEventListener('DOMContentLoaded', () => {
         headCircumferenceForAge: { dataKey: 'pc' },
         bmiForAge: { dataKey: 'imc' }
     };
+    
+    function getMetricLabel(m) {
+        if (m.peso) return "Peso"; if (m.talla) return "Talla"; if (m.pc) return "PC"; if (m.imc) return "IMC"; return "Desconocido";
+    }
+    function getMetricValue(m) {
+        return m.peso || m.talla || m.pc || m.imc || 'N/A';
+    }
+    function getMetricUnit(m) {
+        if (m.peso) return "kg"; if (m.talla || m.pc) return "cm"; if (m.imc) return "kg/m²"; return "";
+    }
+    function getMetricZScore(m) {
+        const score = m.pesoZScore ?? m.tallaZScore ?? m.pcZScore ?? m.imcZScore;
+        return score ? score : 'N/A';
+    }
 });
