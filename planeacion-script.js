@@ -1,6 +1,18 @@
 document.addEventListener('DOMContentLoaded', () => {
     // La conexión 'db' ya está disponible gracias a auth-guard.js
-    
+
+    // --- FUNCIÓN DE AYUDA PARA FECHAS ---
+    function formatDate(dateString) {
+        if (!dateString || !dateString.includes('-')) return "N/A";
+        // Añadir 'T00:00:00' para que se interprete como la medianoche en la zona horaria local
+        const date = new Date(dateString + 'T00:00:00');
+        return date.toLocaleDateString('es-ES', {
+            day: '2-digit',
+            month: '2-digit',
+            year: 'numeric'
+        });
+    }
+
     // --- ELEMENTOS DEL DOM ---
     const patientBanner = document.getElementById('patient-banner');
     const historialContainer = document.getElementById('planes-historial-container');
@@ -30,7 +42,7 @@ document.addEventListener('DOMContentLoaded', () => {
     async function loadHistory() {
         historialContainer.innerHTML = 'Cargando historial...';
         try {
-            const querySnapshot = await db.collection('planesTratamiento')
+            const querySnapshot = await db.collection('planeacionConsultas')
                 .where('codigoUnico', '==', activePatient.codigoUnico)
                 .orderBy('fechaPlan', 'desc')
                 .get();
@@ -42,14 +54,14 @@ document.addEventListener('DOMContentLoaded', () => {
                 return;
             }
 
-            // Guardamos los planes en la memoria para que la página de impresión los use
+            // Guardamos los planes en la memoria de la sesión para que la página de impresión pueda acceder a ellos
             sessionStorage.setItem('patientPlans', JSON.stringify(plans));
 
             historialContainer.innerHTML = '';
             plans.forEach((plan, index) => {
                 const card = document.createElement('div');
                 card.className = 'consulta-card';
-                const fecha = new Date(plan.fechaPlan).toLocaleDateString('es-ES', { year: 'numeric', month: 'long', day: 'numeric' });
+                const fecha = formatDate(plan.fechaPlan); // Usar la función de formateo
                 
                 card.innerHTML = `
                     <div class="plan-summary">
@@ -58,14 +70,15 @@ document.addEventListener('DOMContentLoaded', () => {
                             <span class="motivo-preview">${plan.diagnosticoRelacionado || 'Plan General'}</span>
                         </div>
                         <div class="plan-actions">
-                            <a href="imprimir-plan.html?index=${index}" class="button-secondary small-btn">Ver / Imprimir</a>
+                            <a href="imprimir-planeacion.html?index=${index}" class="button-secondary small-btn">Ver / Imprimir</a>
                         </div>
                     </div>
                 `;
                 historialContainer.appendChild(card);
             });
         } catch (error) {
-            historialContainer.innerHTML = `<p class="error-message">Error al cargar el historial: ${error.message}</p>`;
+            console.error("Error al cargar historial de planeaciones:", error);
+            historialContainer.innerHTML = `<p class="error-message">Error al cargar el historial. Es posible que falte un índice en Firestore.</p>`;
         }
     }
 });
