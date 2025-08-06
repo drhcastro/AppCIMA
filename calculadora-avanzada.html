@@ -31,7 +31,7 @@
                     </div>
                     <div class="form-group">
                         <label for="calc-edad">Edad (años)</label>
-                        <input type="number" id="calc-edad" step="0.1">
+                        <input type="number" id="calc-edad" step="0.1" required>
                     </div>
                 </div>
                 <div class="form-group">
@@ -42,14 +42,19 @@
             <div class="card">
                 <h3>Datos Antropométricos</h3>
                 <div class="form-grid">
-                    <div class="form-group"><label for="calc-peso">Peso (kg)</label><input type="number" id="calc-peso" step="0.1"></div>
-                    <div class="form-group"><label for="calc-talla">Talla (cm)</label><input type="number" id="calc-talla" step="0.1"></div>
+                    <div class="form-group"><label for="calc-peso">Peso (kg)</label><input type="number" id="calc-peso" step="0.1" required></div>
+                    <div class="form-group"><label for="calc-talla">Talla (cm)</label><input type="number" id="calc-talla" step="0.1" required></div>
                     <div class="form-group"><label for="calc-pc">PC (cm)</label><input type="number" id="calc-pc" step="0.1"></div>
-                    <div class="form-group"><label for="calc-tricipital">Pl. Tricipital (mm)</label><input type="number" id="calc-tricipital" step="0.1"></div>
-                    <div class="form-group"><label for="calc-subescapular">Pl. Subescapular (mm)</label><input type="number" id="calc-subescapular" step="0.1"></div>
                     <div class="form-group"><label for="calc-per-braquial">Per. Braquial (cm)</label><input type="number" id="calc-per-braquial" step="0.1"></div>
                 </div>
-                <button id="calculate-btn" class="button-primary" style="width: 100%;">Calcular</button>
+                <h4>Pliegues Cutáneos (mm)</h4>
+                <div class="form-grid">
+                    <div class="form-group"><label for="calc-tricipital">Tricipital</label><input type="number" id="calc-tricipital" step="0.1"></div>
+                    <div class="form-group"><label for="calc-subescapular">Subescapular</label><input type="number" id="calc-subescapular" step="0.1"></div>
+                    <div class="form-group"><label for="calc-bicipital">Bicipital</label><input type="number" id="calc-bicipital" step="0.1"></div>
+                    <div class="form-group"><label for="calc-suprailiaco">Suprailiaco</label><input type="number" id="calc-suprailiaco" step="0.1"></div>
+                </div>
+                <button id="calculate-btn" class="button-primary" style="width: 100%; margin-top: 1rem;">Calcular</button>
             </div>
         </div>
 
@@ -74,6 +79,9 @@
 <script src="auth-guard.js"></script>
 <script src="data.js"></script>
 <script src="calculadora-avanzada-script.js"></script>
+
+</body>
+</html>
 
 </body>
 </html>
