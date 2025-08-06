@@ -59,44 +59,32 @@ document.addEventListener('DOMContentLoaded', () => {
                 // Corrección de la fecha para evitar problemas de zona horaria
                 const fecha = new Date(consulta.fechaConsulta + 'T00:00:00').toLocaleDateString('es-ES', { year: 'numeric', month: 'long', day: 'numeric' });
                 
-                consultaCard.innerHTML = `
+                 consultaCard.innerHTML = `
                     <details>
-                        <summary class="consulta-summary">
-                            <div class="summary-info">
-                                <strong>${fecha}</strong>
-                                <span class="motivo-preview">${(consulta.sintomasSignosMotivo || '').substring(0, 50)}...</span>
-                            </div>
-                            <span class="medico-preview">${consulta.medicoTratante || ''}</span>
-                        </summary>
-                        <div class="consulta-details">
+                        <summary>...</summary>
+                        <div class="consulta-details" id="detail-${consulta.id}">
                             <div class="details-actions">
+                                <button class="print-btn" data-id="${consulta.id}">🖨️ Imprimir</button>
                                 <button class="edit-btn" data-id="${consulta.id}">✏️ Editar</button>
                                 <button class="delete-btn" data-id="${consulta.id}">🗑️ Eliminar</button>
                             </div>
                             <hr>
-                            <h4>Interrogatorio (SAMPLE)</h4>
-                            <p><strong>Síntomas/Motivo:</strong> ${consulta.sintomasSignosMotivo || ''}</p>
-                            <p><strong>Alergias:</strong> ${consulta.alergiasConsulta || ''}</p>
-                            <p><strong>Medicamentos:</strong> ${consulta.medicamentosPrevios || ''}</p>
-                            <p><strong>Historial Previo:</strong> ${consulta.historialClinicoPrevio || ''}</p>
-                            <p><strong>Líquidos/Alimentos:</strong> ${consulta.liquidosAlimentos || ''}</p>
-                            <p><strong>Eventos Relacionados:</strong> ${consulta.eventosRelacionados || ''}</p>
-                            <hr>
-                            <h4>Análisis y Diagnóstico</h4>
-                            <p><strong>Análisis/Exploración:</strong> ${consulta.analisis || ''}</p>
-                            <p><strong>Dx. Sindromático:</strong> ${consulta.diagnosticoSindromatico || ''}</p>
-                            <p><strong>Dx. Etiológico:</strong> ${consulta.diagnosticoEtiologico || ''}</p>
-                            <p><strong>Dx. Nutricional:</strong> ${consulta.diagnosticoNutricional || ''}</p>
-                            <p><strong>Dx. Radiológico:</strong> ${consulta.diagnosticoRadiologico || ''}</p>
-                            <p><strong>Dx. Presuntivo:</strong> ${consulta.diagnosticoPresuntivo || ''}</p>
-                            <p><strong>Dx. Nosológico (Final):</strong> ${consulta.diagnosticoNosologico || ''}</p>
+                            ... (resto de los detalles)
                         </div>
                     </details>`;
                 historialContainer.appendChild(consultaCard);
             });
-        } catch (error) {
-            historialContainer.innerHTML = `<p class="error-message">Error al cargar historial: ${error.message}</p>`;
-        }
+    }
+// --- NUEVA FUNCIÓN PARA IMPRIMIR ---
+    function printRecord(id) {
+        const detailToPrint = document.getElementById(`detail-${id}`);
+        if (!detailToPrint) return;
+
+        // Añadir clase para que solo esta sección sea visible al imprimir
+        detailToPrint.classList.add('printable-area');
+        window.print();
+        // Quitar la clase después de imprimir
+        detailToPrint.classList.remove('printable-area');
     }
     
     function editRecord(id) {
