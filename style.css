@@ -154,3 +154,11 @@ tbody tr:hover { background-color: #f1f3f5; }
     .no-print, .actions-toolbar, .main-header, .form-header, .tab-nav, footer { display: none; }
     .card { box-shadow: none; border: 1px solid #ccc; page-break-inside: avoid; }
 }
+/* ... al final de style.css ... */
+#history-table tbody tr {
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+#history-table tbody tr:hover {
+    background-color: #e9ecef;
+}
