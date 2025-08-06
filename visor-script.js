@@ -12,25 +12,41 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // --- FUNCIÓN DE CÁLCULO DE EDAD (MÁS ROBUSTA) ---
+    // --- FUNCIÓN DE CÁLCULO DE EDAD (ACTUALIZADA) ---
     function getAge(dateString) {
-        if (!dateString) {
-            return { text: "Sin fecha de nac.", days: null };
-        }
+        if (!dateString) return { text: "N/A", days: null };
         try {
             const birthDate = new Date(dateString + 'T00:00:00');
-            if (isNaN(birthDate.getTime())) { // Verifica si la fecha es válida
-                return { text: "Fecha inválida", days: null };
-            }
+            if (isNaN(birthDate.getTime())) return { text: "Fecha inválida", days: null };
+            
             const today = new Date();
-            const days = Math.floor((today - birthDate) / (1000 * 60 * 60 * 24));
+            const totalDays = Math.floor((today - birthDate) / (1000 * 60 * 60 * 24));
+
+            if (totalDays < 0) return { text: "Fecha futura", days: totalDays };
+
+            // Lógica para mostrar la edad de forma pediátrica
+            if (totalDays < 31) {
+                return { text: `${totalDays} días`, days: totalDays };
+            }
+            
             let years = today.getFullYear() - birthDate.getFullYear();
             let months = today.getMonth() - birthDate.getMonth();
-            if (months < 0 || (months === 0 && today.getDate() < birthDate.getDate())) {
-                years--;
-                months = 12 + months;
+            
+            if (today.getDate() < birthDate.getDate()) {
+                months--;
             }
-            return { text: `${years}a, ${months}m`, days: days };
+            if (months < 0) {
+                years--;
+                months += 12;
+            }
+
+            const totalMonths = years * 12 + months;
+
+            if (totalMonths < 24) {
+                return { text: `${totalMonths} meses`, days: totalDays };
+            } else {
+                return { text: `${years}a, ${months}m`, days: totalDays };
+            }
         } catch (e) {
             return { text: "Error", days: null };
         }
