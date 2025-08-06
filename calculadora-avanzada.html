@@ -14,38 +14,40 @@
 <div class="page-container">
     <header class="main-header">
         <h1>🧮 Cálculos Nutricionales Avanzados</h1>
-        <div id="patient-banner" style="font-size: 1.1rem; color: var(--muted-text-color);"></div>
+        <p id="patient-banner"></p>
     </header>
 
     <div class="calculator-layout">
         <div class="input-column">
             <div class="card">
-                <h3>Datos Antropométricos</h3>
+                <h3>Datos del Paciente</h3>
                 <div class="form-grid">
                     <div class="form-group">
-                        <label for="calc-peso">Peso (kg)</label>
-                        <input type="number" id="calc-peso" step="0.1">
+                        <label for="calc-sexo">Sexo</label>
+                        <select id="calc-sexo">
+                            <option value="masculino">Masculino</option>
+                            <option value="femenino">Femenino</option>
+                        </select>
                     </div>
                     <div class="form-group">
-                        <label for="calc-talla">Talla (cm)</label>
-                        <input type="number" id="calc-talla" step="0.1">
+                        <label for="calc-edad">Edad (años)</label>
+                        <input type="number" id="calc-edad" step="0.1">
                     </div>
-                    <div class="form-group">
-                        <label for="calc-pc">Perímetro Cefálico (cm)</label>
-                        <input type="number" id="calc-pc" step="0.1">
-                    </div>
-                     <div class="form-group">
-                        <label for="calc-tricipital">Pl. Tricipital (mm)</label>
-                        <input type="number" id="calc-tricipital" step="0.1">
-                    </div>
-                     <div class="form-group">
-                        <label for="calc-subescapular">Pl. Subescapular (mm)</label>
-                        <input type="number" id="calc-subescapular" step="0.1">
-                    </div>
-                    <div class="form-group">
-                        <label for="calc-per-braquial">Per. Braquial (cm)</label>
-                        <input type="number" id="calc-per-braquial" step="0.1">
-                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="calc-pal">Nivel de Act. Física (PAL)</label>
+                    <input type="number" id="calc-pal" step="0.1" value="1.2" title="Ej: 1.2 (sedentario), 1.5 (moderado)">
+                </div>
+            </div>
+            <div class="card">
+                <h3>Datos Antropométricos</h3>
+                <div class="form-grid">
+                    <div class="form-group"><label for="calc-peso">Peso (kg)</label><input type="number" id="calc-peso" step="0.1"></div>
+                    <div class="form-group"><label for="calc-talla">Talla (cm)</label><input type="number" id="calc-talla" step="0.1"></div>
+                    <div class="form-group"><label for="calc-pc">PC (cm)</label><input type="number" id="calc-pc" step="0.1"></div>
+                    <div class="form-group"><label for="calc-tricipital">Pl. Tricipital (mm)</label><input type="number" id="calc-tricipital" step="0.1"></div>
+                    <div class="form-group"><label for="calc-subescapular">Pl. Subescapular (mm)</label><input type="number" id="calc-subescapular" step="0.1"></div>
+                    <div class="form-group"><label for="calc-per-braquial">Per. Braquial (cm)</label><input type="number" id="calc-per-braquial" step="0.1"></div>
                 </div>
                 <button id="calculate-btn" class="button-primary" style="width: 100%;">Calcular</button>
             </div>
@@ -55,7 +57,7 @@
             <div class="card">
                 <h3>Resultados</h3>
                 <div id="results-container">
-                    <p class="info-message">Ingrese los datos y presione "Calcular" para ver los resultados.</p>
+                    <p class="info-message">Ingrese los datos para ver los resultados.</p>
                 </div>
             </div>
         </div>
@@ -64,14 +66,14 @@
     <div style="text-align: center; margin-top: 32px;">
          <a href="#" id="back-to-visor" class="button-secondary">⬅️ Regresar al Expediente</a>
     </div>
-
 </div>
 
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
 <script src="auth-guard.js"></script>
-<script src="data.js"></script> <script src="calculadora-avanzada-script.js"></script>
+<script src="data.js"></script>
+<script src="calculadora-avanzada-script.js"></script>
 
 </body>
 </html>
