@@ -1,26 +1,28 @@
 document.addEventListener('DOMContentLoaded', () => {
     // La conexión 'db' ya está disponible gracias a auth-guard.js
 
-    // --- FUNCIÓN DE AYUDA PARA FECHAS ---
+    // --- FUNCIÓN DE AYUDA PARA FECHAS (soluciona zona horaria y formato) ---
     function formatDate(dateString) {
         if (!dateString || !dateString.includes('-')) return "N/A";
         const date = new Date(dateString + 'T00:00:00');
-        return date.toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit', year: 'numeric' });
+        return date.toLocaleDateString('es-ES', {
+            day: '2-digit',
+            month: '2-digit',
+            year: 'numeric'
+        });
     }
 
     // --- FUNCIÓN DE CÁLCULO DE EDAD (MÁS ROBUSTA) ---
     function getAge(dateString) {
-        // Si no hay fecha de nacimiento, devuelve un objeto seguro.
         if (!dateString) {
-            return { text: "N/A", days: null };
+            return { text: "Sin fecha de nac.", days: null };
         }
         try {
             const birthDate = new Date(dateString + 'T00:00:00');
-            const today = new Date();
-            // Verificar que la fecha sea válida
-            if (isNaN(birthDate.getTime())) {
+            if (isNaN(birthDate.getTime())) { // Verifica si la fecha es válida
                 return { text: "Fecha inválida", days: null };
             }
+            const today = new Date();
             const days = Math.floor((today - birthDate) / (1000 * 60 * 60 * 24));
             let years = today.getFullYear() - birthDate.getFullYear();
             let months = today.getMonth() - birthDate.getMonth();
@@ -52,7 +54,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- CONFIGURACIÓN Y DOM ---
     const TIPOS_DE_TAMIZAJES = ["Cardiológico", "Metabólico", "Visual", "Auditivo", "Genético", "Cadera"];
     const patientHeaderPlaceholder = document.getElementById('patient-header-placeholder');
-    if (!patientHeaderPlaceholder) return;
+    if (!patientHeaderPlaceholder) { return; }
 
     // --- LÓGICA PRINCIPAL ---
     const activePatient = JSON.parse(localStorage.getItem('activePatient'));
@@ -75,7 +77,10 @@ document.addEventListener('DOMContentLoaded', () => {
     
     async function loadDashboardAndSubsections(patientId) {
         try {
-            const [consultasSnap, vacunasSnap, planesSnap, tamizajesSnap, psicoSnap, nutriSnap, rehabSnap, medicionesSnap] = await Promise.all([
+            const [
+                consultasSnap, vacunasSnap, planesSnap, tamizajesSnap, 
+                psicoSnap, nutriSnap, rehabSnap, medicionesSnap
+            ] = await Promise.all([
                 db.collection('consultas').where('codigoUnico', '==', patientId).orderBy('fechaConsulta', 'desc').get(),
                 db.collection('vacunas').where('codigoUnico', '==', patientId).orderBy('fechaAplicacion', 'desc').get(),
                 db.collection('planeacionConsultas').where('codigoUnico', '==', patientId).get(),
@@ -87,8 +92,12 @@ document.addEventListener('DOMContentLoaded', () => {
             ]);
 
             const tamizajes = tamizajesSnap.docs.map(doc => doc.data());
-            const ageInfo = getAge(activePatient.fechaNacimiento);
             
+            // --- CORRECCIÓN CLAVE ---
+            // Obtenemos la información de la edad de forma segura
+            const ageInfo = getAge(activePatient.fechaNacimiento);
+            const ageInDays = ageInfo.days;
+
             const consultas = consultasSnap.docs.map(doc => doc.data());
             const vacunas = vacunasSnap.docs.map(doc => doc.data());
             const planes = planesSnap.docs.map(doc => doc.data());
@@ -108,9 +117,8 @@ document.addEventListener('DOMContentLoaded', () => {
             
             populateDashboard(resumen);
 
-            // Solo ejecutar alertas si tenemos una edad en días válida
-            if (ageInfo.days !== null) {
-                await displayAlerts(activePatient, ageInfo.days, tamizajes);
+            if (ageInDays !== null) {
+                await displayAlerts(activePatient, ageInDays, tamizajes);
             }
             await displaySpecialtyDiagnostics(consultasEspecialidad);
             if (!medicionesSnap.empty) {
@@ -123,7 +131,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // --- FUNCIONES DE VISUALIZACIÓN ---
     function populateHeader(patient) {
         const age = getAge(patient.fechaNacimiento);
         const correctedGA = calculateCorrectedGA(patient.edadGestacionalNacimiento, age.days);
@@ -151,11 +158,73 @@ document.addEventListener('DOMContentLoaded', () => {
         patientHeaderPlaceholder.innerHTML = headerHTML;
     }
     
-    function populateDashboard(resumen) { /* ... (Sin cambios) ... */ }
-    function populateLastMeasurement(medicion) { /* ... (Sin cambios) ... */ }
-    async function displayAlerts(patient, ageInDays, tamizajes) { /* ... (Sin cambios) ... */ }
-    async function displaySpecialtyDiagnostics(diagnostics) { /* ... (Sin cambios) ... */ }
-    function displayError(message) { /* ... (Sin cambios) ... */ }
+    function populateDashboard(resumen) {
+        document.getElementById('summary-ultima-consulta').textContent = formatDate(resumen.ultimaConsulta);
+        const fechaVacuna = formatDate(resumen.ultimaVacuna.fecha);
+        document.getElementById('summary-ultima-vacuna').innerHTML = `${resumen.ultimaVacuna.nombreVacuna} <small style="display:block; color:#6c757d;">${fechaVacuna}</small>`;
+        const fechaConsultaEsp = formatDate(resumen.ultimaConsultaEsp.fecha);
+        document.getElementById('summary-ultima-consulta-esp').innerHTML = `${resumen.ultimaConsultaEsp.tipo} <small style="display:block; color:#6c757d;">${fechaConsultaEsp}</small>`;
+        document.getElementById('summary-pendientes').textContent = resumen.planesActivos;
+        const tamizajesPendientes = TIPOS_DE_TAMIZAJES.filter(t => !resumen.tamizajesRealizados.includes(t));
+        const pendientesText = tamizajesPendientes.length > 0 ? tamizajesPendientes.length.toString() : "Ninguno";
+        const pendientesTitle = tamizajesPendientes.length > 0 ? tamizajesPendientes.join(', ') : "Todos los tamizajes registrados";
+        document.getElementById('summary-tamizajes-pendientes').textContent = pendientesText;
+        document.getElementById('summary-tamizajes-pendientes').title = pendientesTitle;
+    }
+
+    function populateLastMeasurement(medicion) {
+        const container = document.getElementById('last-measurement-card');
+        const details = document.getElementById('last-measurement-details');
+        if (!container || !details) return;
+        
+        let contentHTML = `<div>Fecha: <span>${formatDate(medicion.fechaMedicion)}</span></div>`;
+        if(medicion.peso) contentHTML += `<div>Peso: <span>${medicion.peso} kg (Z: ${medicion.pesoZScore ?? 'N/A'})</span></div>`;
+        if(medicion.talla) contentHTML += `<div>Talla: <span>${medicion.talla} cm (Z: ${medicion.tallaZScore ?? 'N/A'})</span></div>`;
+        if(medicion.pc) contentHTML += `<div>PC: <span>${medicion.pc} cm (Z: ${medicion.pcZScore ?? 'N/A'})</span></div>`;
+        if(medicion.imc) contentHTML += `<div>IMC: <span>${medicion.imc} (Z: ${medicion.imcZScore ?? 'N/A'})</span></div>`;
+        
+        details.innerHTML = contentHTML;
+        container.style.display = 'block';
+    }
+
+    async function displayAlerts(patient, ageInDays, tamizajes) {
+        const alertsContainer = document.getElementById('alerts-container');
+        alertsContainer.innerHTML = '';
+        const ga = parseFloat(patient.edadGestacionalNacimiento);
+        if (ga <= 36.0 && ageInDays >= 30) {
+            const tamizajeVisualRealizado = tamizajes.some(t => t.tipoTamiz === 'Visual');
+            if (!tamizajeVisualRealizado) {
+                const alertDiv = document.createElement('div');
+                alertDiv.className = 'alert alert-warning';
+                alertDiv.textContent = '¡AVISO IMPORTANTE! Se recomienda evaluación de retina para retinopatía del prematuro.';
+                alertsContainer.appendChild(alertDiv);
+            }
+        }
+    }
+
+    async function displaySpecialtyDiagnostics(diagnostics) {
+        const container = document.getElementById('specialty-diagnostics-container');
+        const list = document.getElementById('diagnostics-list');
+        if (diagnostics.length === 0) {
+            container.style.display = 'none';
+            return;
+        }
+        list.innerHTML = '';
+        diagnostics.forEach(dx => {
+            const li = document.createElement('li');
+            const fecha = formatDate(dx.fechaConsulta);
+            li.innerHTML = `<strong>${dx.tipo} (${fecha}):</strong> ${dx.diagnostico || 'Nota registrada.'}`;
+            list.appendChild(li);
+        });
+        container.style.display = 'block';
+    }
+
+    function displayError(message) {
+        const container = document.querySelector('.page-container');
+        if (container) {
+            container.innerHTML = `<div class="card" style="text-align:center;"><p class="error-message">${message}</p><a href="index.html" class="button-secondary">Regresar al Inicio</a></div>`;
+        }
+    }
 
     // Iniciar la carga de la página
     loadPageData();
