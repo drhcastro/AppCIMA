@@ -24,6 +24,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const target = e.target.closest('button');
         if (!target) return;
         const recordId = target.dataset.id;
+
         if (target.classList.contains('delete-btn')) {
             if (confirm('¿Estás seguro de que deseas eliminar este registro?')) {
                 deleteRecord(recordId);
@@ -31,6 +32,9 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         if (target.classList.contains('edit-btn')) {
             editRecord(recordId);
+        }
+        if (target.classList.contains('print-btn')) {
+            printRecord(recordId);
         }
     });
 
@@ -42,7 +46,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 .where('codigoUnico', '==', activePatient.codigoUnico)
                 .orderBy('fechaConsulta', 'desc')
                 .get();
-
             loadedConsultas = querySnapshot.docs.map(doc => doc.data());
             
             historialContainer.innerHTML = '';
@@ -51,17 +54,20 @@ document.addEventListener('DOMContentLoaded', () => {
                 return;
             }
             
-            // --- CORRECCIÓN CLAVE AQUÍ ---
-            // Asegurarse de que la variable 'consulta' está definida en el forEach.
             loadedConsultas.forEach(consulta => {
                 const consultaCard = document.createElement('div');
                 consultaCard.className = 'consulta-card';
-                // Corrección de la fecha para evitar problemas de zona horaria
-                const fecha = new Date(consulta.fechaConsulta + 'T00:00:00').toLocaleDateString('es-ES', { year: 'numeric', month: 'long', day: 'numeric' });
+                const fecha = new Date(consulta.fechaConsulta + 'T00:00:00').toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit', year: 'numeric' });
                 
-                 consultaCard.innerHTML = `
+                consultaCard.innerHTML = `
                     <details>
-                        <summary>...</summary>
+                        <summary class="consulta-summary">
+                            <div class="summary-info">
+                                <strong>${fecha}</strong>
+                                <span class="motivo-preview">${(consulta.sintomasSignosMotivo || '').substring(0, 50)}...</span>
+                            </div>
+                            <span class="medico-preview">${consulta.medicoTratante || ''}</span>
+                        </summary>
                         <div class="consulta-details" id="detail-${consulta.id}">
                             <div class="details-actions">
                                 <button class="print-btn" data-id="${consulta.id}">🖨️ Imprimir</button>
@@ -69,22 +75,30 @@ document.addEventListener('DOMContentLoaded', () => {
                                 <button class="delete-btn" data-id="${consulta.id}">🗑️ Eliminar</button>
                             </div>
                             <hr>
-                            ... (resto de los detalles)
+                            <h4>Interrogatorio (SAMPLE)</h4>
+                            <p><strong>Síntomas/Motivo:</strong> ${consulta.sintomasSignosMotivo || ''}</p>
+                            <p><strong>Alergias:</strong> ${consulta.alergiasConsulta || ''}</p>
+                            <p><strong>Medicamentos:</strong> ${consulta.medicamentosPrevios || ''}</p>
+                            <p><strong>Historial Previo:</strong> ${consulta.historialClinicoPrevio || ''}</p>
+                            <p><strong>Líquidos/Alimentos:</strong> ${consulta.liquidosAlimentos || ''}</p>
+                            <p><strong>Eventos Relacionados:</strong> ${consulta.eventosRelacionados || ''}</p>
+                            <hr>
+                            <h4>Análisis y Diagnóstico</h4>
+                            <p><strong>Análisis/Exploración:</strong> ${consulta.analisis || ''}</p>
+                            <p><strong>Dx. Sindromático:</strong> ${consulta.diagnosticoSindromatico || ''}</p>
+                            <p><strong>Dx. Etiológico:</strong> ${consulta.diagnosticoEtiologico || ''}</p>
+                            <p><strong>Dx. Nutricional:</strong> ${consulta.diagnosticoNutricional || ''}</p>
+                            <p><strong>Dx. Radiológico:</strong> ${consulta.diagnosticoRadiologico || ''}</p>
+                            <p><strong>Dx. Presuntivo:</strong> ${consulta.diagnosticoPresuntivo || ''}</p>
+                            <p><strong>Dx. Nosológico (Final):</strong> ${consulta.diagnosticoNosologico || ''}</p>
                         </div>
                     </details>`;
                 historialContainer.appendChild(consultaCard);
             });
-    }
-// --- NUEVA FUNCIÓN PARA IMPRIMIR ---
-    function printRecord(id) {
-        const detailToPrint = document.getElementById(`detail-${id}`);
-        if (!detailToPrint) return;
-
-        // Añadir clase para que solo esta sección sea visible al imprimir
-        detailToPrint.classList.add('printable-area');
-        window.print();
-        // Quitar la clase después de imprimir
-        detailToPrint.classList.remove('printable-area');
+        } catch (error) {
+            console.error("Error al cargar historial:", error);
+            historialContainer.innerHTML = `<p class="error-message">Error al cargar historial: ${error.message}</p>`;
+        }
     }
     
     function editRecord(id) {
@@ -103,5 +117,13 @@ document.addEventListener('DOMContentLoaded', () => {
         } catch (error) {
             alert(`Error al eliminar: ${error.message}`);
         }
+    }
+
+    function printRecord(id) {
+        const detailToPrint = document.getElementById(`detail-${id}`);
+        if (!detailToPrint) return;
+        detailToPrint.classList.add('printable-area');
+        window.print();
+        detailToPrint.classList.remove('printable-area');
     }
 });
