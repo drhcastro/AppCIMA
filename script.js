@@ -15,11 +15,12 @@ document.addEventListener('DOMContentLoaded', () => {
     const resultsCard = document.getElementById('results-card');
     const resultsText = document.getElementById('results-text');
     const patientBanner = document.getElementById('active-patient-banner');
+    const backBtn = document.getElementById('back-btn');
 
     // --- INICIALIZACIÓN ---
     const activePatient = JSON.parse(localStorage.getItem('activePatient'));
     measureDateInput.valueAsDate = new Date();
-    initializeChart(); // Inicializa la gráfica vacía
+    initializeChart();
 
     if (activePatient) {
         // MODO PACIENTE REGISTRADO
@@ -29,11 +30,14 @@ document.addEventListener('DOMContentLoaded', () => {
         dobInput.disabled = true;
         sexInput.disabled = true;
         historyCard.style.display = 'block';
+        backBtn.href = `visor.html?codigo=${activePatient.codigoUnico}`; // Botón de regreso dinámico
+        backBtn.textContent = '⬅️ Regresar al Expediente';
         loadPatientHistory();
     } else {
         // MODO SIN REGISTRO
         dobInput.disabled = false;
         sexInput.disabled = false;
+        backBtn.textContent = '⬅️ Regresar al Menú Principal';
     }
 
     // --- MANEJO DE EVENTOS ---
@@ -41,15 +45,16 @@ document.addEventListener('DOMContentLoaded', () => {
     historyTableBody.addEventListener('click', (e) => {
         const row = e.target.closest('tr');
         if (row && row.dataset.measurement) {
-            // Quitar la clase 'selected' de otras filas
             historyTableBody.querySelectorAll('tr').forEach(r => r.classList.remove('selected'));
-            // Añadir clase a la fila seleccionada
             row.classList.add('selected');
-            
             const measurement = JSON.parse(row.dataset.measurement);
             plotDistribution(measurement.zScore);
             displayResults(measurement);
         }
+    });
+    chartTypeSelect.addEventListener('change', (e) => {
+        const unit = getUnitFromChartType(e.target.value);
+        document.getElementById('measurement-label').textContent = `Valor de la Medición (${unit})`;
     });
 
     // --- FUNCIONES ---
@@ -75,22 +80,25 @@ document.addEventListener('DOMContentLoaded', () => {
             historyTableBody.innerHTML = '<tr><td colspan="4">No hay mediciones registradas.</td></tr>';
             return;
         }
-        measurements.forEach(m => {
-            const row = document.createElement('tr');
-            const relevantData = {
-                fecha: m.fechaMedicion,
-                tipo: getMetricLabel(m),
-                valor: getMetricValue(m),
-                unidad: getMetricUnit(m),
-                zScore: getMetricZScore(m)
-            };
-            row.dataset.measurement = JSON.stringify(relevantData);
 
+        const flatHistory = [];
+        measurements.forEach(m => {
+            if (m.peso) flatHistory.push({ fecha: m.fechaMedicion, tipo: 'Peso', valor: m.peso, unidad: 'kg', zScore: m.pesoZScore });
+            if (m.talla) flatHistory.push({ fecha: m.fechaMedicion, tipo: 'Talla', valor: m.talla, unidad: 'cm', zScore: m.tallaZScore });
+            if (m.pc) flatHistory.push({ fecha: m.fechaMedicion, tipo: 'PC', valor: m.pc, unidad: 'cm', zScore: m.pcZScore });
+            if (m.imc) flatHistory.push({ fecha: m.fechaMedicion, tipo: 'IMC', valor: m.imc, unidad: 'kg/m²', zScore: m.imcZScore });
+        });
+        
+        flatHistory.sort((a,b) => new Date(b.fecha) - new Date(a.fecha));
+
+        flatHistory.forEach(item => {
+            const row = document.createElement('tr');
+            row.dataset.measurement = JSON.stringify(item);
             row.innerHTML = `
-                <td>${new Date(m.fechaMedicion + 'T00:00:00').toLocaleDateString('es-ES')}</td>
-                <td>${relevantData.tipo}</td>
-                <td>${relevantData.valor} ${relevantData.unidad}</td>
-                <td>${relevantData.zScore}</td>
+                <td>${new Date(item.fecha + 'T00:00:00').toLocaleDateString('es-ES')}</td>
+                <td>${item.tipo}</td>
+                <td>${item.valor} ${item.unidad}</td>
+                <td>${item.zScore ? item.zScore.toFixed(2) : 'N/A'}</td>
             `;
             historyTableBody.appendChild(row);
         });
@@ -102,22 +110,20 @@ document.addEventListener('DOMContentLoaded', () => {
         const measureDate = measureDateInput.value;
         const measurementValue = parseFloat(measurementInput.value);
         if (!dob || !sex || !measureDate || isNaN(measurementValue)) {
-            alert("Por favor, complete todos los campos.");
-            return;
+            alert("Por favor, complete todos los campos."); return;
         }
 
         const ageInDays = Math.floor((new Date(measureDate) - new Date(dob)) / (1000 * 60 * 60 * 24));
-        const chartType = chartTypeSelect.value;
-        const lmsData = whoData[chartType];
+        const chartTypeKey = chartTypeSelect.value;
         
-        const lms = getLMS(ageInDays, sex, lmsData);
+        const lms = getLMS(ageInDays, sex, whoData[chartTypeKey]);
         const zScore = calculateZScore(measurementValue, lms);
 
         const resultData = {
             fecha: measureDate,
             tipo: chartTypeSelect.options[chartTypeSelect.selectedIndex].text,
             valor: measurementValue,
-            unidad: chartConfig[chartType].measurementLabel.match(/\((.*)\)/)[1], // Extrae unidad
+            unidad: getUnitFromChartType(chartTypeKey),
             zScore: zScore
         };
 
@@ -132,29 +138,17 @@ document.addEventListener('DOMContentLoaded', () => {
                 idConsulta: null,
             };
             
-            // Llenar el campo correcto según el tipo de medición
-            const metricKey = chartConfig[chartType].dataKey;
+            const metricKey = chartConfig[chartTypeKey].dataKey;
+            const zScoreKey = `${metricKey}ZScore`;
             newMeasurement[metricKey] = measurementValue;
-            newMeasurement[`${metricKey}ZScore`] = zScore;
+            newMeasurement[zScoreKey] = zScore;
             
-            // Recalcular IMC si es necesario
-            if (metricKey === 'weightForAge' || metricKey === 'lengthForAge') {
-                 const peso = newMeasurement.weightForAge || loadedMeasurements.find(m => m.weightForAge)?.weightForAge;
-                 const talla = newMeasurement.lengthForAge || loadedMeasurements.find(m => m.lengthForAge)?.lengthForAge;
-                 if(peso && talla) {
-                    const imc = peso / Math.pow(talla/100, 2);
-                    newMeasurement.bmiForAge = parseFloat(imc.toFixed(2));
-                    const imcLMS = getLMS(ageInDays, sex, whoData.bmiForAge);
-                    newMeasurement.bmiForAgeZScore = calculateZScore(imc, imcLMS);
-                 }
-            }
-
             try {
                 await db.collection('medicionesCrecimiento').doc(newMeasurement.id).set(newMeasurement);
                 loadPatientHistory();
             } catch (error) {
-                console.error("Error guardando la medición:", error);
-                alert("Error al guardar la medición en la base de datos.");
+                console.error("Error guardando medición:", error);
+                alert("Error al guardar la medición.");
             }
         }
     }
@@ -183,12 +177,12 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!lms || value == null || value <= 0) return null;
         const { L, M, S } = lms;
         const z = (Math.pow(value / M, L) - 1) / (L * S);
-        return parseFloat(z);
+        return z;
     }
 
     function initializeChart() {
         const ctx = document.getElementById('growthChart').getContext('2d');
-         const pdf = (x) => Math.exp(-0.5 * x * x) / Math.sqrt(2 * Math.PI);
+        const pdf = (x) => Math.exp(-0.5 * x * x) / Math.sqrt(2 * Math.PI);
         const range = (start, stop, step) => Array.from({ length: (stop - start) / step + 1 }, (_, i) => start + i * step);
         const curveData = range(-4, 4, 0.1).map(x => ({ x: x, y: pdf(x) }));
 
@@ -196,62 +190,52 @@ document.addEventListener('DOMContentLoaded', () => {
             type: 'line',
             data: {
                 datasets: [
-                    { data: range(-1, 1, 0.1).map(x => ({ x, y: pdf(x) })), backgroundColor: 'rgba(92, 184, 92, 0.5)', pointRadius: 0, fill: 'origin', order: 2 },
-                    { data: [...range(-2, -1, 0.1), NaN, ...range(1, 2, 0.1)].map(x => ({ x, y: pdf(x) })), backgroundColor: 'rgba(240, 173, 78, 0.5)', pointRadius: 0, fill: 'origin', order: 1 },
-                    { data: [...range(-3, -2, 0.1), NaN, ...range(2, 3, 0.1)].map(x => ({ x, y: pdf(x) })), backgroundColor: 'rgba(217, 83, 79, 0.5)', pointRadius: 0, fill: 'origin', order: 0 },
+                    { data: range(-1, 1, 0.1).map(x => ({ x: y, y: pdf(x) })), backgroundColor: 'rgba(92, 184, 92, 0.5)', pointRadius: 0, fill: 'origin', order: 2, label: '' },
+                    { data: [...range(-2, -1, 0.1), NaN, ...range(1, 2, 0.1)].map(x => ({ x: x, y: pdf(x) })), backgroundColor: 'rgba(240, 173, 78, 0.5)', pointRadius: 0, fill: 'origin', order: 1, label: '' },
+                    { data: [...range(-3, -2, 0.1), NaN, ...range(2, 3, 0.1)].map(x => ({ x: x, y: pdf(x) })), backgroundColor: 'rgba(217, 83, 79, 0.5)', pointRadius: 0, fill: 'origin', order: 0, label: '' },
                     { label: 'Distribución Normal', data: curveData, borderColor: 'rgba(0, 0, 0, 0.8)', borderWidth: 2, pointRadius: 0, fill: false, tension: 0.4, order: 3 }
                 ]
             },
             options: {
-                responsive: true, maintainAspectRatio: false,
+                responsive: true,
+                maintainAspectRatio: false,
                 plugins: { title: { display: true, text: 'Distribución de Puntuación Z', font: { size: 18 } }, legend: { display: false }, tooltip: { enabled: false } },
                 scales: {
-                    x: { type: 'linear', title: { display: true, text: 'Puntuación Z (Desviaciones Estándar)' }, min: -4, max: 4, ticks: { stepSize: 1 } },
-                    y: { display: false, max: 0.45 } // FIJA LA ALTURA PARA EVITAR APLANAMIENTO
+                    x: { type: 'linear', title: { display: true, text: 'Puntuación Z (DE)' }, min: -4, max: 4, ticks: { stepSize: 1 } },
+                    y: { display: false, beginAtZero: true, max: 0.45 }
                 }
             }
         });
     }
 
     function plotDistribution(patientZScore) {
-        if (!activeChart) { initializeChart(); }
-        
+        if (!activeChart || isNaN(patientZScore)) { return; }
         const pdf = (x) => Math.exp(-0.5 * x * x) / Math.sqrt(2 * Math.PI);
         const patientPoint = [{ x: patientZScore, y: pdf(patientZScore) }];
 
-        // Eliminar el punto anterior si existe (siempre es el último dataset)
         if (activeChart.data.datasets.length > 4) {
             activeChart.data.datasets.pop();
         }
 
-        // Añadir el nuevo punto
         activeChart.data.datasets.push({
-            label: 'Paciente',
-            data: patientPoint,
-            type: 'scatter',
-            pointRadius: 8,
-            pointHoverRadius: 10,
-            backgroundColor: 'blue',
-            borderColor: 'white',
-            borderWidth: 2,
-            order: 5
+            label: 'Paciente', data: patientPoint, type: 'scatter',
+            pointRadius: 10, pointHoverRadius: 12,
+            backgroundColor: '#005f73', borderColor: 'white',
+            borderWidth: 2, order: 5
         });
-        
-        activeChart.update('none'); // Actualizar sin animación
+        activeChart.update('none');
     }
 
-    // --- Funciones de ayuda para el historial ---
-    function getMetricLabel(m) {
-        if (m.peso) return "Peso"; if (m.talla) return "Talla"; if (m.pc) return "PC"; if (m.imc) return "IMC"; return "Desconocido";
+    function getUnitFromChartType(type) {
+        if (type.includes('weight') || type.includes('bmi')) return 'kg';
+        if (type.includes('length') || type.includes('head')) return 'cm';
+        return '';
     }
-    function getMetricValue(m) {
-        return m.peso || m.talla || m.pc || m.imc;
-    }
-    function getMetricUnit(m) {
-        if (m.peso || m.imc) return "kg"; if (m.talla || m.pc) return "cm"; return "";
-    }
-    function getMetricZScore(m) {
-        const score = m.pesoZScore ?? m.tallaZScore ?? m.pcZScore ?? m.imcZScore;
-        return score ? score.toFixed(2) : "N/A";
-    }
+
+    const chartConfig = {
+        weightForAge: { dataKey: 'peso' },
+        lengthForAge: { dataKey: 'talla' },
+        headCircumferenceForAge: { dataKey: 'pc' },
+        bmiForAge: { dataKey: 'imc' }
+    };
 });
