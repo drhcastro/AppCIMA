@@ -120,6 +120,25 @@ input:focus, select:focus, textarea:focus { outline: none; border-color: var(--s
 .button-danger:hover { background-color: var(--danger-color); color: white; }
 button:disabled { background-color: #ccc; border-color: #ccc; cursor: not-allowed; }
 
+/* --- Estilos para la Página de Gráficas (INCLUYE .chart-card) --- */
+.main-content { display: grid; grid-template-columns: 400px 1fr; gap: 24px; }
+.controls-column, .chart-column { min-width: 0; }
+
+.chart-card {
+    height: 500px;
+    padding: 16px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+#chart-container {
+    position: relative;
+    width: 100%;
+    height: 100%;
+}
+#history-table tbody tr.selected { background-color: #d4edda; font-weight: bold; }
+#history-table tbody tr { cursor: pointer; }
+
 /* --- Estilos para Páginas de Módulos (Historial, Vacunas, etc.) --- */
 .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; }
 .card-header h3 { margin: 0; color: var(--primary-color); }
