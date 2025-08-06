@@ -1,47 +1,27 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Planes de Tratamiento - CIMA Nahui</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    <title>Planeación de Consultas - CIMA Nahui</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-
 <div class="form-container">
     <header class="form-header">
-        <h1>📋 Planes de Tratamiento</h1>
+        <h1>📋 Planeación de Siguiente Consulta</h1>
         <p id="patient-banner">Cargando paciente...</p>
     </header>
-
     <div class="card">
         <div class="card-header">
-            <h3>Historial de Planes</h3>
-            <a href="crear-plan.html" class="button-primary">➕ Crear Nuevo Plan</a>
+            <h3>Historial de Planeaciones</h3>
+            <a href="crear-planeacion.html" class="button-primary">➕ Crear Nueva Planeación</a>
         </div>
-        <div id="planes-historial-container">
-            </div>
+        <div id="planes-historial-container"></div>
     </div>
-    
     <div class="actions-toolbar">
         <a href="#" id="back-to-visor" class="button-secondary">⬅️ Regresar al Expediente</a>
     </div>
-
-    <footer class="form-footer">
-        <p>CIMA Nahui de Occidente &copy; 2025</p>
-    </footer>
+    <footer class="form-footer"></footer>
 </div>
-
-<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
-<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
-<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
-    
-<script src="auth-guard.js"></script>
-    
-<script src="planes-script.js"></script>
-
+<script src="planeacion-script.js"></script>
 </body>
 </html>
