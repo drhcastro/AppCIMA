@@ -1,65 +1,28 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Crear Planeación - CIMA Nahui</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="style.css"> </head>
+    </head>
 <body>
-
 <div class="form-container">
     <header class="form-header">
         <h1>➕ Crear Nueva Planeación</h1>
         <p id="patient-banner">Cargando paciente...</p>
     </header>
-
     <div class="card">
         <form id="plan-form">
-            <div class="form-grid">
-                <div class="form-group">
-                    <label for="fechaPlan">Fecha del Plan</label>
-                    <input type="date" id="fechaPlan" required>
-                </div>
-                <div class="form-group">
-                    <label for="profesional">Profesional a Cargo</label>
-                    <input type="text" id="profesional">
-                </div>
-            </div>
-            <div class="form-group">
-                <label for="diagnosticoRelacionado">Diagnóstico Relacionado</label>
-                <input type="text" id="diagnosticoRelacionado">
-            </div>
-            <div class="form-group">
-                <label for="indicaciones">Indicaciones y Tratamiento</label>
-                <textarea id="indicaciones" rows="10" placeholder="Detallar medicamentos, dosis, terapia, recomendaciones nutricionales, etc."></textarea>
-            </div>
-            <div class="form-group">
-                <label for="proximaCita">Próxima Cita</label>
-                <input type="text" id="proximaCita" placeholder="Ej: En 4 semanas, o 20/08/2025">
-            </div>
-
-            <button type="submit" id="submit-btn" class="button-primary">Guardar Planeación</button>
-            <div id="response-message"></div>
-        </form>
+            </form>
     </div>
-
     <div class="actions-toolbar">
         <a href="planeacion.html" class="button-secondary">⬅️ Regresar al Historial</a>
     </div>
-
-    <footer class="form-footer">
-        <p>CIMA Nahui de Occidente &copy; 2025</p>
-    </footer>
+    <footer class="form-footer"></footer>
+    <p>CIMA Nahui de Occidente &copy; 2025</p>
 </div>
-
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
 <script src="auth-guard.js"></script>
 <script src="crear-planeacion-script.js"></script>
-
 </body>
 </html>
