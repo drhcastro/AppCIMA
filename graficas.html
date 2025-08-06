@@ -5,7 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Gráficas de Crecimiento - CIMA Nahui</title>
     <link rel="stylesheet" href="style.css">
-    </head>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+</head>
 <body>
 
 <div class="page-container">
@@ -22,7 +25,10 @@
                     <label for="chartType">Tipo de Medición</label>
                     <select id="chartType">
                         <option value="weightForAge">Peso para la Edad</option>
-                        </select>
+                        <option value="lengthForAge">Talla para la Edad</option>
+                        <option value="headCircumferenceForAge">Perímetro Cefálico p/ Edad</option>
+                        <option value="bmiForAge">IMC para la Edad</option>
+                    </select>
                 </div>
                 <div id="age-inputs" class="input-group active">
                     <div class="form-group">
@@ -39,7 +45,7 @@
                 </div>
                 <div class="form-group">
                     <label id="measurement-label" for="measurement">Valor de la Medición (kg)</label>
-                    <input type="number" id="measurement" step="0.1" placeholder="Ej: 9.5">
+                    <input type="number" id="measurement" step="0.01" placeholder="Ej: 9.5">
                 </div>
                 <div class="form-group">
                     <label for="measure-date">Fecha de la Medición</label>
@@ -64,7 +70,7 @@
                     </table>
                 </div>
             </div>
-             <a href="index.html" class="button-secondary full-width-btn" style="margin-top: 0;">⬅️ Regresar al Menú Principal</a>
+             <a href="index.html" id="back-btn" class="button-secondary full-width-btn" style="margin-top: 0;">⬅️ Regresar</a>
         </div>
 
         <div class="chart-column">
@@ -74,7 +80,7 @@
                 </div>
             </div>
             <div class="card" id="results-card" style="display: none;">
-                <h3>Resultado de la Medición</h3>
+                <h3>Resultado de la Medición Seleccionada</h3>
                 <div id="results-text"></div>
             </div>
         </div>
@@ -87,5 +93,7 @@
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
 <script src="auth-guard.js"></script>
 <script src="data.js"></script>
-<script src="script.js"></script> </body>
+<script src="script.js"></script>
+
+</body>
 </html>
