@@ -11,12 +11,11 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     const plan = allPlans[planIndex];
-
     if (!plan) {
         document.body.innerHTML = '<h1>Error: Plan de tratamiento no encontrado.</h1>';
         return;
     }
-
+    
     // Rellenar la información del paciente
     document.getElementById('nombre-paciente').textContent = `${activePatient.nombre} ${activePatient.apellidoPaterno}`;
     document.getElementById('fecha-nacimiento').textContent = new Date(activePatient.fechaNacimiento + 'T00:00:00').toLocaleDateString('es-ES');
@@ -28,7 +27,6 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('proxima-cita').textContent = plan.proximaCita;
     document.getElementById('profesional').textContent = plan.profesional;
 
-    // Lógica del botón de imprimir
     document.getElementById('print-btn').addEventListener('click', () => {
         window.print();
     });
