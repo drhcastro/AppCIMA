@@ -270,3 +270,21 @@ tbody tr:hover { background-color: #f1f3f5; }
     text-align: right;
     white-space: nowrap;
 }
+/* --- ESTILOS DE IMPRESIÓN UNIVERSAL --- */
+@media print {
+    body > * {
+        display: none !important; /* Oculta todo por defecto */
+    }
+
+    .printable-area, .printable-area * {
+        display: block !important; /* Muestra solo el área a imprimir */
+        visibility: visible !important;
+    }
+
+    .printable-area {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
+    }
+}
