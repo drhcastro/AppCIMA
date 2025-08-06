@@ -14,6 +14,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const tricipitalInput = document.getElementById('calc-tricipital');
     const subescapularInput = document.getElementById('calc-subescapular');
     const perBraquialInput = document.getElementById('calc-per-braquial');
+    const sexoInput = document.getElementById('calc-sexo');
+    const edadInput = document.getElementById('calc-edad');
+    const palInput = document.getElementById('calc-pal');
 
     // --- INICIALIZACIÓN ---
     const activePatient = JSON.parse(localStorage.getItem('activePatient'));
@@ -21,11 +24,17 @@ document.addEventListener('DOMContentLoaded', () => {
     if (activePatient) {
         patientBanner.innerHTML = `Calculando para: <strong>${activePatient.nombre} ${activePatient.apellidoPaterno}</strong>`;
         backToVisorBtn.href = `visor.html?codigo=${activePatient.codigoUnico}`;
+        
+        // Autorellenar campos si hay un paciente activo
+        if (activePatient.sexo) sexoInput.value = activePatient.sexo.toLowerCase() === 'niño' ? 'masculino' : 'femenino';
+        if (activePatient.fechaNacimiento) {
+            const ageInYears = (new Date() - new Date(activePatient.fechaNacimiento)) / (31557600000);
+            edadInput.value = ageInYears.toFixed(1);
+        }
     } else {
         patientBanner.textContent = "Modo de cálculo rápido (sin paciente activo)";
         backToVisorBtn.href = 'index.html';
     }
-
     // --- MANEJO DE EVENTOS ---
     calculateBtn.addEventListener('click', displayAllCalculations);
 
@@ -52,6 +61,9 @@ document.addEventListener('DOMContentLoaded', () => {
         // 1. Leer todos los valores de entrada
         const peso = parseFloat(pesoInput.value) || null;
         const talla = parseFloat(tallaInput.value) || null;
+        const edad = parseFloat(edadInput.value) || null;
+        const sexo = sexoInput.value;
+        const pal = parseFloat(palInput.value) || 1.0; // Factor de actividad física
         const pc = parseFloat(pcInput.value) || null;
         const plTricipital = parseFloat(tricipitalInput.value) || null;
         const plSubescapular = parseFloat(subescapularInput.value) || null;
@@ -90,6 +102,18 @@ document.addEventListener('DOMContentLoaded', () => {
             results.areaGrasaBraquial = ((perBraquial * plTricipitalCm) / 2 - (Math.PI * Math.pow(plTricipitalCm, 2)) / 4).toFixed(2);
             results.areaMuscularBraquial = (Math.pow(perBraquial - (Math.PI * plTricipitalCm), 2) / (4 * Math.PI)).toFixed(2);
         }
+
+         // --- NUEVO: CÁLCULO DE GASTO ENERGÉTICO (Harris-Benedict) ---
+        if (peso && talla && edad && sexo) {
+            let geb; // Gasto Energético Basal
+            if (sexo === 'masculino') {
+                geb = 66.5 + (13.75 * peso) + (5.003 * talla) - (6.755 * edad);
+            } else { // Femenino
+                geb = 655.1 + (9.563 * peso) + (1.850 * talla) - (4.676 * edad);
+            }
+            results.gebHarrisBenedict = geb.toFixed(2);
+            results.getHarrisBenedict = (geb * pal).toFixed(2); // Gasto Energético Total
+        }
         
         // 3. Generar el HTML para mostrar los resultados
         renderResults(results);
@@ -101,11 +125,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 ${createResultItem('IMC', results.imc, 'kg/m²')}
                 ${createResultItem('Z-Score Peso/Edad', results.pesoZScore, 'DE')}
                 ${createResultItem('Z-Score Talla/Edad', results.tallaZScore, 'DE')}
-                ${createResultItem('Z-Score PC/Edad', results.pcZScore, 'DE')}
-                ${createResultItem('Z-Score IMC/Edad', results.imcZScore, 'DE')}
+                <hr>
                 ${createResultItem('% Grasa Corporal (Slaughter)', results.grasaCorporal, '%')}
                 ${createResultItem('Área Grasa Braquial', results.areaGrasaBraquial, 'cm²')}
                 ${createResultItem('Área Muscular Braquial', results.areaMuscularBraquial, 'cm²')}
+                <hr>
+                ${createResultItem('Gasto Energético Basal (GEB)', results.gebHarrisBenedict, 'kcal/día')}
+                ${createResultItem('Gasto Energético Total (GET)', results.getHarrisBenedict, 'kcal/día')}
             </div>
         `;
     }
